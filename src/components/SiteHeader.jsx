@@ -11,10 +11,10 @@ export default function SiteHeader() {
         <Link to="/" className="brand-link" onClick={close} aria-label="PinkPurple SEO">
           <img
             className="brand-link__logo"
-            src="/brand/logo-original.png"
+            src="/brand/logo-header.png"
             alt="PinkPurple SEO"
-            width={820}
-            height={246}
+            width={844}
+            height={263}
           />
         </Link>
 

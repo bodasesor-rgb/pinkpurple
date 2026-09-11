@@ -97,8 +97,9 @@ main {
 }
 
 .brand-link__logo {
-  height: 68px;
+  height: 58px;
   width: auto;
+  max-width: none;
   background: transparent;
 }
 
@@ -829,7 +830,7 @@ main {
   }
 
   .brand-link__logo {
-    height: 56px;
+    height: 48px;
   }
 
   .hero {
