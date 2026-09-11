@@ -26,33 +26,28 @@ export default function HomePage() {
     <>
       <section className="hero">
         <div className="hero__mesh" aria-hidden="true" />
-        <div className="container hero__grid">
-          <div>
-            <img
-              className="hero__brand"
-              src="/brand/logo-wordmark.png"
-              alt="PinkPurple SEO"
-              width={380}
-              height={120}
-            />
-            <h1>
-              Landings y SEO que <em>venden</em>
-            </h1>
-            <p className="hero__lead">
-              Creamos landings de venta, blogs y posicionamiento para que tu marca crezca en
-              Google — y convierta.
-            </p>
-            <div className="hero__actions">
-              <a className="btn btn-primary" href="#contacto">
-                Hablar de tu proyecto
-              </a>
-              <Link className="btn btn-ghost" to="/servicios">
-                Ver servicios
-              </Link>
-            </div>
-          </div>
-          <div className="hero__mark" aria-hidden="true">
-            <img src="/brand/logo-mark.png" alt="" width={300} height={300} />
+        <div className="container hero__content">
+          <img
+            className="hero__brand"
+            src="/brand/logo-wordmark.png"
+            alt="PinkPurple SEO"
+            width={820}
+            height={246}
+          />
+          <h1>
+            Landings y SEO que <em>venden</em>
+          </h1>
+          <p className="hero__lead">
+            Creamos landings de venta, blogs y posicionamiento para que tu marca crezca en Google
+            — y convierta.
+          </p>
+          <div className="hero__actions">
+            <a className="btn btn-primary" href="#contacto">
+              Hablar de tu proyecto
+            </a>
+            <Link className="btn btn-ghost" to="/servicios">
+              Ver servicios
+            </Link>
           </div>
         </div>
       </section>
