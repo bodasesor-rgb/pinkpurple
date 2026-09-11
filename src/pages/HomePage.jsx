@@ -24,9 +24,9 @@ export default function HomePage() {
               atraer la búsqueda correcta y convertirla en clientes.
             </p>
             <div className="hero__actions">
-              <a className="btn btn-primary" href="#contacto">
-                Solicitar propuesta
-              </a>
+              <Link className="btn btn-primary" to="/productos">
+                Ver productos
+              </Link>
               <Link className="btn btn-ghost" to="/servicios">
                 Ver servicios
               </Link>
@@ -50,7 +50,7 @@ export default function HomePage() {
                 Headline nítido. Prueba social. CTA sin fricción. Así se ve una landing hecha para
                 rankear y vender — no para decorar.
               </p>
-              <div className="page-stage__cta">Cotizar ahora</div>
+              <div className="page-stage__cta">Ver productos</div>
               <ul>
                 <li>Copy orientado a conversión</li>
                 <li>Estructura lista para Google</li>
@@ -131,15 +131,15 @@ export default function HomePage() {
         <div className="container contact-block">
           <div className="contact-block__copy">
             <p className="eyebrow">Siguiente paso</p>
-            <h2>Cuéntanos qué ofreces. Nosotros lo convertimos en páginas.</h2>
+            <h2>Elige el paquete que escala con tu SEO.</h2>
             <p>
-              Propuesta clara, alcance definido y foco en resultados: más visibilidad, mejor
-              mensaje, más conversiones.
+              Starter, Growth, Pro o Diamond: landings, blogs y tokens para Ranking Pulse,
+              Competidores, keywords y SERP.
             </p>
           </div>
-          <a className="btn btn-primary btn-lg" href="mailto:hola@pinkpurple.seo">
-            Escribir a hola@pinkpurple.seo
-          </a>
+          <Link className="btn btn-primary btn-lg" to="/productos">
+            Ver productos
+          </Link>
         </div>
       </section>
     </>

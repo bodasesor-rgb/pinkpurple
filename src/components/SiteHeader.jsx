@@ -31,15 +31,15 @@ export default function SiteHeader() {
         </button>
 
         <nav className={`nav${open ? ' is-open' : ''}`} aria-label="Principal">
+          <NavLink to="/productos" onClick={close}>
+            Productos
+          </NavLink>
           <NavLink to="/servicios" onClick={close}>
             Servicios
           </NavLink>
           <NavLink to="/blog" onClick={close}>
             Blog
           </NavLink>
-          <a className="nav-cta" href="#contacto" onClick={close}>
-            Cotizar proyecto
-          </a>
         </nav>
       </div>
     </header>

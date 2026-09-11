@@ -12,6 +12,7 @@ export default function SiteFooter() {
           <p className="site-footer__tag">Texto y páginas para vender y posicionar.</p>
         </div>
         <div className="site-footer__links">
+          <Link to="/productos">Productos</Link>
           <Link to="/servicios">Servicios</Link>
           <Link to="/blog">Blog</Link>
           <a href="mailto:hola@pinkpurple.seo">hola@pinkpurple.seo</a>

@@ -4,6 +4,7 @@ import SiteFooter from './components/SiteFooter.jsx';
 import HomePage from './pages/HomePage.jsx';
 import BlogIndexPage from './pages/BlogIndexPage.jsx';
 import ServicesPage from './pages/ServicesPage.jsx';
+import ProductsPage from './pages/ProductsPage.jsx';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/productos" element={<ProductsPage />} />
           <Route path="/servicios" element={<ServicesPage />} />
           <Route path="/blog" element={<BlogIndexPage />} />
         </Routes>
