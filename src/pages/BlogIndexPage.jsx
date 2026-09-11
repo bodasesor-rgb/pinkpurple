@@ -1,18 +1,14 @@
 export default function BlogIndexPage() {
   return (
-    <div className="container">
+    <div className="container page-pad">
       <header className="page-hero">
-        <h1>Blog</h1>
+        <p className="eyebrow">Blog</p>
+        <h1>Ideas y páginas en construcción.</h1>
         <p>
-          Aquí aparecerán los artículos SEO que genere Nexus. El front ya tiene la ruta lista.
+          Aquí publicaremos artículos SEO de PinkPurple. Mientras, el foco está en crear landings
+          y contenido para clientes.
         </p>
       </header>
-      <div className="blog-empty">
-        <p>
-          Todavía no hay posts publicados. Cuando Nexus genere blogs, se sincronizarán en{' '}
-          <code>public/blog/</code> (mismo patrón que Bodasesor).
-        </p>
-      </div>
     </div>
   );
 }

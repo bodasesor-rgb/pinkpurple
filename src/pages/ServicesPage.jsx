@@ -2,57 +2,54 @@ import { Link } from 'react-router-dom';
 
 export default function ServicesPage() {
   return (
-    <div className="container">
+    <div className="container page-pad">
       <header className="page-hero">
-        <h1>Servicios PinkPurple</h1>
+        <p className="eyebrow">Servicios</p>
+        <h1>Redacción y páginas con estándar de conversión.</h1>
         <p>
-          Landings de venta, blogs y SEO — el stack completo para atraer, educar y convertir.
+          Tres formatos. Un criterio: claridad para el cliente, estructura para Google, publicación
+          lista para tráfico.
         </p>
       </header>
 
-      <section className="section" style={{ paddingTop: 0 }}>
-        <div className="service-rows">
-          <article className="service-row">
-            <div className="service-row__index">01</div>
-            <div>
-              <h3>Landings de venta</h3>
-              <p>
-                Páginas de servicio y campaña con estructura SEO, copy orientado a conversión y
-                CTAs claros. Ideales para ads y orgánico.
-              </p>
-            </div>
-            <div className="service-row__tag">Venta</div>
-          </article>
-          <article className="service-row">
-            <div className="service-row__index">02</div>
-            <div>
-              <h3>Blogs</h3>
-              <p>
-                Artículos pensados para ranking y lectura: títulos, FAQ, schema y ritmo editorial
-                que alimenta el sitio.
-              </p>
-            </div>
-            <div className="service-row__tag">Contenido</div>
-          </article>
-          <article className="service-row">
-            <div className="service-row__index">03</div>
-            <div>
-              <h3>SEO</h3>
-              <p>
-                Arquitectura de URLs, indexación, sitemaps y páginas escalables generadas con
-                Nexus para crecer sin reescribir el front cada vez.
-              </p>
-            </div>
-            <div className="service-row__tag">Crecimiento</div>
-          </article>
-        </div>
+      <div className="craft-list">
+        <article className="craft-item">
+          <span className="craft-item__n">01</span>
+          <div>
+            <h3>Landings de venta</h3>
+            <p>
+              Páginas de campaña o servicio con promesa, prueba y CTA. Pensadas para ads y
+              búsquedas comerciales de alta intención.
+            </p>
+          </div>
+        </article>
+        <article className="craft-item">
+          <span className="craft-item__n">02</span>
+          <div>
+            <h3>Blogs SEO</h3>
+            <p>
+              Contenido editorial con intención de búsqueda: títulos precisos, jerarquía clara y
+              lectura que sostiene autoridad.
+            </p>
+          </div>
+        </article>
+        <article className="craft-item">
+          <span className="craft-item__n">03</span>
+          <div>
+            <h3>Páginas SEO escalables</h3>
+            <p>
+              Arquitectura por servicio y zona, copy único por URL y base técnica limpia para
+              indexación.
+            </p>
+          </div>
+        </article>
+      </div>
 
-        <p style={{ marginTop: '2.5rem' }}>
-          <Link className="btn btn-primary" to="/#contacto">
-            Hablar del proyecto
-          </Link>
-        </p>
-      </section>
+      <p className="page-cta-line">
+        <Link className="btn btn-primary" to="/#contacto">
+          Solicitar propuesta
+        </Link>
+      </p>
     </div>
   );
 }

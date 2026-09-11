@@ -1,116 +1,147 @@
 import { Link } from 'react-router-dom';
 
-const services = [
-  {
-    index: '01',
-    title: 'Landings de venta',
-    text: 'Páginas de oferta con mensaje directo, prueba y CTA. Hechas para ads y orgánico.',
-    tag: 'Conversión',
-  },
-  {
-    index: '02',
-    title: 'Blogs SEO',
-    text: 'Artículos que responden búsquedas reales y refuerzan la autoridad de tu marca.',
-    tag: 'Contenido',
-  },
-  {
-    index: '03',
-    title: 'SEO de crecimiento',
-    text: 'Arquitectura, indexación y páginas escalables generadas con Nexus.',
-    tag: 'Posicionamiento',
-  },
-];
-
 export default function HomePage() {
   return (
     <>
       <section className="hero">
-        <div className="hero__mesh" aria-hidden="true" />
-        <div className="container hero__content">
-          <img
-            className="hero__brand"
-            src="/brand/logo-wordmark.png"
-            alt="PinkPurple SEO"
-            width={820}
-            height={246}
-          />
-          <h1>
-            Landings y SEO que <em>venden</em>
-          </h1>
-          <p className="hero__lead">
-            Creamos landings de venta, blogs y posicionamiento para que tu marca crezca en Google
-            — y convierta.
-          </p>
-          <div className="hero__actions">
-            <a className="btn btn-primary" href="#contacto">
-              Hablar de tu proyecto
-            </a>
-            <Link className="btn btn-ghost" to="/servicios">
-              Ver servicios
-            </Link>
+        <div className="hero__aurora" aria-hidden="true" />
+        <div className="hero__grid" aria-hidden="true" />
+        <div className="container hero__layout">
+          <div className="hero__copy">
+            <img
+              className="hero__brand"
+              src="/brand/logo-wordmark-light.png"
+              alt="PinkPurple SEO"
+              width={820}
+              height={246}
+            />
+            <h1>
+              Texto que posiciona.
+              <span>Páginas que cierran.</span>
+            </h1>
+            <p className="hero__lead">
+              Diseñamos landings, blogs y páginas SEO con redacción precisa: cada URL existe para
+              atraer la búsqueda correcta y convertirla en clientes.
+            </p>
+            <div className="hero__actions">
+              <a className="btn btn-primary" href="#contacto">
+                Solicitar propuesta
+              </a>
+              <Link className="btn btn-ghost" to="/servicios">
+                Ver servicios
+              </Link>
+            </div>
           </div>
+
+          <aside className="page-stage" aria-label="Vista previa de una landing">
+            <div className="page-stage__beam" aria-hidden="true" />
+            <div className="page-stage__chrome">
+              <div className="page-stage__dots">
+                <span />
+                <span />
+                <span />
+              </div>
+              <p>pinkpurple · landing live</p>
+            </div>
+            <div className="page-stage__body">
+              <p className="page-stage__kicker">Oferta · Intención comercial</p>
+              <h2>La búsqueda termina en tu página</h2>
+              <p>
+                Headline nítido. Prueba social. CTA sin fricción. Así se ve una landing hecha para
+                rankear y vender — no para decorar.
+              </p>
+              <div className="page-stage__cta">Cotizar ahora</div>
+              <ul>
+                <li>Copy orientado a conversión</li>
+                <li>Estructura lista para Google</li>
+                <li>Publicación lista para tráfico</li>
+              </ul>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <section className="section section--dark" id="servicios">
+      <section className="section" id="oficio">
         <div className="container">
-          <div className="section__head">
-            <h2>Lo que hacemos</h2>
-            <p>Tres piezas: captar demanda, educar con contenido y rankear tu oferta.</p>
-          </div>
-          <div className="service-rows">
-            {services.map((item) => (
-              <article className="service-row" key={item.index}>
-                <div className="service-row__index">{item.index}</div>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </div>
-                <div className="service-row__tag">{item.tag}</div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="section__head">
-            <h2>Cómo se publica</h2>
+          <div className="section__intro">
+            <p className="eyebrow">Lo que creamos</p>
+            <h2>Contenido con oficio. Páginas con intención.</h2>
             <p>
-              Front en Netlify. Generación masiva en Nexus. Scrapers bloqueados en el edge.
+              No entregamos reportes eternos. Entregamos texto publicado: landings, blogs y hubs
+              SEO que trabajan mientras tú vendes.
             </p>
           </div>
-          <div className="flow">
-            <div className="flow__step">
-              <strong>1. Marca y keywords</strong>
-              <p>Definimos oferta, mensajes y términos que importan para vender.</p>
-            </div>
-            <div className="flow__step">
-              <strong>2. Nexus genera</strong>
-              <p>Landings y blogs salen del motor; el sitio los recibe listos.</p>
-            </div>
-            <div className="flow__step">
-              <strong>3. Netlify publica</strong>
-              <p>Deploy limpio, URLs indexables y bot-shield contra basura.</p>
-            </div>
+
+          <div className="craft-list">
+            <article className="craft-item">
+              <span className="craft-item__n">01</span>
+              <div>
+                <h3>Landings de venta</h3>
+                <p>
+                  Una promesa, una página, un cierre. Redacción comercial y diseño limpio para ads
+                  y búsqueda de alta intención.
+                </p>
+              </div>
+            </article>
+            <article className="craft-item">
+              <span className="craft-item__n">02</span>
+              <div>
+                <h3>Blogs que abren mercado</h3>
+                <p>
+                  Artículos con intención real de búsqueda: educan, posicionan y alimentan
+                  autoridad sin relleno vacío.
+                </p>
+              </div>
+            </article>
+            <article className="craft-item">
+              <span className="craft-item__n">03</span>
+              <div>
+                <h3>Páginas SEO de servicio</h3>
+                <p>
+                  Cobertura por oferta y ciudad con copy único — páginas que Google puede indexar
+                  y el cliente entiende al instante.
+                </p>
+              </div>
+            </article>
           </div>
         </div>
       </section>
 
-      <div className="container" id="contacto">
-        <div className="cta-band">
-          <div className="cta-band__inner">
-            <div>
-              <h2>¿Armamos tu siguiente landing?</h2>
-              <p>Cuéntanos el nicho y dejamos el sitio + pipeline Nexus listos.</p>
-            </div>
-            <a className="btn btn-ghost" href="mailto:hola@pinkpurple.seo">
-              Escribir a PinkPurple
-            </a>
+      <section className="section section--ink">
+        <div className="container split">
+          <div className="split__lead">
+            <p className="eyebrow eyebrow--light">El estándar PinkPurple</p>
+            <h2>Si el texto no vende la oferta, el SEO solo amplifica el silencio.</h2>
+          </div>
+          <div className="split__body">
+            <p>
+              Empezamos por lo esencial: qué vendes, a quién y por qué deberían elegirte. Con eso
+              escribimos y publicamos páginas que merecen traffic — landings, blogs y arquitectura
+              SEO alineada a tu negocio.
+            </p>
+            <p>
+              El entregable no es una carpeta de consejos. Es presencia digital activa: URLs vivas,
+              indexables, con mensaje claro y llamada a la acción.
+            </p>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="section section--cta" id="contacto">
+        <div className="container contact-block">
+          <div className="contact-block__copy">
+            <p className="eyebrow">Siguiente paso</p>
+            <h2>Cuéntanos qué ofreces. Nosotros lo convertimos en páginas.</h2>
+            <p>
+              Propuesta clara, alcance definido y foco en resultados: más visibilidad, mejor
+              mensaje, más conversiones.
+            </p>
+          </div>
+          <a className="btn btn-primary btn-lg" href="mailto:hola@pinkpurple.seo">
+            Escribir a hola@pinkpurple.seo
+          </a>
+        </div>
+      </section>
     </>
   );
 }
