@@ -15,6 +15,7 @@ export default function SiteFooter() {
           <Link to="/productos">Productos</Link>
           <Link to="/servicios">Servicios</Link>
           <Link to="/blog">Blog</Link>
+          <Link to="/login">Iniciar sesión</Link>
           <a href="mailto:hola@pinkpurple.seo">hola@pinkpurple.seo</a>
         </div>
       </div>

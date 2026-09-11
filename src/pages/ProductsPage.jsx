@@ -183,23 +183,25 @@ export default function ProductsPage() {
                 </ul>
               </div>
 
-              <a
-                className={`btn ${plan.featured ? 'btn-primary' : 'btn-ghost'} plan-card__cta`}
-                href={`mailto:hola@pinkpurple.seo?subject=${encodeURIComponent(`Interés en plan ${plan.name}`)}`}
-              >
-                {plan.price === 0 ? 'Empezar gratis' : `Elegir ${plan.name}`}
-              </a>
+              {plan.price === 0 ? (
+                <Link className="btn btn-ghost plan-card__cta" to="/registro">
+                  Empezar gratis
+                </Link>
+              ) : (
+                <a
+                  className={`btn ${plan.featured ? 'btn-primary' : 'btn-ghost'} plan-card__cta`}
+                  href={`mailto:hola@pinkpurple.seo?subject=${encodeURIComponent(`Interés en plan ${plan.name}`)}`}
+                >
+                  Elegir {plan.name}
+                </a>
+              )}
             </article>
           );
         })}
       </div>
 
-      <p className="plans-note plans-note--strong">
-        <strong>
-          Tokens: Ranking Pulse, Competidores, Búsqueda de palabra clave y SERP reciben tokens
-          iguales a landings + blogs del plan (ej. Starter 150+100 = 250 por herramienta). Free
-          incluye 2 landings, 2 blogs y 2 tokens en cada herramienta.
-        </strong>
+      <p className="plans-note">
+        Los tokens de cada herramienta igualan tus landings + blogs del plan.
       </p>
 
       <p className="page-cta-line">

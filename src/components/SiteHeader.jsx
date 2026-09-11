@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext.jsx';
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="site-header site-header--light">
@@ -40,6 +42,15 @@ export default function SiteHeader() {
           <NavLink to="/blog" onClick={close}>
             Blog
           </NavLink>
+          {isAuthenticated ? (
+            <NavLink className="nav-login" to="/cuenta" onClick={close}>
+              Mi cuenta
+            </NavLink>
+          ) : (
+            <NavLink className="nav-login" to="/login" onClick={close}>
+              Iniciar sesión
+            </NavLink>
+          )}
         </nav>
       </div>
     </header>

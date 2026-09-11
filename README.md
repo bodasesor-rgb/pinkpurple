@@ -36,6 +36,20 @@ npm run build
 - SPA fallback: `/* → /index.html` (200)
 - **Bot shield** (edge): `netlify/edge-functions/bot-shield.ts` — mismo patrón que Bodasesor (403 scrapers/IA training, permite Google/Bing/social, rate limit HTML)
 
+## Auth (Netlify Identity)
+
+Login y registro usan **Netlify Identity** (correo + contraseña).
+
+1. En Netlify: **Site configuration → Identity → Enable Identity**
+2. Registration: **Open** (o Invite only si prefieres)
+3. Opcional: confirma correo en Identity settings
+4. Redeploy si hace falta
+
+Rutas:
+- `/login` — iniciar sesión
+- `/registro` — crear cuenta Free
+- `/cuenta` — área privada del usuario
+
 ## Próximo con Nexus
 
 1. Conectar este repo como sitio destino en Nexus (como Bodasesor).
