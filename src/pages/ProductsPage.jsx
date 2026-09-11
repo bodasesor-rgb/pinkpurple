@@ -7,6 +7,7 @@ const PLANS = [
     price: 0,
     landings: 2,
     blogs: 2,
+    tokens: 2,
     featured: false,
   },
   {
@@ -146,7 +147,7 @@ export default function ProductsPage() {
 
       <div className="plans-grid plans-grid--five">
         {PLANS.map((plan) => {
-          const tokens = plan.landings + plan.blogs;
+          const tokens = plan.tokens ?? plan.landings + plan.blogs;
           return (
             <article
               key={plan.id}
@@ -195,9 +196,9 @@ export default function ProductsPage() {
 
       <p className="plans-note plans-note--strong">
         <strong>
-          Tokens: cada herramienta (Ranking Pulse, Competidores, Búsqueda de palabra clave y SERP)
-          recibe la misma cantidad de tokens que landings + blogs del plan. Free = 2+2 → 4 tokens
-          por herramienta. Starter = 150+100 → 250 tokens por herramienta.
+          Tokens: Ranking Pulse, Competidores, Búsqueda de palabra clave y SERP reciben tokens
+          iguales a landings + blogs del plan (ej. Starter 150+100 = 250 por herramienta). Free
+          incluye 2 landings, 2 blogs y 2 tokens en cada herramienta.
         </strong>
       </p>
 
