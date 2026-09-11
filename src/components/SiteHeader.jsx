@@ -43,11 +43,11 @@ export default function SiteHeader() {
             Blog
           </NavLink>
           {isAuthenticated ? (
-            <NavLink className="nav-login" to="/cuenta" onClick={close}>
+            <NavLink className="btn-nav-brand" to="/cuenta" onClick={close}>
               Mi cuenta
             </NavLink>
           ) : (
-            <NavLink className="nav-login" to="/login" onClick={close}>
+            <NavLink className="btn-nav-brand" to="/login" onClick={close}>
               Iniciar sesión
             </NavLink>
           )}

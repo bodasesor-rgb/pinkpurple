@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
+import GoogleAuthButton from '../components/GoogleAuthButton.jsx';
 
 export default function RegisterPage() {
-  const { register, isAuthenticated, error, clearError, loading } = useAuth();
+  const { register, loginWithGoogle, isAuthenticated, error, clearError, loading } = useAuth();
   const navigate = useNavigate();
 
   const [fullName, setFullName] = useState('');
@@ -45,6 +46,16 @@ export default function RegisterPage() {
         <p className="auth-lead">
           2 landings, 2 blogs y 2 tokens por herramienta para empezar.
         </p>
+
+        <GoogleAuthButton
+          label="Registrarme con Google"
+          onClick={loginWithGoogle}
+          disabled={submitting}
+        />
+
+        <div className="auth-divider" role="presentation">
+          <span>o con correo</span>
+        </div>
 
         <form className="auth-form" onSubmit={onSubmit}>
           <label>

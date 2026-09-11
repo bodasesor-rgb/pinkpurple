@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
+import GoogleAuthButton from '../components/GoogleAuthButton.jsx';
 
 export default function LoginPage() {
-  const { login, isAuthenticated, error, clearError, loading } = useAuth();
+  const { login, loginWithGoogle, isAuthenticated, error, clearError, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/cuenta';
@@ -36,6 +37,16 @@ export default function LoginPage() {
         <p className="eyebrow">Acceso</p>
         <h1>Inicia sesión</h1>
         <p className="auth-lead">Entra a tu espacio PinkPurple para ver tu plan y páginas.</p>
+
+        <GoogleAuthButton
+          label="Entrar con Google"
+          onClick={loginWithGoogle}
+          disabled={submitting}
+        />
+
+        <div className="auth-divider" role="presentation">
+          <span>o con correo</span>
+        </div>
 
         <form className="auth-form" onSubmit={onSubmit}>
           <label>

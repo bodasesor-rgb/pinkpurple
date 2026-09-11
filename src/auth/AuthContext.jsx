@@ -1,5 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { getAuthClient, getCurrentUser } from './authClient.js';
+import {
+  completeExternalLoginFromUrl,
+  getAuthClient,
+  getCurrentUser,
+  getGoogleLoginUrl,
+} from './authClient.js';
 
 const AuthContext = createContext(null);
 
@@ -10,14 +15,20 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let alive = true;
-    try {
-      const current = getCurrentUser();
-      if (alive) setUser(current);
-    } catch {
-      if (alive) setUser(null);
-    } finally {
-      if (alive) setLoading(false);
+
+    async function boot() {
+      try {
+        const fromOAuth = await completeExternalLoginFromUrl();
+        const current = fromOAuth || getCurrentUser();
+        if (alive) setUser(current);
+      } catch {
+        if (alive) setUser(null);
+      } finally {
+        if (alive) setLoading(false);
+      }
     }
+
+    boot();
     return () => {
       alive = false;
     };
@@ -53,7 +64,6 @@ export function AuthProvider({ children }) {
         plan: 'free',
       };
       const created = await getAuthClient().signup(email.trim(), password, data);
-      // Some Identity setups require email confirmation before a session exists.
       const current = getCurrentUser() || created;
       setUser(current);
       return current;
@@ -67,6 +77,11 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const loginWithGoogle = useCallback(() => {
+    setError('');
+    window.location.assign(getGoogleLoginUrl());
   }, []);
 
   const logout = useCallback(async () => {
@@ -87,10 +102,11 @@ export function AuthProvider({ children }) {
       clearError,
       login,
       register,
+      loginWithGoogle,
       logout,
       isAuthenticated: Boolean(user),
     }),
-    [user, loading, error, clearError, login, register, logout],
+    [user, loading, error, clearError, login, register, loginWithGoogle, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

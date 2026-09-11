@@ -38,15 +38,18 @@ npm run build
 
 ## Auth (Netlify Identity)
 
-Login y registro usan **Netlify Identity** (correo + contraseña).
+Login y registro usan **Netlify Identity** (correo + contraseña + Google).
 
 1. En Netlify: **Site configuration → Identity → Enable Identity**
 2. Registration: **Open** (o Invite only si prefieres)
-3. Opcional: confirma correo en Identity settings
+3. **Identity → External providers → Google**
+   - Crea credenciales OAuth en [Google Cloud Console](https://console.cloud.google.com/)
+   - Authorized redirect URI: `https://TU-SITIO.netlify.app/.netlify/identity/callback`
+   - Pega Client ID y Client Secret en Netlify
 4. Redeploy si hace falta
 
 Rutas:
-- `/login` — iniciar sesión
+- `/login` — iniciar sesión (Google o correo)
 - `/registro` — crear cuenta Free
 - `/cuenta` — área privada del usuario
 
