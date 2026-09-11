@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import BrandLogo from '../components/BrandLogo.jsx';
 
 export default function HomePage() {
   return (
@@ -9,7 +8,6 @@ export default function HomePage() {
         <div className="hero__grid" aria-hidden="true" />
         <div className="container hero__layout">
           <div className="hero__copy">
-            <BrandLogo className="brand-logo--hero" />
             <h1>
               Texto que posiciona.
               <span>Páginas que cierran.</span>

@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import BrandLogo from './BrandLogo.jsx';
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
   return (
-    <header className="site-header">
+    <header className="site-header site-header--light">
       <div className="container site-header__inner">
         <Link to="/" className="brand-link" onClick={close} aria-label="PinkPurple SEO">
-          <BrandLogo className="brand-logo--header" />
+          <img
+            className="brand-link__logo"
+            src="/brand/logo-original.png"
+            alt="PinkPurple SEO"
+            width={820}
+            height={246}
+          />
         </Link>
 
         <button

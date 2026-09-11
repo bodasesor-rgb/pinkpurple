@@ -70,11 +70,17 @@ main {
   margin-inline: auto;
 }
 
-/* Header */
+/* Header — barra clara para logo original sin recortes */
 .site-header {
-  position: absolute;
-  inset: 0 0 auto;
+  position: sticky;
+  top: 0;
   z-index: 50;
+}
+
+.site-header--light {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(12, 10, 16, 0.06);
+  box-shadow: 0 8px 28px rgba(7, 6, 11, 0.06);
 }
 
 .site-header__inner {
@@ -82,12 +88,31 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.25rem 0;
+  padding: 0.85rem 0;
 }
 
 .brand-link {
   display: inline-flex;
   align-items: center;
+}
+
+.brand-link__logo {
+  height: 52px;
+  width: auto;
+  background: transparent;
+}
+
+.site-header--light .nav a {
+  color: rgba(12, 10, 16, 0.72);
+}
+
+.site-header--light .nav a:hover,
+.site-header--light .nav a[aria-current='page'] {
+  color: var(--ink);
+}
+
+.site-header--light .menu-toggle span {
+  background: var(--ink);
 }
 
 /* Vector brand logo — crisp on any background */
@@ -240,11 +265,11 @@ main {
 /* Hero */
 .hero {
   position: relative;
-  min-height: 100svh;
+  min-height: calc(100svh - 76px);
   display: grid;
   align-items: center;
   overflow: hidden;
-  padding: 7.5rem 0 4.5rem;
+  padding: 4.5rem 0 4.5rem;
 }
 
 .hero__aurora {
@@ -619,7 +644,7 @@ main {
 
 /* Inner pages */
 .page-pad {
-  padding: 8rem 0 5rem;
+  padding: 4rem 0 5rem;
 }
 
 .page-hero {
@@ -757,8 +782,8 @@ main {
     align-items: stretch;
     gap: 0.2rem;
     padding: 0.9rem 1.25rem 1.2rem;
-    background: rgba(7, 6, 11, 0.96);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border-bottom: 1px solid rgba(12, 10, 16, 0.08);
   }
 
   .nav.is-open {
@@ -775,24 +800,12 @@ main {
     justify-content: center;
   }
 
-  .brand-logo--header .brand-logo__mark {
-    height: 36px;
-  }
-
-  .brand-logo--header .brand-logo__name {
-    font-size: 1.15rem;
-  }
-
-  .brand-logo--hero .brand-logo__mark {
-    height: 56px;
-  }
-
-  .brand-logo--hero .brand-logo__name {
-    font-size: 1.85rem;
+  .brand-link__logo {
+    height: 44px;
   }
 
   .hero {
-    padding-top: 6.5rem;
+    padding-top: 3rem;
     min-height: auto;
   }
 
