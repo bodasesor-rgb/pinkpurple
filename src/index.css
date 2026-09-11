@@ -88,7 +88,7 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.85rem 0;
+  padding: 1rem 0;
 }
 
 .brand-link {
@@ -97,7 +97,7 @@ main {
 }
 
 .brand-link__logo {
-  height: 52px;
+  height: 68px;
   width: auto;
   background: transparent;
 }
@@ -303,6 +303,34 @@ main {
   grid-template-columns: 1.05fr 0.95fr;
   gap: 3.5rem;
   align-items: center;
+}
+
+.hero__brand-name {
+  margin: 0 0 1.15rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3.2vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  animation: rise 0.75s ease both;
+}
+
+.hero__brand-pink {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero__brand-purple {
+  color: #f3eefc;
+}
+
+.hero__brand-p {
+  background: linear-gradient(160deg, #f43cb0, #8c3df5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .hero h1 {
@@ -801,7 +829,7 @@ main {
   }
 
   .brand-link__logo {
-    height: 44px;
+    height: 56px;
   }
 
   .hero {

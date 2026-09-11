@@ -8,6 +8,13 @@ export default function HomePage() {
         <div className="hero__grid" aria-hidden="true" />
         <div className="container hero__layout">
           <div className="hero__copy">
+            <p className="hero__brand-name">
+              <span className="hero__brand-pink">Pink</span>
+              <span className="hero__brand-purple">
+                <span className="hero__brand-p">P</span>
+                urple
+              </span>
+            </p>
             <h1>
               Texto que posiciona.
               <span>Páginas que cierran.</span>
