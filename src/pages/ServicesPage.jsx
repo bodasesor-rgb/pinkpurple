@@ -46,8 +46,8 @@ export default function ServicesPage() {
       </div>
 
       <p className="page-cta-line">
-        <Link className="btn btn-primary" to="/#contacto">
-          Solicitar propuesta
+        <Link className="btn btn-primary" to="/productos">
+          Ver productos
         </Link>
       </p>
     </div>
