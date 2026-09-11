@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import BrandLogo from './BrandLogo.jsx';
 
 export default function SiteFooter() {
   return (
@@ -6,13 +7,7 @@ export default function SiteFooter() {
       <div className="container site-footer__grid">
         <div>
           <Link to="/" aria-label="PinkPurple SEO">
-            <img
-              className="site-footer__logo"
-              src="/brand/logo-wordmark-light.png"
-              alt="PinkPurple SEO"
-              width={820}
-              height={246}
-            />
+            <BrandLogo className="brand-logo--footer" />
           </Link>
           <p className="site-footer__tag">Texto y páginas para vender y posicionar.</p>
         </div>

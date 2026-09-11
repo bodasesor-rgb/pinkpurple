@@ -85,9 +85,112 @@ main {
   padding: 1.25rem 0;
 }
 
-.brand-link img {
-  height: 52px;
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Vector brand logo — crisp on any background */
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  line-height: 1;
+}
+
+.brand-logo__mark {
+  display: block;
+  flex: 0 0 auto;
   width: auto;
+  overflow: visible;
+}
+
+.brand-logo__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.brand-logo__name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.brand-logo__pink {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-logo__purple {
+  color: #f3eefc;
+}
+
+.brand-logo__p {
+  background: linear-gradient(160deg, #f43cb0, #8c3df5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-logo__seo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--magenta);
+  padding-left: 0.08em;
+}
+
+.brand-logo--header .brand-logo__mark {
+  height: 42px;
+}
+
+.brand-logo--header .brand-logo__name {
+  font-size: 1.35rem;
+}
+
+.brand-logo--header .brand-logo__seo {
+  font-size: 0.62rem;
+}
+
+.brand-logo--hero {
+  margin-bottom: 1.75rem;
+  animation: rise 0.8s ease both;
+}
+
+.brand-logo--hero .brand-logo__mark {
+  height: 72px;
+}
+
+.brand-logo--hero .brand-logo__name {
+  font-size: 2.35rem;
+}
+
+.brand-logo--hero .brand-logo__seo {
+  font-size: 0.95rem;
+  letter-spacing: 0.34em;
+}
+
+.brand-logo--footer .brand-logo__mark {
+  height: 36px;
+}
+
+.brand-logo--footer .brand-logo__name {
+  font-size: 1.15rem;
+}
+
+.brand-logo--footer .brand-logo__seo {
+  font-size: 0.58rem;
+}
+
+.brand-logo--mark .brand-logo__mark {
+  height: 100%;
+  width: 100%;
 }
 
 .nav {
@@ -175,13 +278,6 @@ main {
   grid-template-columns: 1.05fr 0.95fr;
   gap: 3.5rem;
   align-items: center;
-}
-
-.hero__brand {
-  width: min(340px, 85%);
-  margin-bottom: 2rem;
-  animation: rise 0.8s ease both;
-  filter: drop-shadow(0 8px 24px rgba(244, 60, 176, 0.25));
 }
 
 .hero h1 {
@@ -550,15 +646,9 @@ main {
   margin-bottom: 1.75rem;
 }
 
-.site-footer__logo {
-  height: 42px;
-  width: auto;
-  margin-bottom: 0.75rem;
-}
-
 .site-footer__tag,
 .site-footer__copy p {
-  margin: 0;
+  margin: 0.85rem 0 0;
   color: var(--muted);
   font-size: 0.92rem;
 }
@@ -685,18 +775,25 @@ main {
     justify-content: center;
   }
 
-  .brand-link img {
-    height: 44px;
+  .brand-logo--header .brand-logo__mark {
+    height: 36px;
+  }
+
+  .brand-logo--header .brand-logo__name {
+    font-size: 1.15rem;
+  }
+
+  .brand-logo--hero .brand-logo__mark {
+    height: 56px;
+  }
+
+  .brand-logo--hero .brand-logo__name {
+    font-size: 1.85rem;
   }
 
   .hero {
     padding-top: 6.5rem;
     min-height: auto;
-  }
-
-  .hero__brand {
-    width: min(280px, 80%);
-    margin-bottom: 1.5rem;
   }
 
   .craft-item {

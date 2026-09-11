@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" fill="none" role="img" aria-label="PinkPurple SEO">
+  <defs>
+    <linearGradient id="wmGrad" x1="20" y1="10" x2="150" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F43CB0"/>
+      <stop offset="1" stop-color="#8C3DF5"/>
+    </linearGradient>
+    <linearGradient id="wmPink" x1="180" y1="40" x2="320" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F43CB0"/>
+      <stop offset="1" stop-color="#C24BEE"/>
+    </linearGradient>
+    <mask id="wmCut">
+      <rect width="200" height="180" fill="#fff"/>
+      <path fill="#000" d="M38 118 L72 86 L86 100 L128 48 L140 58 L90 122 L74 108 L46 130 Z"/>
+      <path fill="#000" d="M118 36 L142 40 L126 60 Z"/>
+    </mask>
+  </defs>
+
+  <!-- Mark -->
+  <path
+    fill="url(#wmGrad)"
+    mask="url(#wmCut)"
+    d="M28 22c0-8 6-14 14-14h38c34 0 58 22 58 54s-24 54-58 54H56v38c0 8-6 14-14 14s-14-6-14-14V22zm28 22v48h24c18 0 28-10 28-24s-10-24-28-24H56z"
+  />
+
+  <!-- PinkPurple wordmark -->
+  <text
+    x="178"
+    y="92"
+    font-family="Inter, Arial, Helvetica, sans-serif"
+    font-size="64"
+    font-weight="800"
+    letter-spacing="-1.5"
+  >
+    <tspan fill="url(#wmPink)">Pink</tspan><tspan fill="#B56BFF">P</tspan><tspan fill="#F5F2FA">urple</tspan>
+  </text>
+
+  <!-- SEO -->
+  <text
+    x="318"
+    y="142"
+    text-anchor="middle"
+    font-family="Inter, Arial, Helvetica, sans-serif"
+    font-size="28"
+    font-weight="800"
+    letter-spacing="6"
+    fill="#F43CB0"
+  >SEO</text>
+</svg>
