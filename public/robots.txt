@@ -1,0 +1,154 @@
+# Buscadores clásicos: acceso total
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Video
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: SemrushBot
+Allow: /
+
+# IA — búsqueda y citas
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: SearchGPT
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+# IA — entrenamiento (bloqueado)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+User-agent: Meta-ExternalFetcher
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: MistralAI-User
+Disallow: /
+
+User-agent: Timpibot
+Disallow: /
+
+User-agent: AI2Bot
+Disallow: /
+
+User-agent: TikTokSpider
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: archive.org_bot
+Disallow: /
+
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: YisouSpider
+Disallow: /
+
+User-agent: Sogou
+Disallow: /
+
+User-agent: 360Spider
+Disallow: /
+
+# SEO scrapers de ancho de banda (SemrushBot permitido arriba)
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: ZoominfoBot
+Disallow: /
+
+User-agent: SEOkicks
+Disallow: /
+
+User-agent: Barkrowler
+Disallow: /
+
+User-agent: *
+Allow: /
+Disallow: /products.json
+Disallow: /collections.json
+Disallow: /cart.json
+Disallow: /cart.js
+Disallow: /meta.json
+Disallow: /search/suggest.json
+Disallow: /wp-admin
+Disallow: /wp-login.php
+Disallow: /xmlrpc.php
+Disallow: /.env
+Disallow: /.git
+
+Sitemap: /sitemap.xml

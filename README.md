@@ -34,6 +34,7 @@ npm run build
 - Publish directory: `dist`
 - Config: `netlify.toml`
 - SPA fallback: `/* → /index.html` (200)
+- **Bot shield** (edge): `netlify/edge-functions/bot-shield.ts` — mismo patrón que Bodasesor (403 scrapers/IA training, permite Google/Bing/social, rate limit HTML)
 
 ## Próximo con Nexus
 
