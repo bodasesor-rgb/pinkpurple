@@ -1,9 +1,9 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { GROWTH_CASES } from '../data/growthCases.js';
 
 const W = 640;
-const H = 220;
-const PAD = { top: 28, right: 48, bottom: 36, left: 44 };
+const H = 240;
+const PAD = { top: 18, right: 48, bottom: 36, left: 44 };
 
 function toPath(values, xOf, yOf) {
   return values
@@ -13,7 +13,9 @@ function toPath(values, xOf, yOf) {
 
 function SearchConsoleChart({ caseData }) {
   const uid = useId().replace(/:/g, '');
+  const wrapRef = useRef(null);
   const [active, setActive] = useState({ clicks: true, impressions: true });
+  const [sticker, setSticker] = useState({ left: '50%', top: '42%' });
 
   const { clicks, impressions, dates, startAt, startLabel, metrics, period } = caseData;
   const plotW = W - PAD.left - PAD.right;
@@ -26,8 +28,14 @@ function SearchConsoleChart({ caseData }) {
 
   const markerX = xOf(startAt);
   const markerY = yOf(clicks[startAt]);
-
   const tickIdx = [0, 3, 6, 9, 13].filter((i) => i < dates.length);
+
+  useEffect(() => {
+    setSticker({
+      left: `${(markerX / W) * 100}%`,
+      top: `${(markerY / H) * 100}%`,
+    });
+  }, [markerX, markerY]);
 
   return (
     <div className="gsc-card">
@@ -74,7 +82,7 @@ function SearchConsoleChart({ caseData }) {
         </div>
       </div>
 
-      <div className="gsc-chart-wrap">
+      <div className="gsc-chart-wrap" ref={wrapRef}>
         <svg className="gsc-chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Crecimiento de ${caseData.business}`}>
           <defs>
             <linearGradient id={`pp-mag-${uid}`} x1="0" y1="0" x2="1" y2="0">
@@ -118,24 +126,33 @@ function SearchConsoleChart({ caseData }) {
             </text>
           ))}
 
-          <line x1={markerX} x2={markerX} y1={markerY} y2={markerY - 52} className="gsc-marker-line" />
+          <line x1={markerX} x2={markerX} y1={markerY} y2={Math.max(PAD.top, markerY - 28)} className="gsc-marker-line" />
           <circle cx={markerX} cy={markerY} r="4.5" fill="#8C3DF5" stroke="#fff" strokeWidth="2" />
-
-          <foreignObject x={markerX - 56} y={markerY - 108} width="112" height="56">
-            <div xmlns="http://www.w3.org/1999/xhtml" className="gsc-annotation">
-              <p className="gsc-annotation__tip">{startLabel}</p>
-              <div className="gsc-annotation__logo">
-                <img src="/brand/logo-mark.svg" alt="" width="28" height="34" />
-              </div>
-            </div>
-          </foreignObject>
         </svg>
+
+        <div
+          className="gsc-sticker"
+          style={{ left: sticker.left, top: sticker.top }}
+          aria-hidden="true"
+        >
+          <div className="gsc-sticker__bubble">
+            <p>{startLabel}</p>
+            <span className="gsc-sticker__tail" />
+          </div>
+          <div className="gsc-sticker__badge">
+            <img src="/brand/logo-mark.svg" alt="" width="26" height="32" />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-export default function GrowthChartCarousel() {
+export default function GrowthChartCarousel({
+  eyebrow = 'Resultados',
+  title = 'Así se ve el crecimiento en buscadores.',
+  lead = 'Ejemplos ilustrativos al estilo de Search Console. Datos de demostración.',
+} = {}) {
   const [index, setIndex] = useState(0);
   const total = GROWTH_CASES.length;
   const current = GROWTH_CASES[index];
@@ -153,12 +170,9 @@ export default function GrowthChartCarousel() {
     <section className="section growth-section" id="resultados" aria-labelledby="growth-title">
       <div className="container">
         <div className="section__intro section__intro--center">
-          <p className="eyebrow">Resultados</p>
-          <h2 id="growth-title">Así se ve el crecimiento en buscadores.</h2>
-          <p>
-            Ejemplos ilustrativos al estilo de Search Console: clics e impresiones suben cuando
-            landings y blogs empiezan a rankear. Datos de demostración.
-          </p>
+          <p className="eyebrow">{eyebrow}</p>
+          <h2 id="growth-title">{title}</h2>
+          <p>{lead}</p>
         </div>
 
         <div className="growth-carousel">

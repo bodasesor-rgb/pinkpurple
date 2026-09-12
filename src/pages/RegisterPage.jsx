@@ -11,6 +11,7 @@ import {
 
 const PLAN_LABELS = {
   free: 'Free',
+  mini: 'Mini',
   starter: 'Starter',
   growth: 'Growth',
   pro: 'Pro',

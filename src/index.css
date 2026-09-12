@@ -1,15 +1,20 @@
 :root {
+  /* Logo PinkPurple Studio (colores originales) */
   --magenta: #f43cb0;
   --lavender: #8c3df5;
+  --logo-pink: #f43cb0;
+  --logo-violet: #8c3df5;
+  --logo-purple: #0b0614;
+  --logo-blush: #fff0f7;
   --black: #000000;
   --white: #ffffff;
-  --ink: #1a1224;
-  --ink-2: #f7f2fb;
+  --ink: #0b0614;
+  --ink-2: #fdf2f8;
   --muted: #6b6478;
   --muted-dark: #4a4458;
   --line: rgba(140, 61, 245, 0.16);
   --glass: rgba(255, 255, 255, 0.72);
-  --grad: linear-gradient(120deg, #f43cb0 0%, #8c3df5 100%);
+  --grad: linear-gradient(90deg, #f43cb0 0%, #8c3df5 100%);
   --grad-soft: linear-gradient(135deg, rgba(244, 60, 176, 0.14), rgba(140, 61, 245, 0.1));
   --font-display: 'Unbounded', system-ui, sans-serif;
   --font-body: 'Figtree', system-ui, sans-serif;
@@ -30,7 +35,7 @@ body {
   min-width: 320px;
   color: var(--ink);
   font-family: var(--font-body);
-  background: #ffffff;
+  background: var(--logo-blush);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
@@ -56,10 +61,10 @@ button,
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(ellipse 90% 55% at 8% -8%, rgba(244, 60, 176, 0.22), transparent 58%),
-    radial-gradient(ellipse 70% 50% at 96% 0%, rgba(140, 61, 245, 0.2), transparent 55%),
+    radial-gradient(ellipse 90% 55% at 8% -8%, rgba(244, 60, 176, 0.2), transparent 58%),
+    radial-gradient(ellipse 70% 50% at 96% 0%, rgba(140, 61, 245, 0.16), transparent 55%),
     radial-gradient(ellipse 55% 40% at 50% 100%, rgba(244, 60, 176, 0.08), transparent 60%),
-    linear-gradient(180deg, #ffffff 0%, #fbf7ff 45%, #f6f0fc 100%);
+    linear-gradient(180deg, #ffffff 0%, #fff5fa 42%, #f7f0fc 100%);
 }
 
 main {
@@ -179,23 +184,27 @@ main {
 }
 
 .brand-logo__purple {
-  color: var(--ink);
+  color: var(--logo-purple);
 }
 
 .brand-logo__p {
-  background: linear-gradient(160deg, #f43cb0, #8c3df5);
+  color: inherit;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+}
+
+.brand-logo__seo,
+.brand-logo__studio {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: none;
+  padding-left: 0;
+  background: var(--grad);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-}
-
-.brand-logo__seo {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--magenta);
-  padding-left: 0.08em;
 }
 
 .brand-logo--header .brand-logo__mark {
@@ -206,8 +215,10 @@ main {
   font-size: 1.35rem;
 }
 
-.brand-logo--header .brand-logo__seo {
-  font-size: 0.62rem;
+.brand-logo--header .brand-logo__seo,
+.brand-logo--header .brand-logo__studio {
+  font-size: 0.95rem;
+  letter-spacing: -0.03em;
 }
 
 .brand-logo--hero {
@@ -223,9 +234,10 @@ main {
   font-size: 2.35rem;
 }
 
-.brand-logo--hero .brand-logo__seo {
-  font-size: 0.95rem;
-  letter-spacing: 0.34em;
+.brand-logo--hero .brand-logo__seo,
+.brand-logo--hero .brand-logo__studio {
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
 }
 
 .brand-logo--footer .brand-logo__mark {
@@ -236,8 +248,10 @@ main {
   font-size: 1.15rem;
 }
 
-.brand-logo--footer .brand-logo__seo {
-  font-size: 0.58rem;
+.brand-logo--footer .brand-logo__seo,
+.brand-logo--footer .brand-logo__studio {
+  font-size: 0.85rem;
+  letter-spacing: -0.03em;
 }
 
 .brand-logo--mark .brand-logo__mark {
@@ -400,14 +414,14 @@ main {
 }
 
 .hero__brand-purple {
-  color: var(--ink);
+  color: var(--logo-purple);
 }
 
 .hero__brand-p {
-  background: linear-gradient(160deg, #f43cb0, #8c3df5);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: inherit;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .hero h1 {
@@ -556,6 +570,25 @@ main {
   margin-bottom: 1.35rem;
   color: #fff;
   box-shadow: 0 10px 30px rgba(244, 60, 176, 0.35);
+}
+
+.page-stage__cta--soon {
+  background: rgba(140, 61, 245, 0.12);
+  color: var(--logo-purple);
+  box-shadow: none;
+  cursor: default;
+}
+
+.product-carousel .page-stage__body {
+  min-height: 16rem;
+}
+
+.product-carousel__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 0 1.25rem 1.15rem;
 }
 
 .page-stage__body ul {
@@ -1518,21 +1551,24 @@ main {
 
 @media (max-width: 1200px) {
   .plans-grid,
-  .plans-grid--five {
+  .plans-grid--five,
+  .plans-grid--six {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 900px) {
   .plans-grid,
-  .plans-grid--five {
+  .plans-grid--five,
+  .plans-grid--six {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 640px) {
   .plans-grid,
-  .plans-grid--five {
+  .plans-grid--five,
+  .plans-grid--six {
     grid-template-columns: 1fr;
   }
 }
@@ -1871,13 +1907,110 @@ button.gsc-metric {
 }
 
 .gsc-chart-wrap {
+  position: relative;
   padding: 0.25rem 0.5rem 0.75rem;
+  overflow: visible;
 }
 
 .gsc-chart {
   display: block;
   width: 100%;
   height: auto;
+}
+
+.gsc-sticker {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  transform: translate(-50%, calc(-100% - 10px));
+  pointer-events: none;
+  filter: drop-shadow(0 10px 22px rgba(140, 61, 245, 0.22));
+}
+
+.gsc-sticker__bubble {
+  position: relative;
+  max-width: 11.5rem;
+  padding: 0.55rem 0.75rem 0.7rem;
+  border-radius: 18px 18px 18px 18px;
+  background: #1a1224;
+  color: #fff;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px rgba(140, 61, 245, 0.35);
+}
+
+.gsc-sticker__bubble p {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.gsc-sticker__tail {
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  width: 14px;
+  height: 14px;
+  transform: translateX(-50%) rotate(45deg);
+  background: #1a1224;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  border-radius: 2px;
+}
+
+.gsc-sticker__badge {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 999px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid #8c3df5;
+  box-shadow: 0 8px 18px rgba(244, 60, 176, 0.28);
+}
+
+.gsc-sticker__badge img {
+  width: 1.15rem;
+  height: auto;
+  display: block;
+}
+
+.plans-grid--six {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.seo-proof {
+  margin: 0 0 2.25rem;
+  padding: 1rem;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid rgba(140, 61, 245, 0.14);
+  box-shadow: 0 16px 40px rgba(140, 61, 245, 0.08);
+  max-width: 28rem;
+}
+
+.seo-proof img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: #f8f9fa;
+}
+
+.seo-proof figcaption {
+  margin: 0.85rem 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.seo-proof figcaption strong {
+  color: #0cce6b;
+  font-weight: 800;
 }
 
 .gsc-grid {

@@ -5,6 +5,7 @@ import PasswordInput from '../components/PasswordInput.jsx';
 import {
   formatNum,
   formatPrice,
+  formatSites,
   getPlanById,
   getPlanPricing,
 } from '../data/plans.js';
@@ -164,6 +165,9 @@ export default function CheckoutPage() {
             </li>
             <li>
               <strong>{formatNum(plan.blogs)}</strong> blogs
+            </li>
+            <li>
+              <strong>{formatSites(plan.sites)}</strong>
             </li>
             {plan.oneShot ? (
               <li>Una sola vez · sin tarjeta</li>

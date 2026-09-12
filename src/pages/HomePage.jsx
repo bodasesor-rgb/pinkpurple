@@ -1,50 +1,34 @@
 import { Link } from 'react-router-dom';
-import GrowthChartCarousel from '../components/GrowthChartCarousel.jsx';
+import ProductServicesCarousel from '../components/ProductServicesCarousel.jsx';
+import { getLiveProducts } from '../data/products.js';
 
-const pillars = [
-  {
-    id: 'keywords',
-    kicker: '01 · Demanda real',
-    title: 'Investigación de palabras clave',
-    text: 'PinkPurple SEO encuentra lo que tus compradores ya están buscando y define sobre qué escribir — sin adivinar temas ni rellenar con contenido vacío.',
-    detail: 'Intención de compra · oportunidades · prioridades de redacción',
-  },
-  {
-    id: 'score',
-    kicker: '02 · Visibilidad',
-    title: 'Optimización para Google + IA',
-    text: 'Cada landing y blog sale afinado para posicionarse en Google y aparecer en buscadores con inteligencia artificial. El estándar PinkPurple SEO apunta a 100/100.',
-    detail: 'SEO técnico · estructura · claridad para humanos y modelos de IA',
-    score: '100/100',
-  },
-  {
-    id: 'publish',
-    kicker: '03 · Publicación',
-    title: 'Funciona en tu servidor',
-    text: 'Conectas tu sitio una sola vez y publicas sin copiar ni pegar. El mismo flujo corre en WordPress, Shopify, Netlify y otros servidores: el código de integración hace que funcione igual en cada plataforma.',
-    detail: 'WordPress · Shopify · Netlify · más servidores compatibles',
-  },
-];
-
-const showcase = [
-  {
-    id: 'seo-visual',
-    title: 'Landings con tu diseño',
-    text: 'El generador escribe páginas de venta que encajan con la marca de tu sitio — no plantillas sueltas.',
-    image: '/brand/seo-product.jpg',
-    alt: 'PinkPurple SEO — crecimiento en buscadores',
-  },
+const studioPillars = [
   {
     id: 'panel',
-    title: 'Panel Nexus listo',
-    text: 'Keywords, Pulse, competidores y publicación en un solo lugar cuando abres tu cuenta.',
-    image: '/brand/logo-studio-header.png',
-    alt: 'PinkPurple Studio',
-    imageClass: 'home-showcase__img--logo',
+    kicker: '01 · Un panel',
+    title: 'Un solo acceso para todos los productos',
+    text: 'PinkPurple Studio es la casa: entras una vez y usas cada producto desde el mismo panel. Hoy SEO; mañana más automatizaciones bajo la misma cuenta.',
+    detail: 'Cuenta única · productos modulares · panel compartido',
+  },
+  {
+    id: 'sites',
+    kicker: '02 · Multi-sitio',
+    title: 'Conecta las páginas que necesites',
+    text: 'No estás limitado a un solo sitio: conectas WordPress, Shopify, Netlify u otros servidores según el plan de cada producto.',
+    detail: 'Varias webs · un flujo · publicación directa',
+  },
+  {
+    id: 'grow',
+    kicker: '03 · Escala',
+    title: 'Automatiza lo repetible',
+    text: 'Cada producto empaqueta trabajo pesado para que tu equipo se enfoque en vender y operar.',
+    detail: 'Útil · publicable · medible',
   },
 ];
 
 export default function HomePage() {
+  const live = getLiveProducts();
+
   return (
     <>
       <section className="hero">
@@ -54,61 +38,30 @@ export default function HomePage() {
           <div className="hero__copy">
             <p className="hero__brand-name">
               <span className="hero__brand-pink">Pink</span>
-              <span className="hero__brand-purple">
-                <span className="hero__brand-p">P</span>
-                urple
-              </span>{' '}
+              <span className="hero__brand-purple">Purple</span>{' '}
               <span className="hero__brand-studio">Studio</span>
             </p>
             <h1>
-              Automatizaciones que
-              <span>hacen crecer tu marca.</span>
+              El panel de automatizaciones
+              <span>para tu marca.</span>
             </h1>
             <p className="hero__lead">
-              PinkPurple Studio construye productos de automatización para negocios. El primero:
-              PinkPurple SEO — landings, blogs y publicación en tu servidor.
+              PinkPurple Studio agrupa productos que trabajan juntos. Un acceso, un panel — y un
+              carrusel de servicios que crece cuando lanzamos cada producto nuevo.
             </p>
             <div className="hero__actions">
-              <Link className="btn btn-primary" to="/productos/seo">
-                Ver PinkPurple SEO
+              <Link className="btn btn-primary" to="/productos">
+                Ver productos
               </Link>
-              <Link className="btn btn-ghost" to="/como-funciona">
-                Cómo funciona
+              <Link className="btn btn-ghost" to="/entrar-panel">
+                Abrir mi panel
               </Link>
             </div>
           </div>
 
-          <aside className="page-stage" aria-label="Producto destacado">
-            <div className="page-stage__beam" aria-hidden="true" />
-            <div className="page-stage__chrome">
-              <div className="page-stage__dots">
-                <span />
-                <span />
-                <span />
-              </div>
-              <p>producto · pinkpurple seo</p>
-            </div>
-            <div className="page-stage__body">
-              <p className="page-stage__kicker">Producto destacado</p>
-              <h2>PinkPurple SEO</h2>
-              <p>
-                Keywords, copy y publicación multi-servidor. De la búsqueda a la URL en vivo —
-                sin copiar ni pegar.
-              </p>
-              <Link className="page-stage__cta" to="/productos/seo">
-                Ver planes SEO
-              </Link>
-              <ul>
-                <li>Investigación de demanda</li>
-                <li>Optimización Google + IA</li>
-                <li>Integración WordPress, Shopify, Netlify…</li>
-              </ul>
-            </div>
-          </aside>
+          <ProductServicesCarousel />
         </div>
       </section>
-
-      <GrowthChartCarousel />
 
       <section className="section home-showcase" id="studio">
         <div className="container">
@@ -116,27 +69,39 @@ export default function HomePage() {
             <p className="eyebrow">PinkPurple Studio</p>
             <h2>Una marca. Varias automatizaciones.</h2>
             <p>
-              Studio es la casa de nuestros productos. Hoy el foco es SEO; mañana sumamos más
-              flujos para operar y escalar tu negocio con la misma calidad.
+              El detalle de landings, blogs y SEO está en el producto PinkPurple SEO. El home es
+              Studio: el panel general para todo lo que vayamos sumando.
             </p>
           </div>
 
           <div className="home-showcase__grid">
-            {showcase.map((item) => (
-              <article className="home-showcase__card" key={item.id}>
-                <div className={`home-showcase__media${item.imageClass ? ` ${item.imageClass}` : ''}`}>
-                  <img src={item.image} alt={item.alt} />
+            {live.map((product) => (
+              <article className="home-showcase__card" key={product.id}>
+                <div className="home-showcase__media">
+                  <img src={product.image} alt={product.imageAlt} />
                 </div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+                <h3>{product.name}</h3>
+                <p>{product.tagline}</p>
+                <Link className="btn btn-primary" to={product.href}>
+                  Ver {product.name}
+                </Link>
               </article>
             ))}
             <article className="home-showcase__card home-showcase__card--cta">
-              <p className="eyebrow">Guía</p>
-              <h3>Qué hace cada módulo</h3>
+              <p className="eyebrow">Carrusel</p>
+              <h3>Más productos en camino</h3>
               <p>
-                Landings, blogs, Pulse, competidores, SERP y publicación — explicados uno a uno.
+                Al crear un producto nuevo en el catálogo, aparece solo en el carrusel del hero y
+                en /productos.
               </p>
+              <Link className="btn btn-ghost" to="/productos">
+                Catálogo
+              </Link>
+            </article>
+            <article className="home-showcase__card home-showcase__card--cta">
+              <p className="eyebrow">Guía</p>
+              <h3>Cómo entra cada pieza</h3>
+              <p>Flujo del panel y módulos de los productos activos.</p>
               <Link className="btn btn-primary" to="/como-funciona">
                 Cómo funciona
               </Link>
@@ -148,20 +113,19 @@ export default function HomePage() {
       <section className="section" id="pilares">
         <div className="container">
           <div className="section__intro">
-            <p className="eyebrow">PinkPurple SEO</p>
-            <h2>El producto para texto, páginas y posicionamiento.</h2>
+            <p className="eyebrow">Studio</p>
+            <h2>Pensado como plataforma, no como un solo tool.</h2>
             <p>
-              Tres movimientos en un solo sistema: entender la demanda, escribir para rankear y
-              publicar donde tu marca ya vive.
+              Entras al panel una vez. Activas productos. Conectas páginas. Escalas sin reinventar
+              el acceso.
             </p>
           </div>
 
           <div className="pillar-stack">
-            {pillars.map((item) => (
+            {studioPillars.map((item) => (
               <article className="pillar" key={item.id}>
                 <div className="pillar__meta">
                   <p className="pillar__kicker">{item.kicker}</p>
-                  {item.score ? <span className="score-chip">{item.score}</span> : null}
                 </div>
                 <h3>{item.title}</h3>
                 <p className="pillar__text">{item.text}</p>
@@ -172,37 +136,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section section--host">
-        <div className="container host-banner">
-          <div className="host-banner__copy">
-            <p className="eyebrow">Integraciones</p>
-            <h2>Tu hosting. Nuestro código. Misma publicación.</h2>
-            <p>
-              No te armamos la web desde cero: nos conectamos a la que ya tienes. WordPress,
-              Shopify, Netlify y muchos servidores más — el código de PinkPurple SEO publica
-              igual en cada plataforma.
-            </p>
-          </div>
-          <Link className="btn btn-primary" to="/productos/seo">
-            Ver PinkPurple SEO
-          </Link>
-        </div>
-      </section>
-
       <section className="section section--ink">
         <div className="container split">
           <div className="split__lead">
-            <p className="eyebrow eyebrow--light">Studio</p>
-            <h2>Automatizamos lo repetible. Tú te enfocas en vender.</h2>
+            <p className="eyebrow eyebrow--light">Panel</p>
+            <h2>Tu operación en un solo lugar.</h2>
           </div>
           <div className="split__body">
             <p>
-              PinkPurple Studio nace para empaquetar automatizaciones serias: primero SEO de
-              páginas y contenido; después, más productos bajo la misma marca.
+              PinkPurple Studio es el acceso general. Planes y límites de landings, blogs y sitios
+              conectados se definen en cada producto — empieza por PinkPurple SEO si quieres
+              contenido y posicionamiento.
             </p>
             <p>
-              Cada producto mantiene un estándar claro — útil, publicable y medible — para que
-              tu operación crezca sin perder control.
+              <Link to="/productos/seo">Ver PinkPurple SEO →</Link>
             </p>
           </div>
         </div>
@@ -211,14 +158,12 @@ export default function HomePage() {
       <section className="section section--cta" id="contacto">
         <div className="container contact-block">
           <div className="contact-block__copy">
-            <p className="eyebrow">PinkPurple SEO</p>
-            <h2>Empieza con el plan que escala tu contenido.</h2>
-            <p>
-              Free para probar. Starter a Diamond para landings, blogs y tokens SEO.
-            </p>
+            <p className="eyebrow">Empieza</p>
+            <h2>Elige un producto y abre tu panel.</h2>
+            <p>Misma cuenta Studio. Herramientas según lo que actives.</p>
           </div>
-          <Link className="btn btn-primary btn-lg" to="/productos/seo">
-            Ver PinkPurple SEO
+          <Link className="btn btn-primary btn-lg" to="/productos">
+            Ver productos
           </Link>
         </div>
       </section>

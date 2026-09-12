@@ -54,12 +54,9 @@ export default function BrandLogo({
       <span className="brand-logo__text">
         <span className="brand-logo__name">
           <span className="brand-logo__pink">Pink</span>
-          <span className="brand-logo__purple">
-            <span className="brand-logo__p">P</span>
-            urple
-          </span>
+          <span className="brand-logo__purple">Purple</span>
         </span>
-        <span className="brand-logo__seo">Studio</span>
+        <span className="brand-logo__studio">Studio</span>
       </span>
     </span>
   );

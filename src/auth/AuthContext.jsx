@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
       const billing = String(extras.billing || 'monthly').toLowerCase();
       const data = {
         full_name: fullName.trim(),
-        plan: ['free', 'starter', 'growth', 'pro', 'diamond'].includes(plan) ? plan : 'free',
+        plan: ['free', 'mini', 'starter', 'growth', 'pro', 'diamond'].includes(plan) ? plan : 'free',
         billing: billing === 'annual' ? 'annual' : 'monthly',
         product: 'seo',
       };
@@ -130,7 +130,7 @@ export function AuthProvider({ children }) {
     const current = getCurrentUser();
     if (!current) throw new Error('Debes iniciar sesión');
     const planKey = String(plan || 'free').toLowerCase();
-    const safePlan = ['free', 'trial', 'starter', 'growth', 'pro', 'diamond'].includes(planKey)
+    const safePlan = ['free', 'trial', 'mini', 'starter', 'growth', 'pro', 'diamond'].includes(planKey)
       ? planKey === 'trial'
         ? 'free'
         : planKey

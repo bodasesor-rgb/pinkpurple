@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { goToNexusPanel } from '../lib/nexusPanel.js';
+import { formatSites } from '../data/plans.js';
 
 const PLAN_META = {
-  free: { name: 'Prueba gratis', landings: 5, blogs: 5, tokens: 0 },
-  trial: { name: 'Prueba gratis', landings: 5, blogs: 5, tokens: 0 },
-  starter: { name: 'Starter', landings: 150, blogs: 100, tokens: 250 },
-  growth: { name: 'Growth', landings: 400, blogs: 150, tokens: 550 },
-  pro: { name: 'Pro', landings: 1000, blogs: 250, tokens: 1250 },
-  diamond: { name: 'Diamond', landings: 2500, blogs: 400, tokens: 2900 },
+  free: { name: 'Prueba gratis', landings: 5, blogs: 5, tokens: 0, sites: 1 },
+  trial: { name: 'Prueba gratis', landings: 5, blogs: 5, tokens: 0, sites: 1 },
+  mini: { name: 'Mini', landings: 50, blogs: 50, tokens: 100, sites: 1 },
+  starter: { name: 'Starter', landings: 150, blogs: 100, tokens: 250, sites: 3 },
+  growth: { name: 'Growth', landings: 400, blogs: 150, tokens: 550, sites: 6 },
+  pro: { name: 'Pro', landings: 1000, blogs: 250, tokens: 1250, sites: 15 },
+  diamond: { name: 'Diamond', landings: 2500, blogs: 400, tokens: 2900, sites: null },
 };
 
 export default function AccountPage() {
@@ -47,6 +49,9 @@ export default function AccountPage() {
             </li>
             <li>
               <strong>{plan.blogs.toLocaleString('es-MX')}</strong> blogs
+            </li>
+            <li>
+              <strong>{formatSites(plan.sites)}</strong>
             </li>
             {plan.tokens > 0 ? (
               <li>
