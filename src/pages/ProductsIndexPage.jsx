@@ -22,7 +22,7 @@ export default function ProductsIndexPage() {
           >
             <div className="product-feature__media" aria-hidden={false}>
               <div className="product-feature__visual">
-                <img src={product.image} alt={product.imageAlt} width={160} height={200} />
+                <img src={product.image} alt={product.imageAlt} width={560} height={560} />
               </div>
             </div>
             <div className="product-feature__body">

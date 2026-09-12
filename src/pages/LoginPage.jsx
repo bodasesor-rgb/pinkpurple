@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
+import PasswordInput from '../components/PasswordInput.jsx';
 import SocialAuthButtons from '../components/SocialAuthButtons.jsx';
 
 export default function LoginPage() {
@@ -54,14 +55,10 @@ export default function LoginPage() {
           </label>
           <label>
             Contraseña
-            <input
-              type="password"
+            <PasswordInput
               autoComplete="current-password"
-              required
-              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
             />
           </label>
 

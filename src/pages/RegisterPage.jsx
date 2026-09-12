@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
+import PasswordInput from '../components/PasswordInput.jsx';
 import SocialAuthButtons from '../components/SocialAuthButtons.jsx';
 
 const PLAN_LABELS = {
@@ -102,11 +103,8 @@ export default function RegisterPage() {
           </label>
           <label>
             Contraseña
-            <input
-              type="password"
+            <PasswordInput
               autoComplete="new-password"
-              required
-              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 8 caracteres"

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { getLiveProducts } from '../data/products.js';
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
+  const location = useLocation();
   const close = () => {
     setOpen(false);
     setProductsOpen(false);
@@ -14,14 +15,20 @@ export default function SiteHeader() {
   const products = getLiveProducts();
   const dropdownRef = useRef(null);
 
+  // Al cambiar de ruta, cierra menú móvil y dropdown (evita navbar trabada)
   useEffect(() => {
-    function onDocClick(e) {
+    setOpen(false);
+    setProductsOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    function onDocPointer(e) {
       if (!dropdownRef.current?.contains(e.target)) {
         setProductsOpen(false);
       }
     }
-    document.addEventListener('click', onDocClick);
-    return () => document.removeEventListener('click', onDocClick);
+    document.addEventListener('pointerdown', onDocPointer);
+    return () => document.removeEventListener('pointerdown', onDocPointer);
   }, []);
 
   return (
@@ -42,7 +49,10 @@ export default function SiteHeader() {
           className="menu-toggle"
           aria-expanded={open}
           aria-label="Abrir menú"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => {
+            setOpen((v) => !v);
+            setProductsOpen(false);
+          }}
         >
           <span />
           <span />
@@ -53,18 +63,26 @@ export default function SiteHeader() {
           <div
             className={`nav-dropdown${productsOpen ? ' is-open' : ''}`}
             ref={dropdownRef}
-            onMouseEnter={() => setProductsOpen(true)}
-            onMouseLeave={() => setProductsOpen(false)}
+            onMouseEnter={() => {
+              if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                setProductsOpen(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                setProductsOpen(false);
+              }
+            }}
           >
             <NavLink
               to="/productos"
               className="nav-dropdown__trigger"
+              aria-expanded={productsOpen}
               onClick={(e) => {
+                // Móvil: abre/cierra el submenú. Desktop: navega a /productos.
                 if (window.matchMedia('(max-width: 760px)').matches) {
                   e.preventDefault();
                   setProductsOpen((v) => !v);
-                } else {
-                  close();
                 }
               }}
             >

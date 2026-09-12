@@ -19,28 +19,29 @@ const ICONS = {
       />
     </svg>
   ),
-  apple: (
+  github: (
     <svg className="btn-social__icon" viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="currentColor"
-        d="M16.4 12.6c0-2.1 1.7-3.1 1.8-3.2-1-1.4-2.5-1.6-3.1-1.6-1.3-.1-2.5.8-3.2.8-.7 0-1.7-.8-2.8-.7-1.4.1-2.8.9-3.5 2.2-1.5 2.6-.4 6.5 1.1 8.6.7 1 1.6 2.2 2.7 2.1 1.1-.1 1.5-.7 2.8-.7s1.7.7 2.8.7 1.9-1.1 2.6-2.1c.8-1.2 1.2-2.3 1.2-2.4-.1 0-2.3-.9-2.4-3.7zM14.2 6.5c.6-.7 1-1.7.9-2.7-1 .1-2.1.6-2.8 1.4-.6.7-1.1 1.7-.9 2.7 1 .1 2.1-.5 2.8-1.4z"
+        d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.9 9.6.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.4-3.4-1.4-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.2-4.6-5.1 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1 .8-.2 1.6-.3 2.4-.3s1.6.1 2.4.3c2-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 4-2.3 4.8-4.6 5.1.4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5 4-1.3 6.9-5.1 6.9-9.6C22 6.6 17.5 2 12 2z"
       />
     </svg>
   ),
-  facebook: (
+  gitlab: (
     <svg className="btn-social__icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="#1877F2"
-        d="M24 12.1C24 5.4 18.6 0 12 0S0 5.4 0 12.1C0 18.1 4.4 23.1 10.1 24v-8.4H7.1v-3.5h3V9.4c0-3 1.8-4.6 4.5-4.6 1.3 0 2.6.2 2.6.2v2.9h-1.5c-1.5 0-1.9.9-1.9 1.9v2.3h3.3l-.5 3.5h-2.8V24C19.6 23.1 24 18.1 24 12.1z"
-      />
+      <path fill="#E24329" d="M12 21.2 16.4 8H7.6L12 21.2z" />
+      <path fill="#FC6D26" d="M12 21.2 7.6 8H2.1L12 21.2z" />
+      <path fill="#FCA326" d="M2.1 8 1 11.3c-.1.3 0 .7.3.9L12 21.2 2.1 8z" />
+      <path fill="#FC6D26" d="M12 21.2 16.4 8h5.5L12 21.2z" />
+      <path fill="#FCA326" d="M21.9 8l1.1 3.3c.1.3 0 .7-.3.9L12 21.2 21.9 8z" />
     </svg>
   ),
 };
 
 const PROVIDERS = [
   { id: 'google', label: 'Iniciar sesión con Google' },
-  { id: 'apple', label: 'Iniciar sesión con Apple' },
-  { id: 'facebook', label: 'Iniciar sesión con Facebook' },
+  { id: 'github', label: 'Iniciar sesión con GitHub' },
+  { id: 'gitlab', label: 'Iniciar sesión con GitLab' },
 ];
 
 export default function SocialAuthButtons({ onProvider, disabled, mode = 'login' }) {
@@ -48,8 +49,8 @@ export default function SocialAuthButtons({ onProvider, disabled, mode = 'login'
     mode === 'register'
       ? {
           google: 'Registrarme con Google',
-          apple: 'Registrarme con Apple',
-          facebook: 'Registrarme con Facebook',
+          github: 'Registrarme con GitHub',
+          gitlab: 'Registrarme con GitLab',
         }
       : null;
 
