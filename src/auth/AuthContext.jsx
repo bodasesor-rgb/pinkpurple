@@ -125,6 +125,30 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const updatePlan = useCallback(async (plan, billing = 'monthly') => {
+    setError('');
+    const current = getCurrentUser();
+    if (!current) throw new Error('Debes iniciar sesión');
+    const planKey = String(plan || 'free').toLowerCase();
+    const safePlan = ['free', 'trial', 'starter', 'growth', 'pro', 'diamond'].includes(planKey)
+      ? planKey === 'trial'
+        ? 'free'
+        : planKey
+      : 'free';
+    const updated = await current.update({
+      data: {
+        ...(current.user_metadata || {}),
+        plan: safePlan,
+        billing: billing === 'annual' ? 'annual' : 'monthly',
+        product: 'seo',
+        payment_demo: true,
+        paid_at: new Date().toISOString(),
+      },
+    });
+    setUser(updated || getCurrentUser());
+    return updated;
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -133,12 +157,13 @@ export function AuthProvider({ children }) {
       clearError,
       login,
       register,
+      updatePlan,
       loginWithGoogle,
       loginWithProvider,
       logout,
       isAuthenticated: Boolean(user),
     }),
-    [user, loading, error, clearError, login, register, loginWithGoogle, loginWithProvider, logout],
+    [user, loading, error, clearError, login, register, updatePlan, loginWithGoogle, loginWithProvider, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

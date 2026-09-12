@@ -1,52 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getProductBySlug } from '../data/products.js';
-
-const ANNUAL_DISCOUNT = 0.25;
-
-const PLANS = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    landings: 2,
-    blogs: 2,
-    tokens: 2,
-    featured: false,
-  },
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: 49,
-    landings: 150,
-    blogs: 100,
-    featured: false,
-  },
-  {
-    id: 'growth',
-    name: 'Growth',
-    price: 99,
-    landings: 400,
-    blogs: 150,
-    featured: true,
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: 199,
-    landings: 1000,
-    blogs: 250,
-    featured: false,
-  },
-  {
-    id: 'diamond',
-    name: 'Diamond',
-    price: 349,
-    landings: 2500,
-    blogs: 400,
-    featured: false,
-  },
-];
+import {
+  PLANS,
+  formatNum,
+  formatPrice,
+  getPlanPricing,
+} from '../data/plans.js';
 
 const INCLUDES = [
   {
@@ -128,39 +88,6 @@ const INCLUDES = [
   },
 ];
 
-function formatNum(n) {
-  return n.toLocaleString('es-MX');
-}
-
-function formatPrice(price) {
-  if (price === 0) return 'Gratis';
-  return `$${price}`;
-}
-
-/** Mensual actual; anual = 25% menos sobre el año (redondeado). */
-function getPlanPricing(monthlyPrice) {
-  if (!monthlyPrice) {
-    return {
-      monthly: 0,
-      annualPerMonth: 0,
-      annualTotal: 0,
-      yearlyIfMonthly: 0,
-      savings: 0,
-    };
-  }
-  const yearlyIfMonthly = monthlyPrice * 12;
-  const annualTotal = Math.round(yearlyIfMonthly * (1 - ANNUAL_DISCOUNT));
-  const annualPerMonth = Math.round(annualTotal / 12);
-  const savings = yearlyIfMonthly - annualTotal;
-  return {
-    monthly: monthlyPrice,
-    annualPerMonth,
-    annualTotal,
-    yearlyIfMonthly,
-    savings,
-  };
-}
-
 export default function SeoProductPage() {
   const [billing, setBilling] = useState('monthly');
   const isAnnual = billing === 'annual';
@@ -227,6 +154,9 @@ export default function SeoProductPage() {
                   o ${formatNum(pricing.annualPerMonth)}/mes en plan anual
                 </p>
               ) : null}
+              {plan.price === 0 ? (
+                <p className="plan-card__annual-meta">5 landings + 5 blogs, una sola vez, sin tarjeta.</p>
+              ) : null}
               <ul className="plan-card__pages">
                 <li>
                   <strong>{formatNum(plan.landings)}</strong> landings
@@ -234,9 +164,13 @@ export default function SeoProductPage() {
                 <li>
                   <strong>{formatNum(plan.blogs)}</strong> blogs
                 </li>
-                <li>
-                  <strong>{formatNum(tokens)}</strong> tokens / herramienta
-                </li>
+                {plan.oneShot ? (
+                  <li>Sin renovación mensual</li>
+                ) : (
+                  <li>
+                    <strong>{formatNum(tokens)}</strong> tokens / herramienta
+                  </li>
+                )}
               </ul>
 
               <div className="plan-card__includes">
@@ -251,18 +185,12 @@ export default function SeoProductPage() {
                 </ul>
               </div>
 
-              {plan.price === 0 ? (
-                <Link className="btn btn-ghost plan-card__cta" to="/registro">
-                  Empezar gratis
-                </Link>
-              ) : (
-                <Link
-                  className={`btn ${plan.featured ? 'btn-primary' : 'btn-ghost'} plan-card__cta`}
-                  to={`/registro?plan=${plan.id}&billing=${isAnnual ? 'annual' : 'monthly'}`}
-                >
-                  Elegir {plan.name}
-                </Link>
-              )}
+              <Link
+                className={`btn ${plan.featured || plan.price === 0 ? 'btn-primary' : 'btn-ghost'} plan-card__cta`}
+                to={`/pago?plan=${plan.id}&billing=${isAnnual ? 'annual' : 'monthly'}`}
+              >
+                {plan.price === 0 ? 'Activar prueba' : `Pagar ${plan.name} (demo)`}
+              </Link>
             </article>
           );
         })}
