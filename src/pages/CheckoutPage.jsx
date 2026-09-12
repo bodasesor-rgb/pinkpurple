@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import PasswordInput from '../components/PasswordInput.jsx';
@@ -12,7 +12,7 @@ import { demoCheckoutNexus, goToNexusPanel } from '../lib/nexusPanel.js';
 
 export default function CheckoutPage() {
   const [searchParams] = useSearchParams();
-  const { user, isAuthenticated, register, login, updatePlan, loading: authLoading } = useAuth();
+  const { register, login, updatePlan, logout, loading: authLoading } = useAuth();
 
   const plan = useMemo(() => getPlanById(searchParams.get('plan')), [searchParams]);
   const billing = useMemo(() => {
@@ -24,36 +24,56 @@ export default function CheckoutPage() {
   const displayPrice = plan.price === 0 ? 0 : billing === 'annual' ? pricing.annualPerMonth : pricing.monthly;
   const isFree = plan.price === 0;
 
-  const [fullName, setFullName] = useState(() => user?.user_metadata?.full_name || '');
-  const [email, setEmail] = useState(() => user?.email || '');
+  // Siempre en blanco: se crea / confirma la cuenta en este paso (no heredar empresa)
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [step, setStep] = useState('ready'); // ready | paying | done
+  const [step, setStep] = useState('ready');
+  const [readyForm, setReadyForm] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        await logout();
+      } catch {
+        /* ignore */
+      } finally {
+        if (alive) {
+          setFullName('');
+          setEmail('');
+          setPassword('');
+          setReadyForm(true);
+        }
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+    // solo al montar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function ensureIdentitySession() {
-    if (isAuthenticated && user) {
-      await updatePlan(plan.id, billing);
-      return user;
-    }
     if (!email.trim() || !password || password.length < 8) {
       throw new Error('Completa correo y contraseña (mín. 8 caracteres).');
     }
     try {
-      await register(email, password, fullName || email.split('@')[0], {
+      await register(email.trim(), password, fullName.trim() || email.split('@')[0], {
         plan: plan.id,
         billing,
       });
     } catch (err) {
       const msg = String(err?.json?.msg || err?.message || '');
       if (/already|registered|exists/i.test(msg)) {
-        await login(email, password);
+        await login(email.trim(), password);
         await updatePlan(plan.id, billing);
       } else {
         throw err;
       }
     }
-    return user;
   }
 
   async function onPay(e) {
@@ -64,28 +84,26 @@ export default function CheckoutPage() {
     try {
       await ensureIdentitySession();
 
-      const payEmail = (user?.email || email).trim();
-      const payPass = password || sessionStorage.getItem('pp_demo_pass') || '';
-      if (password) sessionStorage.setItem('pp_demo_pass', password);
+      const payEmail = email.trim();
+      const payPass = password;
+      sessionStorage.setItem('pp_demo_pass', payPass);
 
       let panelUrl = '/pp';
       try {
         const nexus = await demoCheckoutNexus({
           email: payEmail,
-          password: payPass || password,
-          fullName: fullName || user?.user_metadata?.full_name || '',
+          password: payPass,
+          fullName: fullName.trim() || payEmail.split('@')[0],
           plan: plan.id,
           billing,
         });
         panelUrl = nexus.panelUrl || nexus.enterUrl || '/pp';
       } catch (err) {
-        // Si Nexus no responde, igual avanzamos al panel demo
         console.warn('demo checkout nexus', err);
         panelUrl = '/pp';
       }
 
       setStep('done');
-      // breve feedback y salto al panel
       setTimeout(() => goToNexusPanel(panelUrl), 600);
     } catch (err) {
       setStep('ready');
@@ -100,11 +118,11 @@ export default function CheckoutPage() {
     }
   }
 
-  if (authLoading) {
+  if (authLoading || !readyForm) {
     return (
       <div className="container page-pad auth-page">
         <div className="auth-card">
-          <p className="auth-lead">Cargando…</p>
+          <p className="auth-lead">Preparando checkout…</p>
         </div>
       </div>
     );
@@ -116,8 +134,8 @@ export default function CheckoutPage() {
         <p className="eyebrow">Pago demo</p>
         <h1>{isFree ? 'Activar prueba' : `Pagar ${plan.name}`}</h1>
         <p className="auth-lead">
-          Simulación de compra: <strong>no se pide tarjeta</strong>. Al confirmar entras al panel
-          de {plan.name}.
+          Crea tu cuenta aquí (campos en blanco). <strong>No se pide tarjeta</strong>. Al confirmar
+          entras a tu panel.
         </p>
 
         <div className="checkout-summary">
@@ -158,46 +176,39 @@ export default function CheckoutPage() {
           </ul>
         </div>
 
-        <form className="auth-form" onSubmit={onPay}>
-          {isAuthenticated ? (
-            <p className="auth-muted">
-              Sesión: <strong>{user?.email}</strong>
-            </p>
-          ) : (
-            <label>
-              Nombre
-              <input
-                type="text"
-                autoComplete="name"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Tu nombre"
-              />
-            </label>
-          )}
-
-          {!isAuthenticated ? (
-            <label>
-              Correo
-              <input
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@correo.com"
-              />
-            </label>
-          ) : null}
-
+        <form className="auth-form" onSubmit={onPay} autoComplete="off">
+          <label>
+            Nombre
+            <input
+              type="text"
+              name="pp_checkout_name"
+              autoComplete="off"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Tu nombre"
+            />
+          </label>
+          <label>
+            Correo
+            <input
+              type="email"
+              name="pp_checkout_email"
+              autoComplete="off"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@correo.com"
+            />
+          </label>
           <label>
             Contraseña
             <PasswordInput
-              autoComplete={isAuthenticated ? 'current-password' : 'new-password'}
+              name="pp_checkout_password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={isAuthenticated ? 'Tu contraseña' : 'Mínimo 8 caracteres'}
+              placeholder="Mínimo 8 caracteres"
             />
           </label>
 
@@ -217,14 +228,8 @@ export default function CheckoutPage() {
         <p className="checkout-demo-badge">Demo · sin cobro real · sin datos de tarjeta</p>
         <p className="auth-switch">
           <Link to="/productos/seo">Volver a planes</Link>
-          {!isAuthenticated ? (
-            <>
-              {' · '}
-              <Link to={`/login?next=${encodeURIComponent(`/pago?plan=${plan.id}&billing=${billing}`)}`}>
-                Ya tengo cuenta
-              </Link>
-            </>
-          ) : null}
+          {' · '}
+          <Link to="/entrar-panel">Ya tengo cuenta · abrir panel</Link>
         </p>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
-import { goToNexusPanel } from '../lib/nexusPanel.js';
 
 const PLAN_META = {
   free: { name: 'Prueba gratis', landings: 5, blogs: 5, tokens: 0 },
@@ -56,7 +55,9 @@ export default function AccountPage() {
           <button
             type="button"
             className="btn btn-primary"
-            onClick={() => goToNexusPanel('/pp')}
+            onClick={() => {
+              window.location.assign('/entrar-panel');
+            }}
           >
             Abrir mi panel SEO
           </button>

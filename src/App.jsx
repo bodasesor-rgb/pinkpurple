@@ -9,6 +9,7 @@ import SeoProductPage from './pages/SeoProductPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
+import EnterPanelPage from './pages/EnterPanelPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegisterPage />} />
           <Route path="/pago" element={<CheckoutPage />} />
+          <Route path="/entrar-panel" element={<EnterPanelPage />} />
           <Route
             path="/cuenta"
             element={
