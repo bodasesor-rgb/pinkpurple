@@ -14,6 +14,7 @@ export default function AccountPage() {
   const meta = user?.user_metadata || {};
   const planKey = String(meta.plan || 'free').toLowerCase();
   const plan = PLAN_META[planKey] || PLAN_META.free;
+  const billing = meta.billing === 'annual' ? 'Anual' : 'Mensual';
   const displayName = meta.full_name || user?.email || 'Usuario';
 
   async function onLogout() {
@@ -25,13 +26,14 @@ export default function AccountPage() {
       <header className="page-hero page-hero--wide">
         <p className="eyebrow">Mi cuenta</p>
         <h1>Hola, {displayName}</h1>
-        <p>Este es tu espacio PinkPurple. Aquí verás tu plan y el avance de tus páginas.</p>
+        <p>Este es tu espacio en PinkPurple Studio. Aquí verás tu plan de PinkPurple SEO.</p>
       </header>
 
       <div className="account-grid">
         <section className="account-panel">
           <h2>Plan actual</h2>
           <p className="account-plan-name">{plan.name}</p>
+          <p className="auth-muted">Facturación: {planKey === 'free' ? '—' : billing}</p>
           <ul className="plan-card__pages">
             <li>
               <strong>{plan.landings.toLocaleString('es-MX')}</strong> landings
@@ -43,7 +45,7 @@ export default function AccountPage() {
               <strong>{plan.tokens.toLocaleString('es-MX')}</strong> tokens / herramienta
             </li>
           </ul>
-          <Link className="btn btn-ghost" to="/productos">
+          <Link className="btn btn-ghost" to="/productos/seo">
             Cambiar de plan
           </Link>
         </section>

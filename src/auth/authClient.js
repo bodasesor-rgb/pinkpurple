@@ -20,11 +20,15 @@ export function getCurrentUser() {
   return getAuthClient().currentUser();
 }
 
-export function getGoogleLoginUrl() {
-  return getAuthClient().loginExternalUrl('google');
+export function getExternalLoginUrl(provider) {
+  return getAuthClient().loginExternalUrl(provider);
 }
 
-/** Completa sesión si el usuario vuelve de Google OAuth con tokens en el hash. */
+export function getGoogleLoginUrl() {
+  return getExternalLoginUrl('google');
+}
+
+/** Completa sesión si el usuario vuelve de OAuth con tokens en el hash. */
 export async function completeExternalLoginFromUrl() {
   if (typeof window === 'undefined') return null;
 

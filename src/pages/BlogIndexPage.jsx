@@ -5,8 +5,8 @@ export default function BlogIndexPage() {
         <p className="eyebrow">Blog</p>
         <h1>Ideas y páginas en construcción.</h1>
         <p>
-          Aquí publicaremos artículos SEO de PinkPurple. Mientras, el foco está en crear landings
-          y contenido para clientes.
+          Aquí publicaremos artículos de PinkPurple Studio. Mientras, el foco está en PinkPurple
+          SEO: landings y contenido para clientes.
         </p>
       </header>
     </div>

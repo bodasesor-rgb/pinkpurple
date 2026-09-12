@@ -1,5 +1,30 @@
 import { Link } from 'react-router-dom';
 
+const pillars = [
+  {
+    id: 'keywords',
+    kicker: '01 · Demanda real',
+    title: 'Investigación de palabras clave',
+    text: 'PinkPurple SEO encuentra lo que tus compradores ya están buscando y define sobre qué escribir — sin adivinar temas ni rellenar con contenido vacío.',
+    detail: 'Intención de compra · oportunidades · prioridades de redacción',
+  },
+  {
+    id: 'score',
+    kicker: '02 · Visibilidad',
+    title: 'Optimización para Google + IA',
+    text: 'Cada landing y blog sale afinado para posicionarse en Google y aparecer en buscadores con inteligencia artificial. El estándar PinkPurple SEO apunta a 100/100.',
+    detail: 'SEO técnico · estructura · claridad para humanos y modelos de IA',
+    score: '100/100',
+  },
+  {
+    id: 'publish',
+    kicker: '03 · Publicación',
+    title: 'Funciona en tu servidor',
+    text: 'Conectas tu sitio una sola vez y publicas sin copiar ni pegar. El mismo flujo corre en WordPress, Shopify, Netlify y otros servidores: el código de integración hace que funcione igual en cada plataforma.',
+    detail: 'WordPress · Shopify · Netlify · más servidores compatibles',
+  },
+];
+
 export default function HomePage() {
   return (
     <>
@@ -13,27 +38,28 @@ export default function HomePage() {
               <span className="hero__brand-purple">
                 <span className="hero__brand-p">P</span>
                 urple
-              </span>
+              </span>{' '}
+              <span className="hero__brand-studio">Studio</span>
             </p>
             <h1>
-              Texto que posiciona.
-              <span>Páginas que cierran.</span>
+              Automatizaciones que
+              <span>hacen crecer tu marca.</span>
             </h1>
             <p className="hero__lead">
-              Diseñamos landings, blogs y páginas SEO con redacción precisa: cada URL existe para
-              atraer la búsqueda correcta y convertirla en clientes.
+              PinkPurple Studio construye productos de automatización para negocios. El primero:
+              PinkPurple SEO — landings, blogs y publicación en tu servidor.
             </p>
             <div className="hero__actions">
-              <Link className="btn btn-primary" to="/productos">
-                Ver productos
+              <Link className="btn btn-primary" to="/productos/seo">
+                Ver PinkPurple SEO
               </Link>
-              <Link className="btn btn-ghost" to="/servicios">
-                Ver servicios
+              <Link className="btn btn-ghost" to="/registro">
+                Empezar gratis
               </Link>
             </div>
           </div>
 
-          <aside className="page-stage" aria-label="Vista previa de una landing">
+          <aside className="page-stage" aria-label="Producto destacado">
             <div className="page-stage__beam" aria-hidden="true" />
             <div className="page-stage__chrome">
               <div className="page-stage__dots">
@@ -41,87 +67,99 @@ export default function HomePage() {
                 <span />
                 <span />
               </div>
-              <p>pinkpurple · landing live</p>
+              <p>producto · pinkpurple seo</p>
             </div>
             <div className="page-stage__body">
-              <p className="page-stage__kicker">Oferta · Intención comercial</p>
-              <h2>La búsqueda termina en tu página</h2>
+              <p className="page-stage__kicker">Producto destacado</p>
+              <h2>PinkPurple SEO</h2>
               <p>
-                Headline nítido. Prueba social. CTA sin fricción. Así se ve una landing hecha para
-                rankear y vender — no para decorar.
+                Keywords, copy y publicación multi-servidor. De la búsqueda a la URL en vivo —
+                sin copiar ni pegar.
               </p>
-              <div className="page-stage__cta">Ver productos</div>
+              <Link className="page-stage__cta" to="/productos/seo">
+                Ver planes SEO
+              </Link>
               <ul>
-                <li>Copy orientado a conversión</li>
-                <li>Estructura lista para Google</li>
-                <li>Publicación lista para tráfico</li>
+                <li>Investigación de demanda</li>
+                <li>Optimización Google + IA</li>
+                <li>Integración WordPress, Shopify, Netlify…</li>
               </ul>
             </div>
           </aside>
         </div>
       </section>
 
-      <section className="section" id="oficio">
+      <section className="section" id="studio">
+        <div className="container">
+          <div className="section__intro section__intro--center">
+            <p className="eyebrow">PinkPurple Studio</p>
+            <h2>Una marca. Varias automatizaciones.</h2>
+            <p>
+              Studio es la casa de nuestros productos. Hoy el foco es SEO; mañana sumamos más
+              flujos para operar y escalar tu negocio con la misma calidad.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="section" id="pilares">
         <div className="container">
           <div className="section__intro">
-            <p className="eyebrow">Lo que creamos</p>
-            <h2>Contenido con oficio. Páginas con intención.</h2>
+            <p className="eyebrow">PinkPurple SEO</p>
+            <h2>El producto para texto, páginas y posicionamiento.</h2>
             <p>
-              No entregamos reportes eternos. Entregamos texto publicado: landings, blogs y hubs
-              SEO que trabajan mientras tú vendes.
+              Tres movimientos en un solo sistema: entender la demanda, escribir para rankear y
+              publicar donde tu marca ya vive.
             </p>
           </div>
 
-          <div className="craft-list">
-            <article className="craft-item">
-              <span className="craft-item__n">01</span>
-              <div>
-                <h3>Landings de venta</h3>
-                <p>
-                  Una promesa, una página, un cierre. Redacción comercial y diseño limpio para ads
-                  y búsqueda de alta intención.
-                </p>
-              </div>
-            </article>
-            <article className="craft-item">
-              <span className="craft-item__n">02</span>
-              <div>
-                <h3>Blogs que abren mercado</h3>
-                <p>
-                  Artículos con intención real de búsqueda: educan, posicionan y alimentan
-                  autoridad sin relleno vacío.
-                </p>
-              </div>
-            </article>
-            <article className="craft-item">
-              <span className="craft-item__n">03</span>
-              <div>
-                <h3>Páginas SEO de servicio</h3>
-                <p>
-                  Cobertura por oferta y ciudad con copy único — páginas que Google puede indexar
-                  y el cliente entiende al instante.
-                </p>
-              </div>
-            </article>
+          <div className="pillar-stack">
+            {pillars.map((item) => (
+              <article className="pillar" key={item.id}>
+                <div className="pillar__meta">
+                  <p className="pillar__kicker">{item.kicker}</p>
+                  {item.score ? <span className="score-chip">{item.score}</span> : null}
+                </div>
+                <h3>{item.title}</h3>
+                <p className="pillar__text">{item.text}</p>
+                <p className="pillar__detail">{item.detail}</p>
+              </article>
+            ))}
           </div>
+        </div>
+      </section>
+
+      <section className="section section--host">
+        <div className="container host-banner">
+          <div className="host-banner__copy">
+            <p className="eyebrow">Integraciones</p>
+            <h2>Tu hosting. Nuestro código. Misma publicación.</h2>
+            <p>
+              No te armamos la web desde cero: nos conectamos a la que ya tienes. WordPress,
+              Shopify, Netlify y muchos servidores más — el código de PinkPurple SEO publica
+              igual en cada plataforma.
+            </p>
+          </div>
+          <Link className="btn btn-primary" to="/productos/seo">
+            Ver PinkPurple SEO
+          </Link>
         </div>
       </section>
 
       <section className="section section--ink">
         <div className="container split">
           <div className="split__lead">
-            <p className="eyebrow eyebrow--light">El estándar PinkPurple</p>
-            <h2>Si el texto no vende la oferta, el SEO solo amplifica el silencio.</h2>
+            <p className="eyebrow eyebrow--light">Studio</p>
+            <h2>Automatizamos lo repetible. Tú te enfocas en vender.</h2>
           </div>
           <div className="split__body">
             <p>
-              Empezamos por lo esencial: qué vendes, a quién y por qué deberían elegirte. Con eso
-              escribimos y publicamos páginas que merecen traffic — landings, blogs y arquitectura
-              SEO alineada a tu negocio.
+              PinkPurple Studio nace para empaquetar automatizaciones serias: primero SEO de
+              páginas y contenido; después, más productos bajo la misma marca.
             </p>
             <p>
-              El entregable no es una carpeta de consejos. Es presencia digital activa: URLs vivas,
-              indexables, con mensaje claro y llamada a la acción.
+              Cada producto mantiene un estándar claro — útil, publicable y medible — para que
+              tu operación crezca sin perder control.
             </p>
           </div>
         </div>
@@ -130,15 +168,14 @@ export default function HomePage() {
       <section className="section section--cta" id="contacto">
         <div className="container contact-block">
           <div className="contact-block__copy">
-            <p className="eyebrow">Siguiente paso</p>
-            <h2>Elige el paquete que escala con tu SEO.</h2>
+            <p className="eyebrow">PinkPurple SEO</p>
+            <h2>Empieza con el plan que escala tu contenido.</h2>
             <p>
-              Starter, Growth, Pro o Diamond: landings, blogs y tokens para Ranking Pulse,
-              Competidores, keywords y SERP.
+              Free para probar. Starter a Diamond para landings, blogs y tokens SEO.
             </p>
           </div>
-          <Link className="btn btn-primary btn-lg" to="/productos">
-            Ver productos
+          <Link className="btn btn-primary btn-lg" to="/productos/seo">
+            Ver PinkPurple SEO
           </Link>
         </div>
       </section>

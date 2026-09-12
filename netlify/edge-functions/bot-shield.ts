@@ -451,6 +451,7 @@ export const config: Config = {
     '/.well-known/*',
     '/sitemap.xml',
     '/llms.txt',
+    '/.netlify/*',
   ],
   onError: 'bypass',
 }

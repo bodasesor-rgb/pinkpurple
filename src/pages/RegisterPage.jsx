@@ -1,11 +1,30 @@
-import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
-import GoogleAuthButton from '../components/GoogleAuthButton.jsx';
+import SocialAuthButtons from '../components/SocialAuthButtons.jsx';
+
+const PLAN_LABELS = {
+  free: 'Free',
+  starter: 'Starter',
+  growth: 'Growth',
+  pro: 'Pro',
+  diamond: 'Diamond',
+};
 
 export default function RegisterPage() {
-  const { register, loginWithGoogle, isAuthenticated, error, clearError, loading } = useAuth();
+  const { register, loginWithProvider, isAuthenticated, error, clearError, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const selectedPlan = useMemo(() => {
+    const plan = String(searchParams.get('plan') || 'free').toLowerCase();
+    return PLAN_LABELS[plan] ? plan : 'free';
+  }, [searchParams]);
+
+  const selectedBilling = useMemo(() => {
+    const billing = String(searchParams.get('billing') || 'monthly').toLowerCase();
+    return billing === 'annual' ? 'annual' : 'monthly';
+  }, [searchParams]);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -23,12 +42,16 @@ export default function RegisterPage() {
     setInfo('');
     setSubmitting(true);
     try {
-      const user = await register(email, password, fullName);
-      if (user?.confirmed_at || user?.token?.access_token) {
+      const user = await register(email, password, fullName, {
+        plan: selectedPlan,
+        billing: selectedBilling,
+      });
+      const hasSession = Boolean(user?.token?.access_token || getAccessToken(user));
+      if (hasSession || user?.confirmed_at) {
         navigate('/cuenta', { replace: true });
       } else {
         setInfo(
-          'Cuenta creada. Si tu sitio pide confirmación, revisa tu correo y luego inicia sesión.',
+          'Cuenta creada. Revisa tu correo para confirmar (si Identity lo pide) y luego inicia sesión.',
         );
       }
     } catch {
@@ -42,20 +65,17 @@ export default function RegisterPage() {
     <div className="container page-pad auth-page">
       <div className="auth-card">
         <p className="eyebrow">Registro</p>
-        <h1>Crea tu cuenta Free</h1>
+        <h1>Crea tu cuenta</h1>
         <p className="auth-lead">
-          2 landings, 2 blogs y 2 tokens por herramienta para empezar.
+          Plan seleccionado:{' '}
+          <strong>
+            {PLAN_LABELS[selectedPlan]}
+            {selectedPlan !== 'free'
+              ? ` · ${selectedBilling === 'annual' ? 'Anual' : 'Mensual'}`
+              : ''}
+          </strong>
+          . Podrás acceder a tu espacio PinkPurple SEO al iniciar sesión.
         </p>
-
-        <GoogleAuthButton
-          label="Registrarme con Google"
-          onClick={loginWithGoogle}
-          disabled={submitting}
-        />
-
-        <div className="auth-divider" role="presentation">
-          <span>o con correo</span>
-        </div>
 
         <form className="auth-form" onSubmit={onSubmit}>
           <label>
@@ -101,10 +121,24 @@ export default function RegisterPage() {
           </button>
         </form>
 
+        <div className="auth-divider" role="presentation">
+          <span>OR</span>
+        </div>
+
+        <SocialAuthButtons
+          mode="register"
+          onProvider={loginWithProvider}
+          disabled={submitting}
+        />
+
         <p className="auth-switch">
           ¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link>
         </p>
       </div>
     </div>
   );
+}
+
+function getAccessToken(user) {
+  return user?.token?.access_token || user?.access_token || null;
 }

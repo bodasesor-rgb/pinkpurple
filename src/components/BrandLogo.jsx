@@ -3,7 +3,7 @@ import { useId } from 'react';
 export default function BrandLogo({
   variant = 'full',
   className = '',
-  title = 'PinkPurple SEO',
+  title = 'PinkPurple Studio',
 }) {
   const uid = useId().replace(/:/g, '');
   const gradId = `ppGrad-${uid}`;
@@ -24,7 +24,6 @@ export default function BrandLogo({
         </linearGradient>
         <mask id={maskId} maskUnits="userSpaceOnUse">
           <rect width="160" height="200" fill="#fff" />
-          {/* growth arrow knockout */}
           <path
             fill="#000"
             d="M36 132 L78 92 L94 108 L138 48 L152 60 L100 134 L82 116 L48 146 Z"
@@ -60,7 +59,7 @@ export default function BrandLogo({
             urple
           </span>
         </span>
-        <span className="brand-logo__seo">SEO</span>
+        <span className="brand-logo__seo">Studio</span>
       </span>
     </span>
   );

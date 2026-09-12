@@ -6,21 +6,22 @@ export default function SiteFooter() {
     <footer className="site-footer">
       <div className="container site-footer__grid">
         <div>
-          <Link to="/" aria-label="PinkPurple SEO">
+          <Link to="/" aria-label="PinkPurple Studio">
             <BrandLogo className="brand-logo--footer" />
           </Link>
-          <p className="site-footer__tag">Texto y páginas para vender y posicionar.</p>
+          <p className="site-footer__tag">
+            PinkPurple Studio — automatizaciones para hacer crecer tu marca.
+          </p>
         </div>
         <div className="site-footer__links">
           <Link to="/productos">Productos</Link>
-          <Link to="/servicios">Servicios</Link>
+          <Link to="/productos/seo">PinkPurple SEO</Link>
           <Link to="/blog">Blog</Link>
           <Link to="/login">Iniciar sesión</Link>
-          <a href="mailto:hola@pinkpurple.seo">hola@pinkpurple.seo</a>
         </div>
       </div>
       <div className="container site-footer__copy">
-        <p>© {new Date().getFullYear()} PinkPurple SEO</p>
+        <p>© {new Date().getFullYear()} PinkPurple Studio</p>
       </div>
     </footer>
   );

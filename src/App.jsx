@@ -1,11 +1,11 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import SiteHeader from './components/SiteHeader.jsx';
 import SiteFooter from './components/SiteFooter.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import HomePage from './pages/HomePage.jsx';
 import BlogIndexPage from './pages/BlogIndexPage.jsx';
-import ServicesPage from './pages/ServicesPage.jsx';
-import ProductsPage from './pages/ProductsPage.jsx';
+import ProductsIndexPage from './pages/ProductsIndexPage.jsx';
+import SeoProductPage from './pages/SeoProductPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
@@ -17,8 +17,9 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/productos" element={<ProductsPage />} />
-          <Route path="/servicios" element={<ServicesPage />} />
+          <Route path="/productos" element={<ProductsIndexPage />} />
+          <Route path="/productos/seo" element={<SeoProductPage />} />
+          <Route path="/servicios" element={<Navigate to="/productos/seo" replace />} />
           <Route path="/blog" element={<BlogIndexPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegisterPage />} />

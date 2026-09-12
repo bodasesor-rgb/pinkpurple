@@ -1,13 +1,20 @@
-# PinkPurple SEO
+# PinkPurple Studio
 
-Sitio público (front) de **PinkPurple SEO**: landings de venta, blogs y SEO.
+Sitio de **PinkPurple Studio**: automatizaciones para hacer crecer marcas.
+
+## Marca
+
+| Nivel | Nombre | Rol |
+|-------|--------|-----|
+| Empresa | **PinkPurple Studio** | Marca paraguas (sitio general) |
+| Producto | **PinkPurple SEO** | Landings, blogs, SEO y publicación multi-servidor |
 
 ## Arquitectura
 
-- **pinkpurple** (este repo) → front en **Netlify**
-- **Seo-Nexus-2.0** → generador (landings/blogs). Las claves de IA y panel viven en Nexus, no aquí.
+- **pinkpurple** (este repo) → front en **Netlify** (Studio + producto SEO)
+- **Seo-Nexus-2.0** → generador (landings/blogs). Las claves de IA viven en Nexus.
 
-## Marca
+## Colores
 
 | Token   | Hex       |
 |---------|-----------|
@@ -16,7 +23,7 @@ Sitio público (front) de **PinkPurple SEO**: landings de venta, blogs y SEO.
 | Negro   | `#000000` |
 | Blanco  | `#FFFFFF` |
 
-Logos en `public/brand/`.
+Logo de barra: `public/brand/logo-studio-header.png`.
 
 ## Desarrollo
 
@@ -31,30 +38,13 @@ npm run dev
 npm run build
 ```
 
-- Publish directory: `dist`
-- Config: `netlify.toml`
-- SPA fallback: `/* → /index.html` (200)
-- **Bot shield** (edge): `netlify/edge-functions/bot-shield.ts` — mismo patrón que Bodasesor (403 scrapers/IA training, permite Google/Bing/social, rate limit HTML)
+- Publish: `dist`
+- Bot shield: `netlify/edge-functions/bot-shield.ts`
 
-## Auth (Netlify Identity)
+## Auth
 
-Login y registro usan **Netlify Identity** (correo + contraseña + Google).
+Netlify Identity (correo + Google; Apple/Facebook en UI).
 
-1. En Netlify: **Site configuration → Identity → Enable Identity**
-2. Registration: **Open** (o Invite only si prefieres)
-3. **Identity → External providers → Google**
-   - Crea credenciales OAuth en [Google Cloud Console](https://console.cloud.google.com/)
-   - Authorized redirect URI: `https://TU-SITIO.netlify.app/.netlify/identity/callback`
-   - Pega Client ID y Client Secret en Netlify
-4. Redeploy si hace falta
+Rutas clave: `/login`, `/registro`, `/cuenta`, `/productos` (planes PinkPurple SEO).
 
-Rutas:
-- `/login` — iniciar sesión (Google o correo)
-- `/registro` — crear cuenta Free
-- `/cuenta` — área privada del usuario
-
-## Próximo con Nexus
-
-1. Conectar este repo como sitio destino en Nexus (como Bodasesor).
-2. Sincronizar landings a `public/{slug}/` y blogs a `public/blog/{slug}/`.
-3. Añadir `build:nexus` + Build Hook de Netlify cuando el pipeline esté listo.
+**No hacer push a Netlify hasta confirmación explícita del usuario.**

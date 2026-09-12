@@ -1,4 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getProductBySlug } from '../data/products.js';
+
+const ANNUAL_DISCOUNT = 0.25;
 
 const PLANS = [
   {
@@ -133,21 +137,75 @@ function formatPrice(price) {
   return `$${price}`;
 }
 
-export default function ProductsPage() {
+/** Mensual actual; anual = 25% menos sobre el año (redondeado). */
+function getPlanPricing(monthlyPrice) {
+  if (!monthlyPrice) {
+    return {
+      monthly: 0,
+      annualPerMonth: 0,
+      annualTotal: 0,
+      yearlyIfMonthly: 0,
+      savings: 0,
+    };
+  }
+  const yearlyIfMonthly = monthlyPrice * 12;
+  const annualTotal = Math.round(yearlyIfMonthly * (1 - ANNUAL_DISCOUNT));
+  const annualPerMonth = Math.round(annualTotal / 12);
+  const savings = yearlyIfMonthly - annualTotal;
+  return {
+    monthly: monthlyPrice,
+    annualPerMonth,
+    annualTotal,
+    yearlyIfMonthly,
+    savings,
+  };
+}
+
+export default function SeoProductPage() {
+  const [billing, setBilling] = useState('monthly');
+  const isAnnual = billing === 'annual';
+  const product = getProductBySlug('seo');
+
   return (
     <div className="container page-pad">
       <header className="page-hero page-hero--wide">
-        <p className="eyebrow">Productos</p>
-        <h1>Paquetes de landings, blogs y tokens SEO.</h1>
-        <p>
-          Elige el plan según el volumen de páginas. Todos incluyen las mismas herramientas con
-          tokens según el tamaño del paquete.
-        </p>
+        <p className="eyebrow">PinkPurple SEO</p>
+        <h1>{product?.tagline || 'Paquetes de landings, blogs y tokens SEO.'}</h1>
+        <p>{product?.description}</p>
+        {product?.highlights?.length ? (
+          <ul className="product-feature__list product-feature__list--hero">
+            {product.highlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        ) : null}
       </header>
+
+      <div className="billing-toggle" role="group" aria-label="Periodo de pago">
+        <button
+          type="button"
+          className={`billing-toggle__btn${!isAnnual ? ' is-active' : ''}`}
+          onClick={() => setBilling('monthly')}
+        >
+          Mensual
+        </button>
+        <button
+          type="button"
+          className={`billing-toggle__btn${isAnnual ? ' is-active' : ''}`}
+          onClick={() => setBilling('annual')}
+        >
+          Anual
+          <span className="billing-toggle__save">-25%</span>
+        </button>
+      </div>
 
       <div className="plans-grid plans-grid--five">
         {PLANS.map((plan) => {
           const tokens = plan.tokens ?? plan.landings + plan.blogs;
+          const pricing = getPlanPricing(plan.price);
+          const displayPrice = isAnnual ? pricing.annualPerMonth : pricing.monthly;
+          const periodLabel = plan.price === 0 ? null : isAnnual ? 'USD / mes' : 'USD / mes';
+
           return (
             <article
               key={plan.id}
@@ -156,9 +214,19 @@ export default function ProductsPage() {
               {plan.featured ? <p className="plan-card__badge">Más popular</p> : null}
               <h2>{plan.name}</h2>
               <p className="plan-card__price">
-                <span>{formatPrice(plan.price)}</span>
-                {plan.price > 0 ? <small>USD</small> : null}
+                <span>{formatPrice(displayPrice)}</span>
+                {periodLabel ? <small>{periodLabel}</small> : null}
               </p>
+              {plan.price > 0 && isAnnual ? (
+                <p className="plan-card__annual-meta">
+                  ${formatNum(pricing.annualTotal)} al año · ahorras ${formatNum(pricing.savings)}
+                </p>
+              ) : null}
+              {plan.price > 0 && !isAnnual ? (
+                <p className="plan-card__annual-meta plan-card__annual-meta--muted">
+                  o ${formatNum(pricing.annualPerMonth)}/mes en plan anual
+                </p>
+              ) : null}
               <ul className="plan-card__pages">
                 <li>
                   <strong>{formatNum(plan.landings)}</strong> landings
@@ -188,12 +256,12 @@ export default function ProductsPage() {
                   Empezar gratis
                 </Link>
               ) : (
-                <a
+                <Link
                   className={`btn ${plan.featured ? 'btn-primary' : 'btn-ghost'} plan-card__cta`}
-                  href={`mailto:hola@pinkpurple.seo?subject=${encodeURIComponent(`Interés en plan ${plan.name}`)}`}
+                  to={`/registro?plan=${plan.id}&billing=${isAnnual ? 'annual' : 'monthly'}`}
                 >
                   Elegir {plan.name}
-                </a>
+                </Link>
               )}
             </article>
           );
@@ -201,12 +269,13 @@ export default function ProductsPage() {
       </div>
 
       <p className="plans-note">
-        Los tokens de cada herramienta igualan tus landings + blogs del plan.
+        Los tokens de cada herramienta igualan tus landings + blogs del plan. El plan anual
+        aplica 25% de ahorro frente a pagar 12 meses sueltos (precios redondeados).
       </p>
 
       <p className="page-cta-line">
-        <Link className="btn btn-ghost" to="/servicios">
-          Ver cómo trabajamos
+        <Link className="btn btn-ghost" to="/productos">
+          Ver todos los productos
         </Link>
       </p>
     </div>
