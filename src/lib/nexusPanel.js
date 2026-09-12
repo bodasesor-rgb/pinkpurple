@@ -4,16 +4,43 @@ export const NEXUS_ORIGIN = String(
 ).replace(/\/$/, '');
 
 /**
- * Tras login válido: ir al panel PinkPurple en Hostinger.
- * panelUrl viene de Nexus (ej. /panel?en=…) o se usa /pp.
+ * Contrato entrada panel:
+ * - Preferido: /pp (Nexus decide onboarding vs panel aislado)
+ * - Con handoffToken: /api/pinkpurple/enter?h=… (fija cookie first-party)
+ * - Nunca hub admin /
  */
-export function goToNexusPanel(panelUrl) {
-  const path = panelUrl || '/pp';
-  const normalized = path.startsWith('http') ? path : `${NEXUS_ORIGIN}${path.startsWith('/') ? path : `/${path}`}`;
-  window.location.href = normalized;
+export function resolveNexusEntry(data) {
+  if (!data) return '/pp';
+  if (typeof data === 'string') {
+    const path = data.trim() || '/pp';
+    if (path === '/' || path === '') return '/pp';
+    return path;
+  }
+  const handoff = data.handoffToken || data.handoff;
+  if (handoff) {
+    return `/api/pinkpurple/enter?h=${encodeURIComponent(handoff)}`;
+  }
+  if (data.openUrl && String(data.openUrl).startsWith('/')) {
+    return data.openUrl;
+  }
+  // Preferido: enterUrl (/pp). No deep-link a /onboarding desde Pink.
+  const enter = data.enterUrl || '/pp';
+  if (enter === '/' || enter === '') return '/pp';
+  return enter;
 }
 
-/** Crea sesión Nexus (cookie) y devuelve panelUrl / enterUrl. */
+/**
+ * Redirect de navegador completo al panel Nexus (no solo fetch).
+ */
+export function goToNexusPanel(panelUrlOrResponse) {
+  const path = resolveNexusEntry(panelUrlOrResponse);
+  const normalized = path.startsWith('http')
+    ? path
+    : `${NEXUS_ORIGIN}${path.startsWith('/') ? path : `/${path}`}`;
+  window.location.assign(normalized);
+}
+
+/** Crea sesión Nexus (cookie) y devuelve panelUrl / enterUrl / handoffToken. */
 export async function loginNexusPinkpurple(email, password) {
   const res = await fetch(`${NEXUS_ORIGIN}/api/pinkpurple/login`, {
     method: 'POST',

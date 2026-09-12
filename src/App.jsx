@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
 import EnterPanelPage from './pages/EnterPanelPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
+import HowItWorksPage from './pages/HowItWorksPage.jsx';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/productos" element={<ProductsIndexPage />} />
           <Route path="/productos/seo" element={<SeoProductPage />} />
+          <Route path="/como-funciona" element={<HowItWorksPage />} />
           <Route path="/servicios" element={<Navigate to="/productos/seo" replace />} />
           <Route path="/blog" element={<BlogIndexPage />} />
           <Route path="/login" element={<LoginPage />} />

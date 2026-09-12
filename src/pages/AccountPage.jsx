@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
+import { goToNexusPanel } from '../lib/nexusPanel.js';
 
 const PLAN_META = {
   free: { name: 'Prueba gratis', landings: 5, blogs: 5, tokens: 0 },
@@ -27,7 +28,10 @@ export default function AccountPage() {
       <header className="page-hero page-hero--wide">
         <p className="eyebrow">Mi cuenta</p>
         <h1>Hola, {displayName}</h1>
-        <p>Este es tu espacio en PinkPurple Studio. El trabajo SEO se abre en tu panel.</p>
+        <p>
+          Este es tu espacio en PinkPurple Studio. El trabajo SEO vive en Nexus — aquí solo
+          abres el panel.
+        </p>
       </header>
 
       <div className="account-grid">
@@ -55,12 +59,13 @@ export default function AccountPage() {
           <button
             type="button"
             className="btn btn-primary"
-            onClick={() => {
-              window.location.assign('/entrar-panel');
-            }}
+            onClick={() => goToNexusPanel('/pp')}
           >
             Abrir mi panel SEO
           </button>
+          <Link className="btn btn-ghost" to="/entrar-panel" style={{ marginTop: '0.75rem' }}>
+            Entrar con correo / contraseña
+          </Link>
           <Link className="btn btn-ghost" to="/productos/seo" style={{ marginTop: '0.75rem' }}>
             Ver planes
           </Link>
@@ -69,11 +74,11 @@ export default function AccountPage() {
         <section className="account-panel">
           <h2>Tu espacio</h2>
           <p className="auth-muted">
-            Generación de landings, blogs y herramientas SEO viven en el panel. Usa el botón para
-            entrar.
+            Landings, blogs y herramientas SEO están en Nexus (<code>/pp</code>). Si no hay
+            sesión, usa “Entrar con correo”.
           </p>
           <p className="account-email">
-            Sesión: <strong>{user?.email}</strong>
+            Sesión sitio: <strong>{user?.email}</strong>
           </p>
           <button type="button" className="btn btn-ghost" onClick={onLogout}>
             Cerrar sesión

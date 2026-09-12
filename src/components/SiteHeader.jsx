@@ -103,11 +103,14 @@ export default function SiteHeader() {
             </div>
           </div>
 
+          <NavLink to="/como-funciona" onClick={close}>
+            Cómo funciona
+          </NavLink>
           <NavLink to="/blog" onClick={close}>
             Blog
           </NavLink>
           <NavLink to="/entrar-panel" onClick={close}>
-            Mi panel
+            Abrir panel
           </NavLink>
           {isAuthenticated ? (
             <NavLink className="btn-nav-brand" to="/cuenta" onClick={close}>

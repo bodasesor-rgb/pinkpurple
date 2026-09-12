@@ -4,8 +4,8 @@ import PasswordInput from '../components/PasswordInput.jsx';
 import { goToNexusPanel, loginNexusPinkpurple } from '../lib/nexusPanel.js';
 
 /**
- * Entrada al panel: siempre pide correo/contraseña (en blanco).
- * No usa sesión vieja de empresa.
+ * Entrada al panel: correo/contraseña → POST login Nexus → redirect navegador a /pp.
+ * Nexus decide onboarding vs panel aislado. No hay panel embebido en Pink.
  */
 export default function EnterPanelPage() {
   const [email, setEmail] = useState('');
@@ -19,8 +19,7 @@ export default function EnterPanelPage() {
     setSubmitting(true);
     try {
       const nexus = await loginNexusPinkpurple(email.trim(), password);
-      const panelUrl = nexus.panelUrl || nexus.enterUrl || '/pp';
-      goToNexusPanel(panelUrl);
+      goToNexusPanel(nexus);
     } catch (err) {
       setError(err?.message || 'No se pudo abrir el panel. Revisa correo y contraseña.');
     } finally {
@@ -32,10 +31,11 @@ export default function EnterPanelPage() {
     <div className="container page-pad auth-page">
       <div className="auth-card">
         <p className="eyebrow">Panel SEO</p>
-        <h1>Abrir mi panel</h1>
+        <h1>Abrir mi panel SEO</h1>
         <p className="auth-lead">
-          Escribe el correo y contraseña de tu cuenta PinkPurple. Los campos empiezan vacíos: no se
-          reutiliza otra empresa.
+          Escribe el correo y contraseña de tu cuenta PinkPurple. Te llevamos a Nexus (
+          <code>/pp</code>
+          ): si ya pagaste y falta marca, abre el wizard; si ya completaste, tu panel aislado.
         </p>
 
         <form className="auth-form" onSubmit={onSubmit} autoComplete="off">
@@ -65,7 +65,7 @@ export default function EnterPanelPage() {
           {error ? <p className="auth-error">{error}</p> : null}
 
           <button className="btn btn-primary auth-submit" type="submit" disabled={submitting}>
-            {submitting ? 'Entrando…' : 'Entrar al panel'}
+            {submitting ? 'Entrando…' : 'Abrir mi panel SEO'}
           </button>
         </form>
 

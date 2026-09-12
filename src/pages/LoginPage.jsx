@@ -1,28 +1,32 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import PasswordInput from '../components/PasswordInput.jsx';
 import SocialAuthButtons from '../components/SocialAuthButtons.jsx';
 import { goToNexusPanel, loginNexusPinkpurple, registerNexusPinkpurple } from '../lib/nexusPanel.js';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const { login, loginWithProvider, isAuthenticated, error, clearError, loading } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // OAuth Identity sin cookie Nexus → pedir credenciales panel, no /pp a ciegas
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      goToNexusPanel(sessionStorage.getItem('pp_after_oauth') || '/pp');
+      const after = sessionStorage.getItem('pp_after_oauth');
       sessionStorage.removeItem('pp_after_oauth');
+      if (after) {
+        navigate('/entrar-panel', { replace: true });
+      }
     }
-  }, [loading, isAuthenticated]);
+  }, [loading, isAuthenticated, navigate]);
 
   async function openNexusPanel(emailValue, passwordValue, fullName = '') {
     try {
-      const nexus = await loginNexusPinkpurple(emailValue, passwordValue);
-      return nexus.panelUrl || nexus.enterUrl || '/pp';
+      return await loginNexusPinkpurple(emailValue, passwordValue);
     } catch {
       try {
         await registerNexusPinkpurple({
@@ -32,10 +36,9 @@ export default function LoginPage() {
           plan: 'trial',
           billing: 'monthly',
         });
-        const nexus = await loginNexusPinkpurple(emailValue, passwordValue);
-        return nexus.panelUrl || nexus.enterUrl || '/pp';
+        return await loginNexusPinkpurple(emailValue, passwordValue);
       } catch {
-        return '/pp';
+        return { enterUrl: '/pp' };
       }
     }
   }
@@ -46,8 +49,8 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(email, password);
-      const panelUrl = await openNexusPanel(email, password);
-      goToNexusPanel(panelUrl);
+      const nexus = await openNexusPanel(email, password);
+      goToNexusPanel(nexus);
     } catch {
       // error already in context
     } finally {
@@ -55,13 +58,13 @@ export default function LoginPage() {
     }
   }
 
-  if (!loading && isAuthenticated) {
+  if (!loading && isAuthenticated && submitting) {
     return (
       <div className="container page-pad auth-page">
         <div className="auth-card">
           <p className="eyebrow">Acceso</p>
           <h1>Abriendo tu panel…</h1>
-          <p className="auth-lead">Te estamos llevando a PinkPurple SEO.</p>
+          <p className="auth-lead">Te estamos llevando a PinkPurple SEO en Nexus.</p>
         </div>
       </div>
     );
@@ -73,7 +76,8 @@ export default function LoginPage() {
         <p className="eyebrow">Acceso</p>
         <h1>Inicia sesión</h1>
         <p className="auth-lead">
-          Entra a tu espacio en PinkPurple Studio. Tras validar, abriremos tu panel SEO.
+          Entra a tu espacio en PinkPurple Studio. Tras validar, abrimos tu panel en Nexus (
+          <code>/pp</code>).
         </p>
 
         <form className="auth-form" onSubmit={onSubmit}>
@@ -110,7 +114,7 @@ export default function LoginPage() {
 
         <SocialAuthButtons
           onProvider={(provider) => {
-            sessionStorage.setItem('pp_after_oauth', '/pp');
+            sessionStorage.setItem('pp_after_oauth', '1');
             loginWithProvider(provider);
           }}
           disabled={submitting}
@@ -118,6 +122,8 @@ export default function LoginPage() {
 
         <p className="auth-switch">
           ¿No tienes cuenta? <Link to="/registro">Crear cuenta Free</Link>
+          {' · '}
+          <Link to="/entrar-panel">Abrir mi panel SEO</Link>
         </p>
       </div>
     </div>

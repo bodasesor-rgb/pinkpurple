@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import GrowthChartCarousel from '../components/GrowthChartCarousel.jsx';
 
 const pillars = [
   {
@@ -22,6 +23,24 @@ const pillars = [
     title: 'Funciona en tu servidor',
     text: 'Conectas tu sitio una sola vez y publicas sin copiar ni pegar. El mismo flujo corre en WordPress, Shopify, Netlify y otros servidores: el código de integración hace que funcione igual en cada plataforma.',
     detail: 'WordPress · Shopify · Netlify · más servidores compatibles',
+  },
+];
+
+const showcase = [
+  {
+    id: 'seo-visual',
+    title: 'Landings con tu diseño',
+    text: 'El generador escribe páginas de venta que encajan con la marca de tu sitio — no plantillas sueltas.',
+    image: '/brand/seo-product.jpg',
+    alt: 'PinkPurple SEO — crecimiento en buscadores',
+  },
+  {
+    id: 'panel',
+    title: 'Panel Nexus listo',
+    text: 'Keywords, Pulse, competidores y publicación en un solo lugar cuando abres tu cuenta.',
+    image: '/brand/logo-studio-header.png',
+    alt: 'PinkPurple Studio',
+    imageClass: 'home-showcase__img--logo',
   },
 ];
 
@@ -53,8 +72,8 @@ export default function HomePage() {
               <Link className="btn btn-primary" to="/productos/seo">
                 Ver PinkPurple SEO
               </Link>
-              <Link className="btn btn-ghost" to="/registro">
-                Empezar gratis
+              <Link className="btn btn-ghost" to="/como-funciona">
+                Cómo funciona
               </Link>
             </div>
           </div>
@@ -89,7 +108,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section" id="studio">
+      <GrowthChartCarousel />
+
+      <section className="section home-showcase" id="studio">
         <div className="container">
           <div className="section__intro section__intro--center">
             <p className="eyebrow">PinkPurple Studio</p>
@@ -98,6 +119,28 @@ export default function HomePage() {
               Studio es la casa de nuestros productos. Hoy el foco es SEO; mañana sumamos más
               flujos para operar y escalar tu negocio con la misma calidad.
             </p>
+          </div>
+
+          <div className="home-showcase__grid">
+            {showcase.map((item) => (
+              <article className="home-showcase__card" key={item.id}>
+                <div className={`home-showcase__media${item.imageClass ? ` ${item.imageClass}` : ''}`}>
+                  <img src={item.image} alt={item.alt} />
+                </div>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            ))}
+            <article className="home-showcase__card home-showcase__card--cta">
+              <p className="eyebrow">Guía</p>
+              <h3>Qué hace cada módulo</h3>
+              <p>
+                Landings, blogs, Pulse, competidores, SERP y publicación — explicados uno a uno.
+              </p>
+              <Link className="btn btn-primary" to="/como-funciona">
+                Cómo funciona
+              </Link>
+            </article>
           </div>
         </div>
       </section>

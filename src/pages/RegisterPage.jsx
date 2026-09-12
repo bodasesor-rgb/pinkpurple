@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import PasswordInput from '../components/PasswordInput.jsx';
 import SocialAuthButtons from '../components/SocialAuthButtons.jsx';
@@ -18,6 +18,7 @@ const PLAN_LABELS = {
 };
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const { register, loginWithProvider, isAuthenticated, error, clearError, loading } = useAuth();
   const [searchParams] = useSearchParams();
 
@@ -39,9 +40,9 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      goToNexusPanel('/pp');
+      navigate('/entrar-panel', { replace: true });
     }
-  }, [loading, isAuthenticated]);
+  }, [loading, isAuthenticated, navigate]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -68,14 +69,12 @@ export default function RegisterPage() {
 
       const hasSession = Boolean(user?.token?.access_token || getAccessToken(user));
       if (hasSession || user?.confirmed_at) {
-        let panelUrl = '/pp';
         try {
           const nexus = await loginNexusPinkpurple(email, password);
-          panelUrl = nexus.panelUrl || nexus.enterUrl || '/pp';
+          goToNexusPanel(nexus);
         } catch {
-          panelUrl = '/pp';
+          goToNexusPanel('/pp');
         }
-        goToNexusPanel(panelUrl);
       } else {
         setInfo(
           'Cuenta creada. Revisa tu correo para confirmar y luego inicia sesión para abrir tu panel.',
@@ -164,7 +163,7 @@ export default function RegisterPage() {
         <SocialAuthButtons
           mode="register"
           onProvider={(provider) => {
-            sessionStorage.setItem('pp_after_oauth', '/pp');
+            sessionStorage.setItem('pp_after_oauth', '1');
             loginWithProvider(provider);
           }}
           disabled={submitting}

@@ -88,7 +88,7 @@ export default function CheckoutPage() {
       const payPass = password;
       sessionStorage.setItem('pp_demo_pass', payPass);
 
-      let panelUrl = '/pp';
+      let nexusPayload = { enterUrl: '/pp' };
       try {
         const nexus = await demoCheckoutNexus({
           email: payEmail,
@@ -97,14 +97,13 @@ export default function CheckoutPage() {
           plan: plan.id,
           billing,
         });
-        panelUrl = nexus.panelUrl || nexus.enterUrl || '/pp';
+        nexusPayload = nexus;
       } catch (err) {
         console.warn('demo checkout nexus', err);
-        panelUrl = '/pp';
       }
 
       setStep('done');
-      setTimeout(() => goToNexusPanel(panelUrl), 600);
+      setTimeout(() => goToNexusPanel(nexusPayload), 600);
     } catch (err) {
       setStep('ready');
       setError(

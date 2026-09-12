@@ -16,6 +16,7 @@ export default function SiteFooter() {
         <div className="site-footer__links">
           <Link to="/productos">Productos</Link>
           <Link to="/productos/seo">PinkPurple SEO</Link>
+          <Link to="/como-funciona">Cómo funciona</Link>
           <Link to="/blog">Blog</Link>
           <Link to="/login">Iniciar sesión</Link>
         </div>
