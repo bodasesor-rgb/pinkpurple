@@ -1,8 +1,13 @@
-import { useMemo, useState } from 'react';
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import PasswordInput from '../components/PasswordInput.jsx';
 import SocialAuthButtons from '../components/SocialAuthButtons.jsx';
+import {
+  goToNexusPanel,
+  loginNexusPinkpurple,
+  registerNexusPinkpurple,
+} from '../lib/nexusPanel.js';
 
 const PLAN_LABELS = {
   free: 'Free',
@@ -14,7 +19,6 @@ const PLAN_LABELS = {
 
 export default function RegisterPage() {
   const { register, loginWithProvider, isAuthenticated, error, clearError, loading } = useAuth();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const selectedPlan = useMemo(() => {
@@ -33,9 +37,11 @@ export default function RegisterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [info, setInfo] = useState('');
 
-  if (!loading && isAuthenticated) {
-    return <Navigate to="/cuenta" replace />;
-  }
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      goToNexusPanel('/pp');
+    }
+  }, [loading, isAuthenticated]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -47,12 +53,32 @@ export default function RegisterPage() {
         plan: selectedPlan,
         billing: selectedBilling,
       });
+
+      try {
+        await registerNexusPinkpurple({
+          email,
+          password,
+          fullName,
+          plan: selectedPlan,
+          billing: selectedBilling,
+        });
+      } catch {
+        /* Nexus puede pedir verify; Identity ya creó la cuenta */
+      }
+
       const hasSession = Boolean(user?.token?.access_token || getAccessToken(user));
       if (hasSession || user?.confirmed_at) {
-        navigate('/cuenta', { replace: true });
+        let panelUrl = '/pp';
+        try {
+          const nexus = await loginNexusPinkpurple(email, password);
+          panelUrl = nexus.panelUrl || nexus.enterUrl || '/pp';
+        } catch {
+          panelUrl = '/pp';
+        }
+        goToNexusPanel(panelUrl);
       } else {
         setInfo(
-          'Cuenta creada. Revisa tu correo para confirmar (si Identity lo pide) y luego inicia sesión.',
+          'Cuenta creada. Revisa tu correo para confirmar y luego inicia sesión para abrir tu panel.',
         );
       }
     } catch {
@@ -60,6 +86,18 @@ export default function RegisterPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (!loading && isAuthenticated) {
+    return (
+      <div className="container page-pad auth-page">
+        <div className="auth-card">
+          <p className="eyebrow">Registro</p>
+          <h1>Abriendo tu panel…</h1>
+          <p className="auth-lead">Cuenta lista. Te llevamos a PinkPurple SEO.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -75,7 +113,7 @@ export default function RegisterPage() {
               ? ` · ${selectedBilling === 'annual' ? 'Anual' : 'Mensual'}`
               : ''}
           </strong>
-          . Podrás acceder a tu espacio PinkPurple SEO al iniciar sesión.
+          . Al entrar te llevamos a tu panel en PinkPurple SEO.
         </p>
 
         <form className="auth-form" onSubmit={onSubmit}>
@@ -125,7 +163,10 @@ export default function RegisterPage() {
 
         <SocialAuthButtons
           mode="register"
-          onProvider={loginWithProvider}
+          onProvider={(provider) => {
+            sessionStorage.setItem('pp_after_oauth', '/pp');
+            loginWithProvider(provider);
+          }}
           disabled={submitting}
         />
 

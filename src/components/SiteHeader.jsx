@@ -107,9 +107,13 @@ export default function SiteHeader() {
             Blog
           </NavLink>
           {isAuthenticated ? (
-            <NavLink className="btn-nav-brand" to="/cuenta" onClick={close}>
-              Mi cuenta
-            </NavLink>
+            <a
+              className="btn-nav-brand"
+              href="https://white-ferret-567834.hostingersite.com/pp"
+              onClick={close}
+            >
+              Mi panel
+            </a>
           ) : (
             <NavLink className="btn-nav-brand" to="/login" onClick={close}>
               Iniciar sesión
