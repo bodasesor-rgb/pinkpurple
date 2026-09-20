@@ -2909,6 +2909,155 @@ button.gsc-metric {
   background: rgba(244, 60, 176, 0.05);
 }
 
+.nx-callout--publish > .nx-field,
+.nx-callout--publish > .nx-row {
+  margin-bottom: 0.65rem;
+}
+
+.nx-publish-grid {
+  border: 0;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 1fr;
+}
+
+.nx-publish-grid legend {
+  font-size: 0.86rem;
+  font-weight: 650;
+  margin-bottom: 0.55rem;
+  color: var(--ink);
+}
+
+.nx-publish-card {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  border: 1px solid rgba(140, 61, 245, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nx-publish-card:hover {
+  border-color: rgba(140, 61, 245, 0.35);
+}
+
+.nx-publish-card.is-active {
+  border-color: rgba(140, 61, 245, 0.55);
+  box-shadow: 0 0 0 2px rgba(140, 61, 245, 0.12);
+  background: rgba(140, 61, 245, 0.06);
+}
+
+.nx-publish-card input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.nx-publish-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.nx-publish-card__body strong {
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.nx-publish-card__body small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.nx-publish-badge {
+  display: inline-block;
+  margin-top: 0.35rem;
+  width: fit-content;
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: rgba(15, 23, 42, 0.06);
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+}
+
+.nx-publish-badge--ok {
+  color: #0f766e;
+  background: rgba(0, 170, 150, 0.12);
+}
+
+.nx-publish-badge--warn {
+  color: #9a3412;
+  background: rgba(234, 88, 12, 0.12);
+}
+
+.nx-howto-btn {
+  margin-top: 0.35rem;
+  padding: 0.5rem 0.95rem !important;
+  font-size: 0.88rem !important;
+}
+
+.nx-howto {
+  margin-top: 0.85rem;
+  padding: 0.95rem 1rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(140, 61, 245, 0.28);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.nx-howto h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+}
+
+.nx-howto__push {
+  margin: 0 0 0.65rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.nx-howto ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.nx-howto li {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.nx-howto__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+@media (min-width: 720px) {
+  .nx-publish-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 980px) {
+  .nx-publish-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .nx-social-list {
   display: grid;
   gap: 0.75rem;

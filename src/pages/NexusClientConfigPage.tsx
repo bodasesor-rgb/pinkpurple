@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type Re
 import {
   CONFIG_SECTIONS,
   EMPTY_CONFIG,
-  PUBLISH_TARGET_OPTIONS,
   SAMPLE_CONFIG,
   SOCIAL_NETWORK_OPTIONS,
   TONE_OPTIONS,
@@ -18,6 +17,11 @@ import {
   type SocialNetworkId,
 } from '../app/config/nexusClientConfig';
 import { COUNTRIES, getCountry, statesForCountry, type CountryCode } from '../app/config/locations';
+import {
+  PUBLISH_PLATFORMS,
+  getPublishPlatform,
+  isApiKeyPublish,
+} from '../app/config/publishPlatforms';
 
 type FieldProps = {
   label: string;
@@ -107,11 +111,16 @@ function applyScanToConfig(prev: NexusClientConfig, data: ScanData): NexusClient
     }
   }
 
-  const publishHint = (data.cmsHints || [])[0];
+  const publishHint = String((data.cmsHints || [])[0] || '').toLowerCase();
   let publishTarget = prev.publishTarget;
-  if (publishHint === 'netlify') publishTarget = 'netlify';
-  else if (publishHint === 'wordpress' || publishHint === 'shopify' || publishHint === 'wix') {
-    publishTarget = 'api';
+  if (publishHint.includes('netlify')) publishTarget = 'netlify';
+  else if (publishHint.includes('shopify')) publishTarget = 'shopify';
+  else if (publishHint.includes('wix')) publishTarget = 'wix';
+  else if (publishHint.includes('webflow')) publishTarget = 'webflow';
+  else if (publishHint.includes('squarespace')) publishTarget = 'squarespace';
+  else if (publishHint.includes('hostinger')) publishTarget = 'hostinger';
+  else if (publishHint.includes('wordpress') || publishHint.includes('wp')) {
+    publishTarget = 'wordpress';
   }
 
   return {
@@ -153,6 +162,7 @@ export default function NexusClientConfigPage() {
   const [countryOpen, setCountryOpen] = useState(false);
   const [draftColor, setDraftColor] = useState('#8c3df5');
   const [draftHex, setDraftHex] = useState('#8c3df5');
+  const [howToOpen, setHowToOpen] = useState(false);
 
   const missing = useMemo(() => missingRequired(config), [config]);
   const country = getCountry(config.countryCode);
@@ -324,7 +334,10 @@ export default function NexusClientConfigPage() {
       publishTarget: target,
       hasOwnSite: target !== 'preview',
     }));
+    setHowToOpen(false);
   }
+
+  const activePlatform = getPublishPlatform(config.publishTarget);
 
   return (
     <div className="page-pad nx-page">
@@ -662,114 +675,169 @@ export default function NexusClientConfigPage() {
               <h2>{CONFIG_SECTIONS[6].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[6].blurb}</p>
 
-              <fieldset className="nx-radios">
-                <legend>¿Cómo se conecta el sitio?</legend>
-                {PUBLISH_TARGET_OPTIONS.map((opt) => (
-                  <label key={opt.id} className="nx-radio nx-radio--block">
+              <fieldset className="nx-publish-grid">
+                <legend>Elige la plataforma</legend>
+                {PUBLISH_PLATFORMS.map((opt) => (
+                  <label
+                    key={opt.id}
+                    className={`nx-publish-card${config.publishTarget === opt.id ? ' is-active' : ''}`}
+                  >
                     <input
                       type="radio"
                       name="publishTarget"
                       checked={config.publishTarget === opt.id}
                       onChange={() => setPublishTarget(opt.id)}
                     />
-                    <span>
+                    <span className="nx-publish-card__body">
                       <strong>{opt.label}</strong>
                       <small>{opt.hint}</small>
+                      {opt.howTo.canPushWithApiKey ? (
+                        <em className="nx-publish-badge nx-publish-badge--ok">Push con API key</em>
+                      ) : opt.mode === 'netlify_build' ? (
+                        <em className="nx-publish-badge">Deploy en build</em>
+                      ) : opt.mode === 'preview' ? (
+                        <em className="nx-publish-badge">Sin API</em>
+                      ) : (
+                        <em className="nx-publish-badge nx-publish-badge--warn">Revisar caso</em>
+                      )}
                     </span>
                   </label>
                 ))}
               </fieldset>
 
-              {config.publishTarget === 'preview' ? (
-                <Field
-                  label="Slug de preview"
-                  hint="Se usará como tu-marca.pinkpurple.site"
+              {activePlatform ? (
+                <div
+                  className={`nx-callout nx-callout--publish${
+                    activePlatform.mode === 'netlify_build'
+                      ? ' nx-callout--netlify'
+                      : activePlatform.howTo.canPushWithApiKey
+                        ? ' nx-callout--api'
+                        : ''
+                  }`}
                 >
-                  <input
-                    placeholder="tu-marca"
-                    value={config.publishSlug}
-                    onChange={onText('publishSlug')}
-                  />
-                </Field>
-              ) : null}
-
-              {config.publishTarget === 'netlify' ? (
-                <div className="nx-callout nx-callout--netlify">
                   <p>
-                    <strong>Netlify (modelo Bodasesor):</strong> Nexus no hace push de HTML a su
-                    sitio. Se conecta el proyecto Netlify; en el <em>build</em> de Netlify se baja el
-                    SEO y se despliega desde <strong>su código / su repo</strong>. Así no se borra
-                    la página principal.
+                    <strong>{activePlatform.label}:</strong> {activePlatform.howTo.summary}
                   </p>
-                  <div className="nx-row">
+
+                  {config.publishTarget === 'preview' ? (
                     <Field
-                      label="Site ID o URL Netlify"
-                      required
-                      hint="Ej. site id o https://app.netlify.com/sites/…"
+                      label="Slug de preview"
+                      hint="Se usará como tu-marca.pinkpurple.site"
                     >
                       <input
-                        placeholder="mi-sitio o UUID"
-                        value={config.netlifySiteId}
-                        onChange={onText('netlifySiteId')}
+                        placeholder="tu-marca"
+                        value={config.publishSlug}
+                        onChange={onText('publishSlug')}
                       />
                     </Field>
-                    <Field
-                      label="URL pública del sitio"
-                      hint="Dominio que ve el cliente."
-                    >
-                      <input
-                        type="url"
-                        placeholder="https://tu-dominio.com"
-                        value={config.publishSiteUrl}
-                        onChange={onText('publishSiteUrl')}
-                      />
-                    </Field>
-                  </div>
-                  <Field
-                    label="Token / build hook (conexión)"
-                    hint="Prototipo: aquí irá el secreto de conexión. Netlify ejecuta el deploy."
+                  ) : null}
+
+                  {config.publishTarget === 'netlify' ? (
+                    <>
+                      <div className="nx-row">
+                        <Field
+                          label="Site ID o URL Netlify"
+                          required
+                          hint="Site configuration → General → Site details"
+                        >
+                          <input
+                            placeholder="mi-sitio o UUID"
+                            value={config.netlifySiteId}
+                            onChange={onText('netlifySiteId')}
+                          />
+                        </Field>
+                        <Field label="URL pública del sitio" hint="Dominio que ve el cliente.">
+                          <input
+                            type="url"
+                            placeholder="https://tu-dominio.com"
+                            value={config.publishSiteUrl}
+                            onChange={onText('publishSiteUrl')}
+                          />
+                        </Field>
+                      </div>
+                      <Field
+                        label="Build hook / token de conexión"
+                        hint="Build & deploy → Build hooks. Netlify ejecuta el deploy."
+                      >
+                        <input
+                          type="password"
+                          autoComplete="off"
+                          placeholder="Build hook o token"
+                          value={config.netlifyConnectToken}
+                          onChange={onText('netlifyConnectToken')}
+                        />
+                      </Field>
+                    </>
+                  ) : null}
+
+                  {isApiKeyPublish(config.publishTarget) ||
+                  config.publishTarget === 'squarespace' ||
+                  config.publishTarget === 'hostinger' ? (
+                    <div className="nx-row">
+                      <Field
+                        label="URL del sitio"
+                        required={
+                          config.publishTarget !== 'hostinger' ||
+                          Boolean(config.publishSiteUrl.trim())
+                        }
+                      >
+                        <input
+                          type="url"
+                          placeholder="https://tu-dominio.com"
+                          value={config.publishSiteUrl}
+                          onChange={onText('publishSiteUrl')}
+                        />
+                      </Field>
+                      <Field
+                        label={
+                          activePlatform.howTo.canPushWithApiKey
+                            ? 'API key / token'
+                            : 'API key (si existe)'
+                        }
+                        required={activePlatform.howTo.canPushWithApiKey}
+                        hint={
+                          activePlatform.howTo.fieldsNote ||
+                          'No se muestra en el HTML público.'
+                        }
+                      >
+                        <input
+                          type="password"
+                          autoComplete="off"
+                          placeholder="••••••••"
+                          value={config.publishApiKey}
+                          onChange={onText('publishApiKey')}
+                        />
+                      </Field>
+                    </div>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    className="btn btn-ghost nx-howto-btn"
+                    onClick={() => setHowToOpen((v) => !v)}
+                    aria-expanded={howToOpen}
                   >
-                    <input
-                      type="password"
-                      autoComplete="off"
-                      placeholder="Build hook o token de conexión"
-                      value={config.netlifyConnectToken}
-                      onChange={onText('netlifyConnectToken')}
-                    />
-                  </Field>
-                </div>
-              ) : null}
+                    {howToOpen ? 'Ocultar guía' : '¿Cómo lo hago?'}
+                  </button>
 
-              {config.publishTarget === 'api' ? (
-                <div className="nx-callout nx-callout--api">
-                  <p>
-                    <strong>WordPress, Wix, Shopify, Hostinger y similares:</strong> el cliente pega
-                    la <em>API key</em> (o application password) de su página. Ahí sí Nexus puede
-                    publicar / hacer push por API sin pisar un repo Git ajeno.
-                  </p>
-                  <div className="nx-row">
-                    <Field label="URL del sitio / CMS" required>
-                      <input
-                        type="url"
-                        placeholder="https://tu-dominio.com"
-                        value={config.publishSiteUrl}
-                        onChange={onText('publishSiteUrl')}
-                      />
-                    </Field>
-                    <Field
-                      label="API key / application password"
-                      required
-                      hint="No se muestra en el HTML público; solo en el panel."
-                    >
-                      <input
-                        type="password"
-                        autoComplete="off"
-                        placeholder="••••••••"
-                        value={config.publishApiKey}
-                        onChange={onText('publishApiKey')}
-                      />
-                    </Field>
-                  </div>
+                  {howToOpen ? (
+                    <div className="nx-howto">
+                      <h3>{activePlatform.howTo.title}</h3>
+                      <p className="nx-howto__push">
+                        {activePlatform.howTo.canPushWithApiKey
+                          ? 'Sí se puede publicar con API key / token.'
+                          : 'No basta solo con API key (o no aplica).'}
+                      </p>
+                      <ol>
+                        {activePlatform.howTo.steps.map((step) => (
+                          <li key={step}>{step}</li>
+                        ))}
+                      </ol>
+                      {activePlatform.howTo.fieldsNote ? (
+                        <p className="nx-howto__note">{activePlatform.howTo.fieldsNote}</p>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </section>
@@ -900,9 +968,13 @@ function toPayload(config: NexusClientConfig) {
       pushBy:
         config.publishTarget === 'netlify'
           ? 'netlify_build'
-          : config.publishTarget === 'api'
+          : getPublishPlatform(config.publishTarget)?.mode === 'nexus_api'
             ? 'nexus_api'
-            : 'none',
+            : getPublishPlatform(config.publishTarget)?.mode === 'manual_review'
+              ? 'manual_review'
+              : 'none',
+      platformLabel: getPublishPlatform(config.publishTarget)?.label || config.publishTarget,
+      canPushWithApiKey: Boolean(getPublishPlatform(config.publishTarget)?.howTo.canPushWithApiKey),
     },
     social: config.socialLinks
       .filter((s) => s.url.trim())

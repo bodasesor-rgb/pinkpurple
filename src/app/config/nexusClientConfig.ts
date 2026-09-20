@@ -4,14 +4,10 @@
  */
 
 import type { CountryCode } from './locations';
+import { migratePublishTarget, type PublishTarget } from './publishPlatforms';
 
+export type { PublishTarget } from './publishPlatforms';
 export type NexusTone = 'formal' | 'cercano' | 'experto';
-
-/** Cómo se publica el contenido en el sitio del cliente. */
-export type PublishTarget =
-  | 'preview' // *.pinkpurple.site
-  | 'netlify' // build/push en su Netlify (como Bodasesor) — Nexus no pisa el sitio
-  | 'api'; // WordPress, Wix, Shopify, Hostinger… vía API key — Nexus empuja
 
 export type SocialNetworkId =
   | 'instagram'
@@ -108,7 +104,7 @@ export const CONFIG_SECTIONS: ConfigSection[] = [
     id: 'publicacion',
     title: '7 · Dónde publica',
     blurb:
-      'Netlify = su build hace el deploy (como Bodasesor). Otros CMS = conexión por API key y Nexus empuja.',
+      'Elige la plataforma (cada una aparte). Netlify despliega en su build; WordPress/Shopify/Wix/Webflow admiten push con API key.',
   },
   {
     id: 'redes',
@@ -133,28 +129,6 @@ export const SOCIAL_NETWORK_OPTIONS: { id: SocialNetworkId; label: string }[] = 
   { id: 'pinterest', label: 'Pinterest' },
   { id: 'whatsapp', label: 'WhatsApp (canal)' },
   { id: 'other', label: 'Otra…' },
-];
-
-export const PUBLISH_TARGET_OPTIONS: {
-  id: PublishTarget;
-  label: string;
-  hint: string;
-}[] = [
-  {
-    id: 'preview',
-    label: 'Preview PinkPurple (*.pinkpurple.site)',
-    hint: 'Sin sitio propio todavía. Solo preview en Nexus.',
-  },
-  {
-    id: 'netlify',
-    label: 'Netlify (como Bodasesor)',
-    hint: 'El push lo hace Netlify en su build/repo. Nexus no escribe HTML encima de su sitio.',
-  },
-  {
-    id: 'api',
-    label: 'WordPress, Wix, Shopify u otro (API key)',
-    hint: 'Conectas con API key / application password. Ahí sí Nexus puede publicar por API.',
-  },
 ];
 
 function newSocialId(): string {
@@ -217,7 +191,7 @@ export const SAMPLE_CONFIG: NexusClientConfig = {
   targetKeywords:
     'remodelación residencial, diseño interior, remodelar departamento',
   hasOwnSite: true,
-  publishTarget: 'api',
+  publishTarget: 'wordpress',
   publishSiteUrl: 'https://ejemplo-negocio.mx',
   publishApiKey: '',
   publishSlug: 'estudio-norte',
@@ -266,11 +240,18 @@ function migrateLegacy(raw: Record<string, unknown>): Partial<NexusClientConfig>
     next.socialLinks = links.length ? links : EMPTY_CONFIG.socialLinks;
   }
 
-  if (!raw.publishTarget) {
-    if (raw.hasOwnSite === false || raw.cmsPlatform === 'none') next.publishTarget = 'preview';
-    else if (raw.cmsPlatform === 'other' || String(raw.cmsPlatform || '').includes('netlify')) {
-      next.publishTarget = 'netlify';
-    } else next.publishTarget = 'api';
+  if (raw.publishTarget != null) {
+    next.publishTarget = migratePublishTarget(raw.publishTarget);
+  } else if (raw.hasOwnSite === false || raw.cmsPlatform === 'none') {
+    next.publishTarget = 'preview';
+  } else if (String(raw.cmsPlatform || '').includes('netlify')) {
+    next.publishTarget = 'netlify';
+  } else if (String(raw.cmsPlatform || '') === 'shopify') {
+    next.publishTarget = 'shopify';
+  } else if (String(raw.cmsPlatform || '') === 'wordpress' || raw.hasOwnSite) {
+    next.publishTarget = 'wordpress';
+  } else {
+    next.publishTarget = 'preview';
   }
 
   if (!raw.countryCode) next.countryCode = 'MX';
@@ -337,9 +318,18 @@ export function missingRequired(config: NexusClientConfig): string[] {
   if (config.publishTarget === 'preview' && !config.publishSlug.trim() && !config.brandName.trim()) {
     miss.push('Slug de preview');
   }
-  if (config.publishTarget === 'api') {
-    if (!config.publishSiteUrl.trim()) miss.push('URL del sitio (API)');
-    if (!config.publishApiKey.trim()) miss.push('API key del sitio');
+  const apiTargets = new Set(['wordpress', 'shopify', 'wix', 'webflow', 'other']);
+  if (apiTargets.has(config.publishTarget)) {
+    if (!config.publishSiteUrl.trim()) miss.push('URL del sitio');
+    if (
+      (config.publishTarget === 'wordpress' ||
+        config.publishTarget === 'shopify' ||
+        config.publishTarget === 'wix' ||
+        config.publishTarget === 'webflow') &&
+      !config.publishApiKey.trim()
+    ) {
+      miss.push('API key / token');
+    }
   }
   if (config.publishTarget === 'netlify') {
     if (!config.netlifySiteId.trim() && !config.publishSiteUrl.trim()) {
