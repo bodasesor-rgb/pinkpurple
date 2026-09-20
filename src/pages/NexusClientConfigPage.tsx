@@ -476,7 +476,7 @@ export default function NexusClientConfigPage() {
                     <option value="">Elige un país…</option>
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.code}>
-                        {c.name}
+                        {c.flag} {c.name}
                       </option>
                     ))}
                   </select>
