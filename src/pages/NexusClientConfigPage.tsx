@@ -163,6 +163,8 @@ export default function NexusClientConfigPage() {
   const [draftColor, setDraftColor] = useState('#8c3df5');
   const [draftHex, setDraftHex] = useState('#8c3df5');
   const [howToOpen, setHowToOpen] = useState(false);
+  const [logoDragOver, setLogoDragOver] = useState(false);
+  const [logoError, setLogoError] = useState('');
 
   const missing = useMemo(() => missingRequired(config), [config]);
   const country = getCountry(config.countryCode);
@@ -240,6 +242,32 @@ export default function NexusClientConfigPage() {
       ...prev,
       brandColors: prev.brandColors.filter((c) => c !== hex),
     }));
+  }
+
+  function applyLogoFile(file: File | null | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setLogoError('Solo imágenes (PNG, SVG, WebP o JPG).');
+      return;
+    }
+    if (file.size > 2.5 * 1024 * 1024) {
+      setLogoError('Máximo 2.5 MB. Usa PNG/SVG sin fondo.');
+      return;
+    }
+    setLogoError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result || '');
+      if (!dataUrl) return;
+      setConfig((prev) => ({ ...prev, logoUrl: dataUrl }));
+    };
+    reader.onerror = () => setLogoError('No se pudo leer el archivo.');
+    reader.readAsDataURL(file);
+  }
+
+  function clearLogo() {
+    setConfig((prev) => ({ ...prev, logoUrl: '' }));
+    setLogoError('');
   }
 
   function patchSocial(id: string, patch: Partial<SocialLink>) {
@@ -336,8 +364,6 @@ export default function NexusClientConfigPage() {
     }));
     setHowToOpen(false);
   }
-
-  const activePlatform = getPublishPlatform(config.publishTarget);
 
   return (
     <div className="page-pad nx-page">
@@ -526,14 +552,66 @@ export default function NexusClientConfigPage() {
                     <p className="nx-field__hint">Sin colores aún.</p>
                   )}
                 </div>
-                <Field label="Logo (URL)" hint="En producción: upload de imagen.">
-                  <input
-                    type="url"
-                    placeholder="https://…/logo.png"
-                    value={config.logoUrl}
-                    onChange={onText('logoUrl')}
-                  />
-                </Field>
+                <div className="nx-field">
+                  <span className="nx-field__label">Logo</span>
+                  <div
+                    className={`nx-logo-drop${logoDragOver ? ' is-over' : ''}${config.logoUrl ? ' has-preview' : ''}`}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setLogoDragOver(true);
+                    }}
+                    onDragLeave={() => setLogoDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setLogoDragOver(false);
+                      applyLogoFile(e.dataTransfer.files?.[0]);
+                    }}
+                  >
+                    {config.logoUrl ? (
+                      <div className="nx-logo-preview">
+                        <img src={config.logoUrl} alt="Vista previa del logo" />
+                      </div>
+                    ) : (
+                      <p className="nx-logo-drop__hint">
+                        Arrastra tu logo aquí o elige un archivo
+                      </p>
+                    )}
+                    <div className="nx-logo-drop__actions">
+                      <label className="btn btn-ghost nx-logo-file-btn">
+                        Cargar imagen
+                        <input
+                          type="file"
+                          accept="image/png,image/svg+xml,image/webp,image/jpeg"
+                          hidden
+                          onChange={(e) => {
+                            applyLogoFile(e.target.files?.[0]);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                      {config.logoUrl ? (
+                        <button type="button" className="btn btn-ghost" onClick={clearLogo}>
+                          Quitar
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                  <small className="nx-field__hint">
+                    Debe ser imagen <strong>sin fondo</strong> (PNG o SVG preferible). Máx. 2.5 MB.
+                  </small>
+                  {logoError ? <p className="nx-scan-error">{logoError}</p> : null}
+                  <Field
+                    label="O pega una URL"
+                    hint="Opcional si ya subiste el archivo."
+                  >
+                    <input
+                      type="url"
+                      placeholder="https://…/logo.png"
+                      value={config.logoUrl.startsWith('data:') ? '' : config.logoUrl}
+                      onChange={onText('logoUrl')}
+                    />
+                  </Field>
+                </div>
               </div>
             </section>
 
@@ -675,171 +753,170 @@ export default function NexusClientConfigPage() {
               <h2>{CONFIG_SECTIONS[6].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[6].blurb}</p>
 
-              <fieldset className="nx-publish-grid">
-                <legend>Elige la plataforma</legend>
-                {PUBLISH_PLATFORMS.map((opt) => (
-                  <label
-                    key={opt.id}
-                    className={`nx-publish-card${config.publishTarget === opt.id ? ' is-active' : ''}`}
-                  >
-                    <input
-                      type="radio"
-                      name="publishTarget"
-                      checked={config.publishTarget === opt.id}
-                      onChange={() => setPublishTarget(opt.id)}
-                    />
-                    <span className="nx-publish-card__body">
-                      <strong>{opt.label}</strong>
-                      <small>{opt.hint}</small>
-                      {opt.howTo.canPushWithApiKey ? (
-                        <em className="nx-publish-badge nx-publish-badge--ok">Push con API key</em>
-                      ) : opt.mode === 'netlify_build' ? (
-                        <em className="nx-publish-badge">Deploy en build</em>
-                      ) : opt.mode === 'preview' ? (
-                        <em className="nx-publish-badge">Sin API</em>
-                      ) : (
-                        <em className="nx-publish-badge nx-publish-badge--warn">Revisar caso</em>
-                      )}
-                    </span>
-                  </label>
-                ))}
-              </fieldset>
-
-              {activePlatform ? (
-                <div
-                  className={`nx-callout nx-callout--publish${
-                    activePlatform.mode === 'netlify_build'
-                      ? ' nx-callout--netlify'
-                      : activePlatform.howTo.canPushWithApiKey
-                        ? ' nx-callout--api'
-                        : ''
-                  }`}
-                >
-                  <p>
-                    <strong>{activePlatform.label}:</strong> {activePlatform.howTo.summary}
-                  </p>
-
-                  {config.publishTarget === 'preview' ? (
-                    <Field
-                      label="Slug de preview"
-                      hint="Se usará como tu-marca.pinkpurple.site"
+              <div className="nx-publish-list" role="listbox" aria-label="Plataformas de publicación">
+                {PUBLISH_PLATFORMS.map((opt) => {
+                  const open = config.publishTarget === opt.id;
+                  return (
+                    <div
+                      key={opt.id}
+                      className={`nx-publish-row${open ? ' is-open' : ''}`}
+                      role="option"
+                      aria-selected={open}
                     >
-                      <input
-                        placeholder="tu-marca"
-                        value={config.publishSlug}
-                        onChange={onText('publishSlug')}
-                      />
-                    </Field>
-                  ) : null}
+                      <button
+                        type="button"
+                        className="nx-publish-row__head"
+                        onClick={() => setPublishTarget(opt.id)}
+                        aria-expanded={open}
+                      >
+                        <span className="nx-publish-row__title">
+                          <strong>{opt.label}</strong>
+                          <small>{opt.hint}</small>
+                        </span>
+                        {opt.howTo.canPushWithApiKey ? (
+                          <em className="nx-publish-badge nx-publish-badge--ok">Push con API key</em>
+                        ) : opt.mode === 'netlify_build' ? (
+                          <em className="nx-publish-badge">Deploy en build</em>
+                        ) : opt.mode === 'preview' ? (
+                          <em className="nx-publish-badge">Sin API</em>
+                        ) : (
+                          <em className="nx-publish-badge nx-publish-badge--warn">Revisar caso</em>
+                        )}
+                        <span className="nx-publish-row__chev" aria-hidden>
+                          {open ? '▾' : '▸'}
+                        </span>
+                      </button>
 
-                  {config.publishTarget === 'netlify' ? (
-                    <>
-                      <div className="nx-row">
-                        <Field
-                          label="Site ID o URL Netlify"
-                          required
-                          hint="Site configuration → General → Site details"
+                      {open ? (
+                        <div
+                          className={`nx-publish-row__body${
+                            opt.mode === 'netlify_build'
+                              ? ' nx-callout--netlify'
+                              : opt.howTo.canPushWithApiKey
+                                ? ' nx-callout--api'
+                                : ''
+                          }`}
                         >
-                          <input
-                            placeholder="mi-sitio o UUID"
-                            value={config.netlifySiteId}
-                            onChange={onText('netlifySiteId')}
-                          />
-                        </Field>
-                        <Field label="URL pública del sitio" hint="Dominio que ve el cliente.">
-                          <input
-                            type="url"
-                            placeholder="https://tu-dominio.com"
-                            value={config.publishSiteUrl}
-                            onChange={onText('publishSiteUrl')}
-                          />
-                        </Field>
-                      </div>
-                      <Field
-                        label="Build hook / token de conexión"
-                        hint="Build & deploy → Build hooks. Netlify ejecuta el deploy."
-                      >
-                        <input
-                          type="password"
-                          autoComplete="off"
-                          placeholder="Build hook o token"
-                          value={config.netlifyConnectToken}
-                          onChange={onText('netlifyConnectToken')}
-                        />
-                      </Field>
-                    </>
-                  ) : null}
+                          <p>
+                            <strong>{opt.label}:</strong> {opt.howTo.summary}
+                          </p>
 
-                  {isApiKeyPublish(config.publishTarget) ||
-                  config.publishTarget === 'squarespace' ||
-                  config.publishTarget === 'hostinger' ? (
-                    <div className="nx-row">
-                      <Field
-                        label="URL del sitio"
-                        required={
-                          config.publishTarget !== 'hostinger' ||
-                          Boolean(config.publishSiteUrl.trim())
-                        }
-                      >
-                        <input
-                          type="url"
-                          placeholder="https://tu-dominio.com"
-                          value={config.publishSiteUrl}
-                          onChange={onText('publishSiteUrl')}
-                        />
-                      </Field>
-                      <Field
-                        label={
-                          activePlatform.howTo.canPushWithApiKey
-                            ? 'API key / token'
-                            : 'API key (si existe)'
-                        }
-                        required={activePlatform.howTo.canPushWithApiKey}
-                        hint={
-                          activePlatform.howTo.fieldsNote ||
-                          'No se muestra en el HTML público.'
-                        }
-                      >
-                        <input
-                          type="password"
-                          autoComplete="off"
-                          placeholder="••••••••"
-                          value={config.publishApiKey}
-                          onChange={onText('publishApiKey')}
-                        />
-                      </Field>
-                    </div>
-                  ) : null}
+                          {opt.id === 'preview' ? (
+                            <Field
+                              label="Slug de preview"
+                              hint="Se usará como tu-marca.pinkpurple.site"
+                            >
+                              <input
+                                placeholder="tu-marca"
+                                value={config.publishSlug}
+                                onChange={onText('publishSlug')}
+                              />
+                            </Field>
+                          ) : null}
 
-                  <button
-                    type="button"
-                    className="btn btn-ghost nx-howto-btn"
-                    onClick={() => setHowToOpen((v) => !v)}
-                    aria-expanded={howToOpen}
-                  >
-                    {howToOpen ? 'Ocultar guía' : '¿Cómo lo hago?'}
-                  </button>
+                          {opt.id === 'netlify' ? (
+                            <>
+                              <div className="nx-row">
+                                <Field
+                                  label="Site ID o URL Netlify"
+                                  required
+                                  hint="Site configuration → General → Site details"
+                                >
+                                  <input
+                                    placeholder="mi-sitio o UUID"
+                                    value={config.netlifySiteId}
+                                    onChange={onText('netlifySiteId')}
+                                  />
+                                </Field>
+                                <Field label="URL pública del sitio" hint="Dominio que ve el cliente.">
+                                  <input
+                                    type="url"
+                                    placeholder="https://tu-dominio.com"
+                                    value={config.publishSiteUrl}
+                                    onChange={onText('publishSiteUrl')}
+                                  />
+                                </Field>
+                              </div>
+                              <Field
+                                label="Build hook / token de conexión"
+                                hint="Build & deploy → Build hooks. Netlify ejecuta el deploy."
+                              >
+                                <input
+                                  type="password"
+                                  autoComplete="off"
+                                  placeholder="Build hook o token"
+                                  value={config.netlifyConnectToken}
+                                  onChange={onText('netlifyConnectToken')}
+                                />
+                              </Field>
+                            </>
+                          ) : null}
 
-                  {howToOpen ? (
-                    <div className="nx-howto">
-                      <h3>{activePlatform.howTo.title}</h3>
-                      <p className="nx-howto__push">
-                        {activePlatform.howTo.canPushWithApiKey
-                          ? 'Sí se puede publicar con API key / token.'
-                          : 'No basta solo con API key (o no aplica).'}
-                      </p>
-                      <ol>
-                        {activePlatform.howTo.steps.map((step) => (
-                          <li key={step}>{step}</li>
-                        ))}
-                      </ol>
-                      {activePlatform.howTo.fieldsNote ? (
-                        <p className="nx-howto__note">{activePlatform.howTo.fieldsNote}</p>
+                          {isApiKeyPublish(opt.id) ||
+                          opt.id === 'squarespace' ||
+                          opt.id === 'hostinger' ? (
+                            <div className="nx-row">
+                              <Field label="URL del sitio" required={opt.id !== 'hostinger'}>
+                                <input
+                                  type="url"
+                                  placeholder="https://tu-dominio.com"
+                                  value={config.publishSiteUrl}
+                                  onChange={onText('publishSiteUrl')}
+                                />
+                              </Field>
+                              <Field
+                                label={
+                                  opt.howTo.canPushWithApiKey
+                                    ? 'API key / token'
+                                    : 'API key (si existe)'
+                                }
+                                required={opt.howTo.canPushWithApiKey}
+                                hint={opt.howTo.fieldsNote || 'No se muestra en el HTML público.'}
+                              >
+                                <input
+                                  type="password"
+                                  autoComplete="off"
+                                  placeholder="••••••••"
+                                  value={config.publishApiKey}
+                                  onChange={onText('publishApiKey')}
+                                />
+                              </Field>
+                            </div>
+                          ) : null}
+
+                          <button
+                            type="button"
+                            className="btn btn-ghost nx-howto-btn"
+                            onClick={() => setHowToOpen((v) => !v)}
+                            aria-expanded={howToOpen}
+                          >
+                            {howToOpen ? 'Ocultar guía' : '¿Cómo lo hago?'}
+                          </button>
+
+                          {howToOpen ? (
+                            <div className="nx-howto">
+                              <h3>{opt.howTo.title}</h3>
+                              <p className="nx-howto__push">
+                                {opt.howTo.canPushWithApiKey
+                                  ? 'Sí se puede publicar con API key / token.'
+                                  : 'No basta solo con API key (o no aplica).'}
+                              </p>
+                              <ol>
+                                {opt.howTo.steps.map((step) => (
+                                  <li key={step}>{step}</li>
+                                ))}
+                              </ol>
+                              {opt.howTo.fieldsNote ? (
+                                <p className="nx-howto__note">{opt.howTo.fieldsNote}</p>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
                       ) : null}
                     </div>
-                  ) : null}
-                </div>
-              ) : null}
+                  );
+                })}
+              </div>
             </section>
 
             {/* 8 · Redes */}
