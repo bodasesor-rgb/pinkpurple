@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext.jsx';
-import { getLiveProducts } from '../data/products.js';
+import { useAuth } from '../auth/AuthContext.tsx';
+import { PRODUCTS } from '../data/products.js';
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -12,14 +12,20 @@ export default function SiteHeader() {
     setProductsOpen(false);
   };
   const { isAuthenticated } = useAuth();
-  const products = getLiveProducts();
   const dropdownRef = useRef(null);
+  const leaveTimer = useRef(null);
 
-  // Al cambiar de ruta, cierra menú móvil y dropdown (evita navbar trabada)
+  const clearLeaveTimer = () => {
+    if (leaveTimer.current) {
+      window.clearTimeout(leaveTimer.current);
+      leaveTimer.current = null;
+    }
+  };
+
   useEffect(() => {
     setOpen(false);
     setProductsOpen(false);
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
 
   useEffect(() => {
     function onDocPointer(e) {
@@ -27,9 +33,24 @@ export default function SiteHeader() {
         setProductsOpen(false);
       }
     }
+    function onKey(e) {
+      if (e.key === 'Escape') {
+        setProductsOpen(false);
+        setOpen(false);
+      }
+    }
     document.addEventListener('pointerdown', onDocPointer);
-    return () => document.removeEventListener('pointerdown', onDocPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDocPointer);
+      document.removeEventListener('keydown', onKey);
+      clearLeaveTimer();
+    };
   }, []);
+
+  const isFinePointer = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   return (
     <header className="site-header site-header--light">
@@ -64,42 +85,49 @@ export default function SiteHeader() {
             className={`nav-dropdown${productsOpen ? ' is-open' : ''}`}
             ref={dropdownRef}
             onMouseEnter={() => {
-              if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-                setProductsOpen(true);
-              }
+              if (!isFinePointer()) return;
+              clearLeaveTimer();
+              setProductsOpen(true);
             }}
             onMouseLeave={() => {
-              if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-                setProductsOpen(false);
-              }
+              if (!isFinePointer()) return;
+              clearLeaveTimer();
+              // Pequeño delay: el gap entre trigger y menú no cierra el clic
+              leaveTimer.current = window.setTimeout(() => setProductsOpen(false), 180);
             }}
           >
-            <NavLink
-              to="/productos"
+            <button
+              type="button"
               className="nav-dropdown__trigger"
               aria-expanded={productsOpen}
-              onClick={(e) => {
-                // Móvil: abre/cierra el submenú. Desktop: navega a /productos.
-                if (window.matchMedia('(max-width: 760px)').matches) {
-                  e.preventDefault();
-                  setProductsOpen((v) => !v);
-                }
-              }}
+              aria-haspopup="true"
+              onClick={() => setProductsOpen((v) => !v)}
             >
               Productos
               <span className="nav-dropdown__caret" aria-hidden="true">
                 ▾
               </span>
-            </NavLink>
+            </button>
             <div className="nav-dropdown__menu" role="menu">
               <NavLink to="/productos" role="menuitem" onClick={close}>
                 Todos los productos
               </NavLink>
-              {products.map((product) => (
-                <NavLink key={product.id} to={product.href} role="menuitem" onClick={close}>
+              {PRODUCTS.map((product) => (
+                <NavLink
+                  key={product.id}
+                  to={product.status === 'live' ? product.href : `/productos#${product.slug}`}
+                  role="menuitem"
+                  onClick={close}
+                >
                   {product.name}
+                  {product.status !== 'live' ? (
+                    <span className="nav-dropdown__soon">Pronto</span>
+                  ) : null}
                 </NavLink>
               ))}
+              <NavLink to="/configuracion-nexus" role="menuitem" onClick={close}>
+                Configuración Nexus
+              </NavLink>
             </div>
           </div>
 
@@ -109,12 +137,17 @@ export default function SiteHeader() {
           <NavLink to="/blog" onClick={close}>
             Blog
           </NavLink>
-          <NavLink to="/entrar-panel" onClick={close}>
-            Abrir panel
+          <NavLink
+            to="/configuracion-nexus"
+            className="nav-link--config"
+            title="Configuración Nexus cliente"
+            onClick={close}
+          >
+            Config Nexus
           </NavLink>
           {isAuthenticated ? (
-            <NavLink className="btn-nav-brand" to="/cuenta" onClick={close}>
-              Cuenta
+            <NavLink className="btn-nav-brand" to="/app" onClick={close}>
+              Mi panel
             </NavLink>
           ) : (
             <NavLink className="btn-nav-brand" to="/login" onClick={close}>

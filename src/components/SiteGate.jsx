@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import PasswordInput from './PasswordInput.jsx';
+import PasswordInput from './ui/PasswordInput.tsx';
 
 const GATE_KEY = 'pp_site_gate_ok';
 

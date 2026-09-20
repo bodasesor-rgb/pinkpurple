@@ -1,11 +1,12 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext.jsx';
+import { useAuth } from '../auth/AuthContext';
+import type { ReactNode } from 'react';
 
-export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+export default function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, status } = useAuth();
   const location = useLocation();
 
-  if (loading) {
+  if (status === 'loading') {
     return (
       <div className="container page-pad">
         <p className="auth-muted">Cargando sesión…</p>
@@ -17,5 +18,5 @@ export default function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  return children;
+  return <>{children}</>;
 }

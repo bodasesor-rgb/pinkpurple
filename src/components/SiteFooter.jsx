@@ -17,6 +17,7 @@ export default function SiteFooter() {
           <Link to="/productos">Productos</Link>
           <Link to="/productos/seo">PinkPurple SEO</Link>
           <Link to="/como-funciona">Cómo funciona</Link>
+          <Link to="/configuracion-nexus">Configuración Nexus</Link>
           <Link to="/blog">Blog</Link>
           <Link to="/login">Iniciar sesión</Link>
         </div>

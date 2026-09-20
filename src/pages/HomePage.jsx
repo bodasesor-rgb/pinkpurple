@@ -53,7 +53,7 @@ export default function HomePage() {
               <Link className="btn btn-primary" to="/productos">
                 Ver productos
               </Link>
-              <Link className="btn btn-ghost" to="/entrar-panel">
+              <Link className="btn btn-ghost" to="/app">
                 Abrir mi panel
               </Link>
             </div>
@@ -69,8 +69,8 @@ export default function HomePage() {
             <p className="eyebrow">PinkPurple Studio</p>
             <h2>Una marca. Varias automatizaciones.</h2>
             <p>
-              El detalle de landings, blogs y SEO está en el producto PinkPurple SEO. El home es
-              Studio: el panel general para todo lo que vayamos sumando.
+              Hoy ya puedes usar PinkPurple SEO. Los siguientes productos aparecerán solos en el
+              carrusel y en el catálogo cuando los activemos.
             </p>
           </div>
 
@@ -87,18 +87,32 @@ export default function HomePage() {
                 </Link>
               </article>
             ))}
-            <article className="home-showcase__card home-showcase__card--cta">
-              <p className="eyebrow">Carrusel</p>
+
+            <article className="home-showcase__card">
+              <div className="home-showcase__media">
+                <img
+                  src="/brand/studio-dev.png"
+                  alt="Más productos PinkPurple Studio en camino"
+                />
+              </div>
+              <p className="eyebrow">Próximamente</p>
               <h3>Más productos en camino</h3>
               <p>
-                Al crear un producto nuevo en el catálogo, aparece solo en el carrusel del hero y
-                en /productos.
+                Al crear un producto nuevo en el catálogo, aparece en el carrusel del hero y en
+                /productos.
               </p>
               <Link className="btn btn-ghost" to="/productos">
                 Catálogo
               </Link>
             </article>
-            <article className="home-showcase__card home-showcase__card--cta">
+
+            <article className="home-showcase__card">
+              <div className="home-showcase__media">
+                <img
+                  src="/brand/guide-globe.jpg"
+                  alt="Cómo entra cada pieza en el panel PinkPurple"
+                />
+              </div>
               <p className="eyebrow">Guía</p>
               <h3>Cómo entra cada pieza</h3>
               <p>Flujo del panel y módulos de los productos activos.</p>

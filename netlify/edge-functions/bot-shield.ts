@@ -452,6 +452,9 @@ export const config: Config = {
     '/sitemap.xml',
     '/llms.txt',
     '/.netlify/*',
+    // API del panel: el polling de trabajos supera el límite de 30/min pensado
+    // para páginas HTML, y la auth la protege la propia función de sesión.
+    '/api/*',
   ],
   onError: 'bypass',
 }

@@ -1,13 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PRODUCTS, getLiveProducts } from '../data/products.js';
 
 /**
- * Carrusel de productos Studio (page-stage).
- * Live + “próximamente” del catálogo; al agregar items en products.js aparecen solos.
+ * Carrusel de productos Studio.
+ * Prioriza productos live (el existente se ve primero); los “soon” entran después.
  */
 export default function ProductServicesCarousel() {
-  const items = PRODUCTS.length ? PRODUCTS : getLiveProducts();
+  const items = useMemo(() => {
+    const live = getLiveProducts();
+    const soon = PRODUCTS.filter((p) => p.status !== 'live');
+    // Mientras haya pocos live, se ven primero; al crear más, el carrusel crece solo.
+    return [...live, ...soon];
+  }, []);
+
   const [index, setIndex] = useState(0);
   const total = items.length;
   const current = items[index] || items[0];
@@ -34,20 +40,22 @@ export default function ProductServicesCarousel() {
           <span />
           <span />
         </div>
-        <p>
-          producto · {String(current.name || '').toLowerCase()}
-        </p>
+        <p>producto · {String(current.name || '').toLowerCase()}</p>
       </div>
 
+      {current.image ? (
+        <div className="product-carousel__visual">
+          <img src={current.image} alt={current.imageAlt || current.name} />
+        </div>
+      ) : null}
+
       <div className="page-stage__body" key={current.id}>
-        <p className="page-stage__kicker">
-          {isLive ? 'Producto destacado' : 'Próximamente'}
-        </p>
+        <p className="page-stage__kicker">{isLive ? 'Producto destacado' : 'Próximamente'}</p>
         <h2>{current.name}</h2>
         <p>{current.tagline || current.description}</p>
         {isLive ? (
           <Link className="page-stage__cta" to={current.href}>
-            Ver planes {current.name.replace(/^PinkPurple\s+/i, '')}
+            Ver {current.name}
           </Link>
         ) : (
           <span className="page-stage__cta page-stage__cta--soon">Aviso al lanzar</span>
@@ -73,7 +81,7 @@ export default function ProductServicesCarousel() {
                 type="button"
                 role="tab"
                 aria-selected={i === index}
-                className={`growth-dot${i === index ? ' is-active' : ''}`}
+                className={`growth-dot${i === index ? ' is-active' : ''}${item.status === 'live' ? ' is-live' : ''}`}
                 onClick={() => setIndex(i)}
                 aria-label={item.name}
               />

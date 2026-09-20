@@ -1,7 +1,17 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { PRODUCTS } from '../data/products.js';
 
 export default function ProductsIndexPage() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const id = String(location.hash || '').replace(/^#/, '');
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [location.hash]);
+
   return (
     <div className="container page-pad">
       <header className="page-hero page-hero--wide">
@@ -20,9 +30,9 @@ export default function ProductsIndexPage() {
             className={`product-feature${product.status !== 'live' ? ' product-feature--soon' : ''}`}
             id={product.slug}
           >
-            <div className="product-feature__media" aria-hidden={false}>
+            <div className="product-feature__media">
               <div className="product-feature__visual">
-                <img src={product.image} alt={product.imageAlt} width={560} height={560} />
+                <img src={product.image} alt={product.imageAlt} />
               </div>
             </div>
             <div className="product-feature__body">

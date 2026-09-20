@@ -14,6 +14,7 @@ const INCLUDES = [
   {
     id: 'landings',
     label: 'Landings',
+    short: 'Landings',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
@@ -25,6 +26,7 @@ const INCLUDES = [
   {
     id: 'blogs',
     label: 'Blogs',
+    short: 'Blogs',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -40,6 +42,7 @@ const INCLUDES = [
   {
     id: 'pulse',
     label: 'Ranking Pulse',
+    short: 'Pulse',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -55,6 +58,7 @@ const INCLUDES = [
   {
     id: 'competitors',
     label: 'Competidores',
+    short: 'Comp.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <circle cx="8" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.8" />
@@ -71,6 +75,7 @@ const INCLUDES = [
   {
     id: 'keywords',
     label: 'Palabra clave',
+    short: 'Keywords',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <circle cx="10.5" cy="10.5" r="5.5" stroke="currentColor" strokeWidth="1.8" />
@@ -81,6 +86,7 @@ const INCLUDES = [
   {
     id: 'serp',
     label: 'SERP',
+    short: 'SERP',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M5 7h14M5 12h10M5 17h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -119,6 +125,9 @@ export default function SeoProductPage() {
   const [billing, setBilling] = useState('monthly');
   const isAnnual = billing === 'annual';
   const product = getProductBySlug('seo');
+  const freePlan = PLANS.find((p) => p.price === 0) || PLANS[0];
+  const paidPlans = PLANS.filter((p) => p.price > 0);
+  const allPlans = [freePlan, ...paidPlans];
 
   return (
     <>
@@ -149,71 +158,100 @@ export default function SeoProductPage() {
           </figcaption>
         </figure>
 
-        <div className="billing-toggle" role="group" aria-label="Periodo de pago">
-          <button
-            type="button"
-            className={`billing-toggle__btn${!isAnnual ? ' is-active' : ''}`}
-            onClick={() => setBilling('monthly')}
-          >
-            Mensual
-          </button>
-          <button
-            type="button"
-            className={`billing-toggle__btn${isAnnual ? ' is-active' : ''}`}
-            onClick={() => setBilling('annual')}
-          >
-            Anual
-            <span className="billing-toggle__save">-25%</span>
-          </button>
+        <div className="plans-toolbar">
+          <div className="billing-toggle" role="group" aria-label="Periodo de pago">
+            <button
+              type="button"
+              className={`billing-toggle__btn${!isAnnual ? ' is-active' : ''}`}
+              onClick={() => setBilling('monthly')}
+            >
+              Mensual
+            </button>
+            <button
+              type="button"
+              className={`billing-toggle__btn${isAnnual ? ' is-active' : ''}`}
+              onClick={() => setBilling('annual')}
+            >
+              Anual
+              <span className="billing-toggle__save">-25%</span>
+            </button>
+          </div>
         </div>
 
         <div className="plans-grid plans-grid--six">
-          {PLANS.map((plan) => {
+          {allPlans.map((plan) => {
+            const isFree = plan.price === 0;
             const tokens = plan.tokens ?? plan.landings + plan.blogs;
-            const pricing = getPlanPricing(plan.price);
-            const displayPrice = isAnnual ? pricing.annualPerMonth : pricing.monthly;
-            const periodLabel = plan.price === 0 ? null : 'USD / mes';
+            const pricing = isFree ? null : getPlanPricing(plan.price);
+            const displayPrice = isFree
+              ? null
+              : isAnnual
+                ? pricing.annualPerMonth
+                : pricing.monthly;
 
             return (
               <article
                 key={plan.id}
-                className={`plan-card${plan.featured ? ' plan-card--featured' : ''}${plan.price === 0 ? ' plan-card--free' : ''}`}
+                className={`plan-card${plan.featured ? ' plan-card--featured' : ''}${
+                  isFree ? ' plan-card--free' : ''
+                }`}
               >
                 {plan.featured ? <p className="plan-card__badge">Más popular</p> : null}
                 <h2>{plan.name}</h2>
-                <p className="plan-card__price">
-                  <span>{formatPrice(displayPrice)}</span>
-                  {periodLabel ? <small>{periodLabel}</small> : null}
-                </p>
-                {plan.price > 0 && isAnnual ? (
-                  <p className="plan-card__annual-meta">
-                    ${formatNum(pricing.annualTotal)} al año · ahorras ${formatNum(pricing.savings)}
-                  </p>
-                ) : null}
-                {plan.price > 0 && !isAnnual ? (
-                  <p className="plan-card__annual-meta plan-card__annual-meta--muted">
-                    o ${formatNum(pricing.annualPerMonth)}/mes en plan anual
-                  </p>
-                ) : null}
-                {plan.price === 0 ? (
-                  <p className="plan-card__annual-meta">5 landings + 5 blogs, una sola vez, sin tarjeta.</p>
-                ) : null}
+                {isFree ? (
+                  <>
+                    <p className="plan-card__price">
+                      <span>Gratis</span>
+                    </p>
+                    <p className="plan-card__annual-meta plan-card__annual-meta--muted">
+                      Una sola vez · sin tarjeta
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="plan-card__price">
+                      <span>{formatPrice(displayPrice)}</span>
+                      <small>USD / mes</small>
+                    </p>
+                    {isAnnual ? (
+                      <p className="plan-card__annual-meta">
+                        ${formatNum(pricing.annualTotal)} al año · ahorras $
+                        {formatNum(pricing.savings)}
+                      </p>
+                    ) : (
+                      <p className="plan-card__annual-meta plan-card__annual-meta--muted">
+                        o ${formatNum(pricing.annualPerMonth)}/mes anual
+                      </p>
+                    )}
+                  </>
+                )}
                 <ul className="plan-card__pages">
-                  <li>
-                    <strong>{formatNum(plan.landings)}</strong> landings
-                  </li>
-                  <li>
-                    <strong>{formatNum(plan.blogs)}</strong> blogs
-                  </li>
+                  {isFree ? (
+                    <li>
+                      <strong>
+                        {formatNum(plan.landings)} + {formatNum(plan.blogs)}
+                      </strong>{' '}
+                      landings y blogs (una vez)
+                    </li>
+                  ) : (
+                    <>
+                      <li>
+                        <strong>{formatNum(plan.landings)}</strong> landings
+                      </li>
+                      <li>
+                        <strong>{formatNum(plan.blogs)}</strong> blogs
+                      </li>
+                    </>
+                  )}
                   <li>
                     <strong>{formatSites(plan.sites)}</strong>
                   </li>
-                  {plan.oneShot ? (
-                    <li>Sin renovación mensual</li>
-                  ) : (
+                  {!isFree ? (
                     <li>
                       <strong>{formatNum(tokens)}</strong> tokens / herramienta
                     </li>
+                  ) : (
+                    <li>Sin renovación mensual</li>
                   )}
                 </ul>
 
@@ -223,17 +261,21 @@ export default function SeoProductPage() {
                     {INCLUDES.map((item) => (
                       <li key={item.id} title={item.label}>
                         <span className="plan-icons__icon">{item.icon}</span>
-                        <span className="plan-icons__label">{item.label}</span>
+                        <span className="plan-icons__label">{item.short || item.label}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
                 <Link
-                  className={`btn ${plan.featured || plan.price === 0 ? 'btn-primary' : 'btn-ghost'} plan-card__cta`}
-                  to={`/pago?plan=${plan.id}&billing=${isAnnual ? 'annual' : 'monthly'}`}
+                  className={`btn ${
+                    plan.featured || isFree ? 'btn-primary' : 'btn-ghost'
+                  } plan-card__cta`}
+                  to={`/pago?plan=${plan.id}&billing=${
+                    isFree ? 'monthly' : isAnnual ? 'annual' : 'monthly'
+                  }`}
                 >
-                  {plan.price === 0 ? 'Activar prueba' : `Pagar ${plan.name} (demo)`}
+                  {isFree ? 'Activar prueba' : `Elegir ${plan.name}`}
                 </Link>
               </article>
             );
@@ -242,7 +284,7 @@ export default function SeoProductPage() {
 
         <p className="plans-note plans-note--strong">
           <strong>Varias páginas web:</strong> puedes conectar más de un sitio. Mini = 1 · Starter
-          = 3 · Growth = 6 · Pro = 15 · Diamond = ilimitadas. Free y prueba = 1 sitio.
+          = 3 · Growth = 6 · Pro = 15 · Diamond = ilimitadas. Prueba gratis = 1 sitio.
         </p>
 
         <p className="plans-note">

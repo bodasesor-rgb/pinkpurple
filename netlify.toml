@@ -5,10 +5,21 @@
 [build.environment]
   NODE_VERSION = "20"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 # Bot shield FIRST — 403 scrapers before SPA / bandwidth burn.
 [[edge_functions]]
   path = "/*"
   function = "bot-shield"
+
+# Sesión + proxy a Nexus. Debe ir ANTES del fallback SPA.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/nexus-proxy/:splat"
+  status = 200
+  force = true
 
 [[redirects]]
   from = "/*"
