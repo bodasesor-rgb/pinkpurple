@@ -37,13 +37,14 @@ export interface NexusClientConfig {
   brandName: string;
   tagline: string;
   tone: NexusTone;
-  colors: string;
+  /** Lista de hex de marca (#rrggbb). */
+  brandColors: string[];
   logoUrl: string;
   whatsapp: string;
   contactEmail: string;
   phone: string;
-  /** ISO-ish country code from locations list */
   countryCode: CountryCode | '';
+  /** División local (antes “estado”); en UI se muestra como “Ciudad”. */
   stateRegion: string;
   cityFocus: string;
   address: string;
@@ -53,13 +54,9 @@ export interface NexusClientConfig {
   hasOwnSite: boolean;
   publishTarget: PublishTarget;
   publishSlug: string;
-  /** URL del sitio / CMS */
   publishSiteUrl: string;
-  /** API key / Application Password / token del CMS (no Netlify) */
   publishApiKey: string;
-  /** Netlify: site id o URL del sitio en Netlify */
   netlifySiteId: string;
-  /** Netlify: build hook o token de conexión (prototipo) */
   netlifyConnectToken: string;
   socialLinks: SocialLink[];
 }
@@ -87,25 +84,25 @@ export const CONFIG_SECTIONS: ConfigSection[] = [
   {
     id: 'contacto',
     title: '3 · Contacto',
-    blurb: 'WhatsApp y correo salen en CTAs, footer y botón flotante.',
+    blurb: 'WhatsApp para CTAs, footer y botón flotante.',
     requiredHint: 'Obligatorio: WhatsApp con código de país',
   },
   {
     id: 'ubicacion',
     title: '4 · Ubicación',
-    blurb: 'País, estado/provincia y ciudad para SEO local.',
-    requiredHint: 'Obligatorio: país, estado y ciudad',
+    blurb: 'País y ciudad (división local) para SEO local.',
+    requiredHint: 'Obligatorio: país y ciudad',
   },
   {
     id: 'oferta',
     title: '5 · Oferta',
-    blurb: 'Servicios y cliente ideal: alimentan H1, secciones y FAQ.',
-    requiredHint: 'Obligatorio: servicios y cliente ideal',
+    blurb: 'Qué ofreces y a quién le hablas: alimentan H1, secciones y FAQ.',
+    requiredHint: 'Obligatorio: oferta y cliente ideal',
   },
   {
     id: 'keywords',
     title: '6 · Keywords',
-    blurb: 'Hasta ~15 frases; el motor las prioriza en títulos y cuerpos.',
+    blurb: 'Hasta ~15 frases de búsqueda; el motor las prioriza en títulos y cuerpos.',
   },
   {
     id: 'publicacion',
@@ -134,7 +131,7 @@ export const SOCIAL_NETWORK_OPTIONS: { id: SocialNetworkId; label: string }[] = 
   { id: 'youtube', label: 'YouTube' },
   { id: 'x', label: 'X (Twitter)' },
   { id: 'pinterest', label: 'Pinterest' },
-  { id: 'whatsapp', label: 'WhatsApp Business (canal)' },
+  { id: 'whatsapp', label: 'WhatsApp (canal)' },
   { id: 'other', label: 'Otra…' },
 ];
 
@@ -176,7 +173,7 @@ export const EMPTY_CONFIG: NexusClientConfig = {
   brandName: '',
   tagline: '',
   tone: 'cercano',
-  colors: '',
+  brandColors: [],
   logoUrl: '',
   whatsapp: '',
   contactEmail: '',
@@ -207,18 +204,18 @@ export const SAMPLE_CONFIG: NexusClientConfig = {
   brandName: 'Estudio Norte',
   tagline: 'Diseño y obra para casas en CDMX',
   tone: 'cercano',
-  colors: '#1e3a8a, #f8fafc',
+  brandColors: ['#1e3a8a', '#f8fafc'],
   whatsapp: '+52 55 1234 5678',
   contactEmail: 'hola@estudionorte.mx',
   countryCode: 'MX',
   stateRegion: 'Ciudad de México',
-  cityFocus: 'Ciudad de México',
+  cityFocus: '',
   address: 'Col. Roma Norte',
   servicesOffered: 'Diseño interior, remodelación completa, asesoría de materiales',
   idealClient:
-    'Familias que remodelan casa o depto en CDMX y quieren un solo equipo de principio a fin',
+    'Familias que buscan un equipo completo para remodelar casa o departamento',
   targetKeywords:
-    'remodelación CDMX, diseño interior Roma Norte, remodelar departamento Ciudad de México',
+    'remodelación residencial, diseño interior, remodelar departamento',
   hasOwnSite: true,
   publishTarget: 'api',
   publishSiteUrl: 'https://ejemplo-negocio.mx',
@@ -231,7 +228,24 @@ export const SAMPLE_CONFIG: NexusClientConfig = {
   ],
 };
 
-export const STORAGE_KEY = 'pp_nexus_client_config_prototype_v2';
+export const STORAGE_KEY = 'pp_nexus_client_config_prototype_v3';
+
+function parseColorList(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    return raw
+      .map((c) => String(c).trim())
+      .filter((c) => /^#?[0-9a-f]{3,8}$/i.test(c))
+      .map((c) => (c.startsWith('#') ? c.toLowerCase() : `#${c.toLowerCase()}`));
+  }
+  if (typeof raw === 'string' && raw.trim()) {
+    return raw
+      .split(/[,;\s]+/)
+      .map((c) => c.trim())
+      .filter((c) => /^#?[0-9a-f]{3,8}$/i.test(c))
+      .map((c) => (c.startsWith('#') ? c.toLowerCase() : `#${c.toLowerCase()}`));
+  }
+  return [];
+}
 
 function migrateLegacy(raw: Record<string, unknown>): Partial<NexusClientConfig> {
   const next: Partial<NexusClientConfig> = { ...raw } as Partial<NexusClientConfig>;
@@ -262,23 +276,47 @@ function migrateLegacy(raw: Record<string, unknown>): Partial<NexusClientConfig>
   if (!raw.countryCode) next.countryCode = 'MX';
   if (!raw.publishSiteUrl && raw.siteHomeUrl) next.publishSiteUrl = String(raw.siteHomeUrl);
 
+  // Colores: string "a, b" o brandColors[]
+  if (!Array.isArray(raw.brandColors)) {
+    next.brandColors = parseColorList(raw.brandColors ?? raw.colors);
+  }
+
+  // Si había ciudad suelta y no estado, súbela a stateRegion (ahora “Ciudad” en UI)
+  if (!String(raw.stateRegion || '').trim() && String(raw.cityFocus || '').trim()) {
+    next.stateRegion = String(raw.cityFocus);
+  }
+
   return next;
 }
 
 export function loadConfig(): NexusClientConfig {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pp_nexus_client_config_prototype_v1');
-    if (!raw) return { ...EMPTY_CONFIG, socialLinks: EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })) };
+    const raw =
+      localStorage.getItem(STORAGE_KEY) ||
+      localStorage.getItem('pp_nexus_client_config_prototype_v2') ||
+      localStorage.getItem('pp_nexus_client_config_prototype_v1');
+    if (!raw) {
+      return {
+        ...EMPTY_CONFIG,
+        brandColors: [],
+        socialLinks: EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })),
+      };
+    }
     const parsed = migrateLegacy(JSON.parse(raw) as Record<string, unknown>);
     return {
       ...EMPTY_CONFIG,
       ...parsed,
+      brandColors: Array.isArray(parsed.brandColors) ? [...parsed.brandColors] : [],
       socialLinks: Array.isArray(parsed.socialLinks)
         ? parsed.socialLinks.map((s) => ({ ...s }))
         : EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })),
     };
   } catch {
-    return { ...EMPTY_CONFIG, socialLinks: EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })) };
+    return {
+      ...EMPTY_CONFIG,
+      brandColors: [],
+      socialLinks: EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })),
+    };
   }
 }
 
@@ -292,9 +330,8 @@ export function missingRequired(config: NexusClientConfig): string[] {
   if (!config.tone) miss.push('Tono de voz');
   if (!config.whatsapp.trim()) miss.push('WhatsApp');
   if (!config.countryCode) miss.push('País');
-  if (!config.stateRegion.trim()) miss.push('Estado / provincia');
-  if (!config.cityFocus.trim()) miss.push('Ciudad');
-  if (!config.servicesOffered.trim()) miss.push('Servicios / productos');
+  if (!config.stateRegion.trim()) miss.push('Ciudad');
+  if (!config.servicesOffered.trim()) miss.push('Oferta / servicios');
   if (!config.idealClient.trim()) miss.push('Cliente ideal');
 
   if (config.publishTarget === 'preview' && !config.publishSlug.trim() && !config.brandName.trim()) {

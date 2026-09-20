@@ -92,18 +92,18 @@ function applyScanToConfig(prev: NexusClientConfig, data: ScanData): NexusClient
     ? data.countryCode
     : prev.countryCode) as CountryCode | '';
 
-  let stateRegion = data.stateRegion?.trim() || prev.stateRegion;
-  if (countryCode && stateRegion) {
+  let locality = (data.city?.trim() || data.stateRegion?.trim() || prev.stateRegion).trim();
+  if (countryCode && locality) {
     const list = statesForCountry(countryCode);
-    const match = list.find((s) => s.toLowerCase() === stateRegion.toLowerCase());
-    if (match) stateRegion = match;
+    const match = list.find((s) => s.toLowerCase() === locality.toLowerCase());
+    if (match) locality = match;
     else {
       const fuzzy = list.find(
         (s) =>
-          s.toLowerCase().includes(stateRegion.toLowerCase()) ||
-          stateRegion.toLowerCase().includes(s.toLowerCase()),
+          s.toLowerCase().includes(locality.toLowerCase()) ||
+          locality.toLowerCase().includes(s.toLowerCase()),
       );
-      if (fuzzy) stateRegion = fuzzy;
+      if (fuzzy) locality = fuzzy;
     }
   }
 
@@ -120,14 +120,14 @@ function applyScanToConfig(prev: NexusClientConfig, data: ScanData): NexusClient
     brandName: data.brandName?.trim() || prev.brandName,
     tagline: data.tagline?.trim() || prev.tagline,
     tone: data.tone || prev.tone,
-    colors: Array.isArray(data.colors) && data.colors.length ? data.colors.join(', ') : prev.colors,
+    brandColors: Array.isArray(data.colors) && data.colors.length ? data.colors : prev.brandColors,
     logoUrl: data.logoUrl?.trim() || prev.logoUrl,
     whatsapp: data.whatsapp?.trim() || prev.whatsapp,
     contactEmail: data.contactEmail?.trim() || prev.contactEmail,
     phone: data.phone?.trim() || prev.phone,
     countryCode: countryCode || prev.countryCode,
-    stateRegion: stateRegion || prev.stateRegion,
-    cityFocus: data.city?.trim() || prev.cityFocus,
+    stateRegion: locality || prev.stateRegion,
+    cityFocus: '',
     address: data.address?.trim() || prev.address,
     servicesOffered: data.servicesOffered?.trim() || prev.servicesOffered,
     idealClient: data.idealClient?.trim() || prev.idealClient,
@@ -149,10 +149,29 @@ export default function NexusClientConfigPage() {
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState('');
   const [scanReport, setScanReport] = useState<ScanData | null>(null);
+  const [countryQuery, setCountryQuery] = useState('');
+  const [countryOpen, setCountryOpen] = useState(false);
+  const [draftColor, setDraftColor] = useState('#8c3df5');
+  const [draftHex, setDraftHex] = useState('#8c3df5');
 
   const missing = useMemo(() => missingRequired(config), [config]);
   const country = getCountry(config.countryCode);
   const states = statesForCountry(config.countryCode);
+
+  const filteredCountries = useMemo(() => {
+    const q = countryQuery.trim().toLowerCase();
+    if (!q) return COUNTRIES;
+    // Letra inicial → sección de esa letra; texto más largo → contiene
+    if (q.length === 1) {
+      return COUNTRIES.filter((c) => c.name.toLowerCase().startsWith(q));
+    }
+    return COUNTRIES.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.code.toLowerCase().includes(q) ||
+        c.flag.includes(countryQuery.trim()),
+    );
+  }, [countryQuery]);
 
   useEffect(() => {
     const id = window.setTimeout(() => {
@@ -161,6 +180,10 @@ export default function NexusClientConfigPage() {
     }, 400);
     return () => window.clearTimeout(id);
   }, [config]);
+
+  useEffect(() => {
+    if (country) setCountryQuery(`${country.flag} ${country.name}`);
+  }, [country?.code]);
 
   function update<K extends keyof NexusClientConfig>(key: K, value: NexusClientConfig[K]) {
     setConfig((prev) => ({ ...prev, [key]: value }));
@@ -177,6 +200,35 @@ export default function NexusClientConfigPage() {
       ...prev,
       countryCode: code,
       stateRegion: '',
+    }));
+    const c = getCountry(code);
+    setCountryQuery(c ? `${c.flag} ${c.name}` : '');
+    setCountryOpen(false);
+  }
+
+  function normalizeHex(raw: string): string | null {
+    const m = String(raw || '').trim().match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (!m) return null;
+    let hex = m[1].toLowerCase();
+    if (hex.length === 3) hex = hex.split('').map((ch) => ch + ch).join('');
+    return `#${hex}`;
+  }
+
+  function addBrandColor(raw?: string) {
+    const hex = normalizeHex(raw ?? draftHex ?? draftColor);
+    if (!hex) return;
+    setConfig((prev) => {
+      if (prev.brandColors.includes(hex)) return prev;
+      return { ...prev, brandColors: [...prev.brandColors, hex] };
+    });
+    setDraftColor(hex);
+    setDraftHex(hex);
+  }
+
+  function removeBrandColor(hex: string) {
+    setConfig((prev) => ({
+      ...prev,
+      brandColors: prev.brandColors.filter((c) => c !== hex),
     }));
   }
 
@@ -417,13 +469,50 @@ export default function NexusClientConfigPage() {
               </fieldset>
 
               <div className="nx-row">
-                <Field label="Colores" hint="Hex separados por coma.">
-                  <input
-                    placeholder="#1e3a8a, #ffffff"
-                    value={config.colors}
-                    onChange={onText('colors')}
-                  />
-                </Field>
+                <div className="nx-field">
+                  <span className="nx-field__label">Colores de marca</span>
+                  <div className="nx-color-add">
+                    <input
+                      type="color"
+                      className="nx-color-swatch-input"
+                      value={normalizeHex(draftColor) || '#8c3df5'}
+                      onChange={(e) => {
+                        setDraftColor(e.target.value);
+                        setDraftHex(e.target.value);
+                      }}
+                      aria-label="Elegir color"
+                    />
+                    <input
+                      type="text"
+                      className="nx-color-hex"
+                      value={draftHex}
+                      onChange={(e) => setDraftHex(e.target.value)}
+                      placeholder="#8c3df5"
+                      spellCheck={false}
+                    />
+                    <button type="button" className="btn btn-ghost" onClick={() => addBrandColor()}>
+                      Agregar color
+                    </button>
+                  </div>
+                  <small className="nx-field__hint">
+                    Usa el selector (tabla de colores) o escribe el código hex y agrégalo a la lista.
+                  </small>
+                  {config.brandColors.length ? (
+                    <ul className="nx-color-list">
+                      {config.brandColors.map((hex) => (
+                        <li key={hex}>
+                          <span className="nx-color-chip" style={{ background: hex }} aria-hidden />
+                          <code>{hex}</code>
+                          <button type="button" className="btn btn-ghost" onClick={() => removeBrandColor(hex)}>
+                            Quitar
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="nx-field__hint">Sin colores aún.</p>
+                  )}
+                </div>
                 <Field label="Logo (URL)" hint="En producción: upload de imagen.">
                   <input
                     type="url"
@@ -439,26 +528,13 @@ export default function NexusClientConfigPage() {
             <section className="nx-card" id="cfg-contacto">
               <h2>{CONFIG_SECTIONS[2].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[2].blurb}</p>
-              <div className="nx-row">
-                <Field label="WhatsApp Business" required hint="Con código de país.">
-                  <input
-                    type="tel"
-                    placeholder="+52 55 1234 5678"
-                    value={config.whatsapp}
-                    onChange={onText('whatsapp')}
-                  />
-                </Field>
-                <Field label="Correo de contacto">
-                  <input
-                    type="email"
-                    placeholder="hola@tu-marca.com"
-                    value={config.contactEmail}
-                    onChange={onText('contactEmail')}
-                  />
-                </Field>
-              </div>
-              <Field label="Teléfono" hint="Opcional si es distinto al WhatsApp.">
-                <input type="tel" value={config.phone} onChange={onText('phone')} />
+              <Field label="WhatsApp" required hint="Con código de país, ej. +52 55 1234 5678">
+                <input
+                  type="tel"
+                  placeholder="+52 55 1234 5678"
+                  value={config.whatsapp}
+                  onChange={onText('whatsapp')}
+                />
               </Field>
             </section>
 
@@ -466,22 +542,63 @@ export default function NexusClientConfigPage() {
             <section className="nx-card" id="cfg-ubicacion">
               <h2>{CONFIG_SECTIONS[3].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[3].blurb}</p>
-              <div className="nx-row nx-row--3">
-                <Field label="País" required>
-                  <select
-                    value={config.countryCode}
-                    onChange={(e) => setCountry(e.target.value as CountryCode | '')}
-                    required
-                  >
-                    <option value="">Elige un país…</option>
-                    {COUNTRIES.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.flag} {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-                <Field label={country?.stateLabel || 'Estado / provincia'} required>
+              <div className="nx-row">
+                <div className="nx-field nx-country-field">
+                  <span className="nx-field__label">
+                    País <em className="nx-req">*</em>
+                  </span>
+                  <input
+                    type="text"
+                    role="combobox"
+                    aria-expanded={countryOpen}
+                    aria-autocomplete="list"
+                    placeholder="Escribe una letra (ej. M) o el nombre…"
+                    value={countryQuery}
+                    onChange={(e) => {
+                      setCountryQuery(e.target.value);
+                      setCountryOpen(true);
+                      if (!e.target.value.trim()) setCountry('');
+                    }}
+                    onFocus={() => setCountryOpen(true)}
+                    onBlur={() => window.setTimeout(() => setCountryOpen(false), 160)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') setCountryOpen(false);
+                      if (e.key === 'Enter' && filteredCountries[0]) {
+                        e.preventDefault();
+                        setCountry(filteredCountries[0].code);
+                      }
+                    }}
+                  />
+                  {countryOpen ? (
+                    <ul className="nx-country-list" role="listbox">
+                      {filteredCountries.length ? (
+                        filteredCountries.map((c) => (
+                          <li key={c.code}>
+                            <button
+                              type="button"
+                              className={config.countryCode === c.code ? 'is-active' : ''}
+                              onMouseDown={(ev) => {
+                                ev.preventDefault();
+                                setCountry(c.code);
+                              }}
+                            >
+                              <span className="nx-country-flag" aria-hidden>
+                                {c.flag}
+                              </span>
+                              <span>{c.name}</span>
+                            </button>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="nx-country-empty">Sin países con esa letra</li>
+                      )}
+                    </ul>
+                  ) : null}
+                  <small className="nx-field__hint">
+                    Escribe la letra inicial para saltar a esa sección (M → México, Brasil…).
+                  </small>
+                </div>
+                <Field label="Ciudad" required hint="División local del país (estado, provincia, región…).">
                   <select
                     value={config.stateRegion}
                     onChange={onText('stateRegion')}
@@ -498,14 +615,6 @@ export default function NexusClientConfigPage() {
                     ))}
                   </select>
                 </Field>
-                <Field label="Ciudad" required>
-                  <input
-                    placeholder="Guadalajara"
-                    value={config.cityFocus}
-                    onChange={onText('cityFocus')}
-                    required
-                  />
-                </Field>
               </div>
               <Field label="Dirección" hint="Opcional.">
                 <input value={config.address} onChange={onText('address')} />
@@ -516,18 +625,18 @@ export default function NexusClientConfigPage() {
             <section className="nx-card" id="cfg-oferta">
               <h2>{CONFIG_SECTIONS[4].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[4].blurb}</p>
-              <Field label="¿Qué servicios o productos ofreces?" required>
+              <Field label="¿Qué ofreces?" required>
                 <textarea
                   rows={3}
-                  placeholder="Ej. Catering para bodas y eventos corporativos…"
+                  placeholder="Ej. Consultoría, productos, clases, instalación, soporte…"
                   value={config.servicesOffered}
                   onChange={onText('servicesOffered')}
                 />
               </Field>
-              <Field label="¿Quién es tu cliente ideal?" required>
+              <Field label="¿A quién le hablas?" required>
                 <textarea
                   rows={3}
-                  placeholder="Ej. Parejas que planean boda en Jalisco…"
+                  placeholder="Ej. Dueños de negocio local, familias, equipos de marketing…"
                   value={config.idealClient}
                   onChange={onText('idealClient')}
                 />
@@ -541,7 +650,7 @@ export default function NexusClientConfigPage() {
               <Field label="Keywords" hint="Separadas por coma.">
                 <textarea
                   rows={3}
-                  placeholder="catering guadalajara, banquetes jalisco…"
+                  placeholder="servicio + ciudad, producto principal, intención de compra…"
                   value={config.targetKeywords}
                   onChange={onText('targetKeywords')}
                 />
@@ -767,18 +876,13 @@ function toPayload(config: NexusClientConfig) {
     brandName: config.brandName.trim(),
     tagline: config.tagline.trim(),
     tone: config.tone,
-    colors: config.colors
-      .split(/[,;\s]+/)
-      .map((c) => c.trim())
-      .filter(Boolean),
+    colors: config.brandColors,
     logoUrl: config.logoUrl.trim(),
     whatsapp: config.whatsapp.trim(),
-    contactEmail: config.contactEmail.trim(),
-    phone: config.phone.trim(),
     countryCode: config.countryCode,
     countryName: country?.name || '',
-    stateRegion: config.stateRegion.trim(),
-    cityFocus: config.cityFocus.trim(),
+    countryFlag: country?.flag || '',
+    city: config.stateRegion.trim(),
     address: config.address.trim(),
     servicesOffered: config.servicesOffered.trim(),
     idealClient: config.idealClient.trim(),
@@ -790,7 +894,6 @@ function toPayload(config: NexusClientConfig) {
       target: config.publishTarget,
       slug: config.publishSlug.trim(),
       siteUrl: config.publishSiteUrl.trim() || config.siteHomeUrl.trim(),
-      // secretos: en payload real irían cifrados / solo servidor
       hasApiKey: Boolean(config.publishApiKey.trim()),
       netlifySiteId: config.netlifySiteId.trim(),
       hasNetlifyToken: Boolean(config.netlifyConnectToken.trim()),
