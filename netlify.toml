@@ -14,6 +14,13 @@
   path = "/*"
   function = "bot-shield"
 
+# Escaneo extremo de sitios (prototipo Config Nexus) — antes del proxy.
+[[redirects]]
+  from = "/api/site-scan"
+  to = "/.netlify/functions/site-scan"
+  status = 200
+  force = true
+
 # Sesión + proxy a Nexus. Debe ir ANTES del fallback SPA.
 [[redirects]]
   from = "/api/*"

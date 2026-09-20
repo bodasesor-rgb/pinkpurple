@@ -26,6 +26,30 @@ type FieldProps = {
   children: ReactNode;
 };
 
+type ScanData = {
+  ok: boolean;
+  url: string;
+  pages?: { url: string; status: number; title: string }[];
+  brandName?: string;
+  tagline?: string;
+  logoUrl?: string;
+  colors?: string[];
+  tone?: NexusTone;
+  phone?: string;
+  whatsapp?: string;
+  contactEmail?: string;
+  address?: string;
+  city?: string;
+  stateRegion?: string;
+  countryCode?: string;
+  servicesOffered?: string;
+  idealClient?: string;
+  keywords?: string[];
+  social?: Record<string, string>;
+  cmsHints?: string[];
+  warnings?: string[];
+};
+
 function Field({ label, hint, required, children }: FieldProps) {
   return (
     <label className="nx-field">
@@ -39,10 +63,92 @@ function Field({ label, hint, required, children }: FieldProps) {
   );
 }
 
+function applyScanToConfig(prev: NexusClientConfig, data: ScanData): NexusClientConfig {
+  const socialLinks: SocialLink[] = [];
+  const social = data.social || {};
+  const networkMap: [SocialNetworkId, string][] = [
+    ['instagram', social.instagram || ''],
+    ['facebook', social.facebook || ''],
+    ['tiktok', social.tiktok || ''],
+    ['linkedin', social.linkedin || ''],
+    ['youtube', social.youtube || ''],
+    ['x', social.x || ''],
+    ['pinterest', social.pinterest || ''],
+  ];
+  for (const [network, url] of networkMap) {
+    if (url) socialLinks.push(createSocialLink(network, url));
+  }
+  if (social.other) {
+    socialLinks.push({
+      ...createSocialLink('other', social.other),
+      customName: 'Threads / otra',
+    });
+  }
+  if (!socialLinks.length) {
+    socialLinks.push(createSocialLink('instagram'), createSocialLink('facebook'));
+  }
+
+  const countryCode = (COUNTRIES.some((c) => c.code === data.countryCode)
+    ? data.countryCode
+    : prev.countryCode) as CountryCode | '';
+
+  let stateRegion = data.stateRegion?.trim() || prev.stateRegion;
+  if (countryCode && stateRegion) {
+    const list = statesForCountry(countryCode);
+    const match = list.find((s) => s.toLowerCase() === stateRegion.toLowerCase());
+    if (match) stateRegion = match;
+    else {
+      const fuzzy = list.find(
+        (s) =>
+          s.toLowerCase().includes(stateRegion.toLowerCase()) ||
+          stateRegion.toLowerCase().includes(s.toLowerCase()),
+      );
+      if (fuzzy) stateRegion = fuzzy;
+    }
+  }
+
+  const publishHint = (data.cmsHints || [])[0];
+  let publishTarget = prev.publishTarget;
+  if (publishHint === 'netlify') publishTarget = 'netlify';
+  else if (publishHint === 'wordpress' || publishHint === 'shopify' || publishHint === 'wix') {
+    publishTarget = 'api';
+  }
+
+  return {
+    ...prev,
+    siteHomeUrl: data.url || prev.siteHomeUrl,
+    brandName: data.brandName?.trim() || prev.brandName,
+    tagline: data.tagline?.trim() || prev.tagline,
+    tone: data.tone || prev.tone,
+    colors: Array.isArray(data.colors) && data.colors.length ? data.colors.join(', ') : prev.colors,
+    logoUrl: data.logoUrl?.trim() || prev.logoUrl,
+    whatsapp: data.whatsapp?.trim() || prev.whatsapp,
+    contactEmail: data.contactEmail?.trim() || prev.contactEmail,
+    phone: data.phone?.trim() || prev.phone,
+    countryCode: countryCode || prev.countryCode,
+    stateRegion: stateRegion || prev.stateRegion,
+    cityFocus: data.city?.trim() || prev.cityFocus,
+    address: data.address?.trim() || prev.address,
+    servicesOffered: data.servicesOffered?.trim() || prev.servicesOffered,
+    idealClient: data.idealClient?.trim() || prev.idealClient,
+    targetKeywords:
+      Array.isArray(data.keywords) && data.keywords.length
+        ? data.keywords.join(', ')
+        : prev.targetKeywords,
+    socialLinks,
+    publishTarget,
+    hasOwnSite: publishTarget !== 'preview',
+    publishSiteUrl: data.url || prev.publishSiteUrl,
+  };
+}
+
 export default function NexusClientConfigPage() {
   const [config, setConfig] = useState<NexusClientConfig>(() => loadConfig());
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [note, setNote] = useState('');
+  const [scanning, setScanning] = useState(false);
+  const [scanError, setScanError] = useState('');
+  const [scanReport, setScanReport] = useState<ScanData | null>(null);
 
   const missing = useMemo(() => missingRequired(config), [config]);
   const country = getCountry(config.countryCode);
@@ -95,11 +201,48 @@ export default function NexusClientConfigPage() {
     }));
   }
 
+  async function runExtremeScan() {
+    const url = config.siteHomeUrl.trim();
+    if (!url) {
+      setScanError('Pega primero la URL del sitio.');
+      return;
+    }
+    setScanning(true);
+    setScanError('');
+    setScanReport(null);
+    try {
+      const res = await fetch('/api/site-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      const body = (await res.json().catch(() => ({}))) as {
+        success?: boolean;
+        error?: string;
+        data?: ScanData;
+      };
+      if (!res.ok || !body.success || !body.data) {
+        throw new Error(body.error || `Escaneo falló (HTTP ${res.status})`);
+      }
+      setScanReport(body.data);
+      setConfig((prev) => applyScanToConfig(prev, body.data as ScanData));
+      const pages = body.data.pages?.length || 1;
+      setNote(
+        `Escaneo extremo listo: ${pages} página(s) leída(s). Revisa marca, ubicación y redes — corrige lo que falte.`,
+      );
+    } catch (err) {
+      setScanError(err instanceof Error ? err.message : 'No se pudo escanear el sitio');
+    } finally {
+      setScanning(false);
+    }
+  }
+
   function loadSample() {
     setConfig({
       ...SAMPLE_CONFIG,
       socialLinks: SAMPLE_CONFIG.socialLinks.map((s) => ({ ...s })),
     });
+    setScanReport(null);
     setNote('Ejemplo cargado para revisar el layout con datos llenos.');
   }
 
@@ -109,6 +252,7 @@ export default function NexusClientConfigPage() {
       ...EMPTY_CONFIG,
       socialLinks: EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })),
     });
+    setScanReport(null);
     setNote('Borrador vacío. Solo se guarda en este navegador.');
   }
 
@@ -174,17 +318,56 @@ export default function NexusClientConfigPage() {
             <section className="nx-card" id="cfg-sitio">
               <h2>{CONFIG_SECTIONS[0].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[0].blurb}</p>
-              <Field
-                label="URL de tu página"
-                hint="Opcional. Si la pone, Nexus intenta escanear marca y colores."
-              >
-                <input
-                  type="url"
-                  placeholder="https://tu-negocio.com"
-                  value={config.siteHomeUrl}
-                  onChange={onText('siteHomeUrl')}
-                />
-              </Field>
+              <div className="nx-scan-row">
+                <Field
+                  label="URL de tu página"
+                  hint="Home del negocio. El escaneo también entra a contacto / nosotros / servicios si existen."
+                >
+                  <input
+                    type="url"
+                    placeholder="https://tu-negocio.com"
+                    value={config.siteHomeUrl}
+                    onChange={onText('siteHomeUrl')}
+                  />
+                </Field>
+                <button
+                  type="button"
+                  className="btn btn-primary nx-scan-btn"
+                  onClick={runExtremeScan}
+                  disabled={scanning}
+                >
+                  {scanning ? 'Escaneando…' : 'Escaneo extremo'}
+                </button>
+              </div>
+              {scanError ? (
+                <p className="nx-scan-error" role="alert">
+                  {scanError}
+                </p>
+              ) : null}
+              {scanReport ? (
+                <div className="nx-scan-report">
+                  <p className="nx-scan-report__title">
+                    Hallazgos · {scanReport.pages?.length || 1} página(s)
+                    {scanReport.cmsHints?.length
+                      ? ` · CMS: ${scanReport.cmsHints.join(', ')}`
+                      : ''}
+                  </p>
+                  <ul className="nx-scan-report__list">
+                    {(scanReport.pages || []).map((p) => (
+                      <li key={p.url}>
+                        <code>{p.status}</code> {p.title || p.url}
+                      </li>
+                    ))}
+                  </ul>
+                  {scanReport.warnings?.length ? (
+                    <p className="nx-scan-report__warn">{scanReport.warnings.join(' · ')}</p>
+                  ) : null}
+                  <p className="nx-scan-report__hint">
+                    Se rellenaron marca, contacto, ubicación (si se detectó), redes, servicios y
+                    keywords. Revisa cada sección y corrige a mano lo que falte.
+                  </p>
+                </div>
+              ) : null}
             </section>
 
             {/* 2 · Marca */}

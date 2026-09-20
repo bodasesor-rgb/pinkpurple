@@ -75,7 +75,8 @@ export const CONFIG_SECTIONS: ConfigSection[] = [
   {
     id: 'sitio',
     title: '1 · Sitio web',
-    blurb: 'Si ya tiene página, la usamos para prellenar marca y tono. Si no, se salta.',
+    blurb:
+      'Pega la URL y lanza un escaneo extremo: home + páginas de contacto/nosotros/servicios. Rellena marca, contacto, ubicación, redes y keywords.',
   },
   {
     id: 'marca',
