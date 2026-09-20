@@ -1,17 +1,23 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import {
-  CMS_OPTIONS,
   CONFIG_SECTIONS,
   EMPTY_CONFIG,
+  PUBLISH_TARGET_OPTIONS,
   SAMPLE_CONFIG,
+  SOCIAL_NETWORK_OPTIONS,
   TONE_OPTIONS,
+  createSocialLink,
   loadConfig,
   missingRequired,
   saveConfig,
-  type CmsPlatform,
+  socialLabel,
   type NexusClientConfig,
   type NexusTone,
+  type PublishTarget,
+  type SocialLink,
+  type SocialNetworkId,
 } from '../app/config/nexusClientConfig';
+import { COUNTRIES, getCountry, statesForCountry, type CountryCode } from '../app/config/locations';
 
 type FieldProps = {
   label: string;
@@ -33,16 +39,14 @@ function Field({ label, hint, required, children }: FieldProps) {
   );
 }
 
-/**
- * Prototipo público en el sitio principal.
- * Aquí se corrige el formulario; cuando quede bien, se manda al panel de clientes.
- */
 export default function NexusClientConfigPage() {
   const [config, setConfig] = useState<NexusClientConfig>(() => loadConfig());
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [note, setNote] = useState('');
 
   const missing = useMemo(() => missingRequired(config), [config]);
+  const country = getCountry(config.countryCode);
+  const states = statesForCountry(config.countryCode);
 
   useEffect(() => {
     const id = window.setTimeout(() => {
@@ -62,14 +66,49 @@ export default function NexusClientConfigPage() {
     };
   }
 
+  function setCountry(code: CountryCode | '') {
+    setConfig((prev) => ({
+      ...prev,
+      countryCode: code,
+      stateRegion: '',
+    }));
+  }
+
+  function patchSocial(id: string, patch: Partial<SocialLink>) {
+    setConfig((prev) => ({
+      ...prev,
+      socialLinks: prev.socialLinks.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+    }));
+  }
+
+  function addSocial() {
+    setConfig((prev) => ({
+      ...prev,
+      socialLinks: [...prev.socialLinks, createSocialLink('other', '')],
+    }));
+  }
+
+  function removeSocial(id: string) {
+    setConfig((prev) => ({
+      ...prev,
+      socialLinks: prev.socialLinks.filter((s) => s.id !== id),
+    }));
+  }
+
   function loadSample() {
-    setConfig({ ...SAMPLE_CONFIG });
+    setConfig({
+      ...SAMPLE_CONFIG,
+      socialLinks: SAMPLE_CONFIG.socialLinks.map((s) => ({ ...s })),
+    });
     setNote('Ejemplo cargado para revisar el layout con datos llenos.');
   }
 
   function resetAll() {
     if (!window.confirm('¿Vaciar el borrador local?')) return;
-    setConfig({ ...EMPTY_CONFIG });
+    setConfig({
+      ...EMPTY_CONFIG,
+      socialLinks: EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })),
+    });
     setNote('Borrador vacío. Solo se guarda en este navegador.');
   }
 
@@ -81,6 +120,14 @@ export default function NexusClientConfigPage() {
         ? `Guardado local. Faltan: ${missing.join(', ')}.`
         : 'Guardado local. Checklist completo — listo para revisar.',
     );
+  }
+
+  function setPublishTarget(target: PublishTarget) {
+    setConfig((prev) => ({
+      ...prev,
+      publishTarget: target,
+      hasOwnSite: target !== 'preview',
+    }));
   }
 
   return (
@@ -123,6 +170,7 @@ export default function NexusClientConfigPage() {
           </aside>
 
           <form className="nx-form" onSubmit={onSubmit}>
+            {/* 1 · Sitio */}
             <section className="nx-card" id="cfg-sitio">
               <h2>{CONFIG_SECTIONS[0].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[0].blurb}</p>
@@ -139,6 +187,7 @@ export default function NexusClientConfigPage() {
               </Field>
             </section>
 
+            {/* 2 · Marca */}
             <section className="nx-card" id="cfg-marca">
               <h2>{CONFIG_SECTIONS[1].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[1].blurb}</p>
@@ -203,6 +252,7 @@ export default function NexusClientConfigPage() {
               </div>
             </section>
 
+            {/* 3 · Contacto */}
             <section className="nx-card" id="cfg-contacto">
               <h2>{CONFIG_SECTIONS[2].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[2].blurb}</p>
@@ -229,22 +279,48 @@ export default function NexusClientConfigPage() {
               </Field>
             </section>
 
+            {/* 4 · Ubicación */}
             <section className="nx-card" id="cfg-ubicacion">
               <h2>{CONFIG_SECTIONS[3].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[3].blurb}</p>
-              <div className="nx-row">
+              <div className="nx-row nx-row--3">
+                <Field label="País" required>
+                  <select
+                    value={config.countryCode}
+                    onChange={(e) => setCountry(e.target.value as CountryCode | '')}
+                    required
+                  >
+                    <option value="">Elige un país…</option>
+                    {COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label={country?.stateLabel || 'Estado / provincia'} required>
+                  <select
+                    value={config.stateRegion}
+                    onChange={onText('stateRegion')}
+                    disabled={!config.countryCode}
+                    required
+                  >
+                    <option value="">
+                      {config.countryCode ? 'Elige…' : 'Primero elige país'}
+                    </option>
+                    {states.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
                 <Field label="Ciudad" required>
                   <input
                     placeholder="Guadalajara"
                     value={config.cityFocus}
                     onChange={onText('cityFocus')}
-                  />
-                </Field>
-                <Field label="Estado / región">
-                  <input
-                    placeholder="Jalisco"
-                    value={config.stateRegion}
-                    onChange={onText('stateRegion')}
+                    required
                   />
                 </Field>
               </div>
@@ -253,6 +329,7 @@ export default function NexusClientConfigPage() {
               </Field>
             </section>
 
+            {/* 5 · Oferta */}
             <section className="nx-card" id="cfg-oferta">
               <h2>{CONFIG_SECTIONS[4].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[4].blurb}</p>
@@ -274,6 +351,7 @@ export default function NexusClientConfigPage() {
               </Field>
             </section>
 
+            {/* 6 · Keywords */}
             <section className="nx-card" id="cfg-keywords">
               <h2>{CONFIG_SECTIONS[5].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[5].blurb}</p>
@@ -287,97 +365,186 @@ export default function NexusClientConfigPage() {
               </Field>
             </section>
 
+            {/* 7 · Publicación */}
             <section className="nx-card" id="cfg-publicacion">
               <h2>{CONFIG_SECTIONS[6].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[6].blurb}</p>
+
               <fieldset className="nx-radios">
-                <legend>¿Ya tienes sitio web?</legend>
-                <label className="nx-radio">
-                  <input
-                    type="radio"
-                    name="hasOwnSite"
-                    checked={config.hasOwnSite}
-                    onChange={() => update('hasOwnSite', true)}
-                  />
-                  <span>Sí — usaré mi dominio / CMS</span>
-                </label>
-                <label className="nx-radio">
-                  <input
-                    type="radio"
-                    name="hasOwnSite"
-                    checked={!config.hasOwnSite}
-                    onChange={() => {
-                      update('hasOwnSite', false);
-                      update('cmsPlatform', 'none');
-                    }}
-                  />
-                  <span>No — asignen un subdominio *.pinkpurple.site</span>
-                </label>
+                <legend>¿Cómo se conecta el sitio?</legend>
+                {PUBLISH_TARGET_OPTIONS.map((opt) => (
+                  <label key={opt.id} className="nx-radio nx-radio--block">
+                    <input
+                      type="radio"
+                      name="publishTarget"
+                      checked={config.publishTarget === opt.id}
+                      onChange={() => setPublishTarget(opt.id)}
+                    />
+                    <span>
+                      <strong>{opt.label}</strong>
+                      <small>{opt.hint}</small>
+                    </span>
+                  </label>
+                ))}
               </fieldset>
 
-              {config.hasOwnSite ? (
-                <div className="nx-row">
-                  <Field label="URL del sitio" required>
-                    <input
-                      type="url"
-                      placeholder="https://tu-dominio.com"
-                      value={config.siteHomeUrl}
-                      onChange={onText('siteHomeUrl')}
-                    />
-                  </Field>
-                  <Field label="Plataforma">
-                    <select
-                      value={config.cmsPlatform}
-                      onChange={(e) => update('cmsPlatform', e.target.value as CmsPlatform)}
-                    >
-                      {CMS_OPTIONS.filter((o) => o.id !== 'none').map((o) => (
-                        <option key={o.id} value={o.id}>
-                          {o.label}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                </div>
-              ) : (
-                <Field label="Slug de preview" hint="tu-marca.pinkpurple.site">
+              {config.publishTarget === 'preview' ? (
+                <Field
+                  label="Slug de preview"
+                  hint="Se usará como tu-marca.pinkpurple.site"
+                >
                   <input
                     placeholder="tu-marca"
                     value={config.publishSlug}
                     onChange={onText('publishSlug')}
                   />
                 </Field>
-              )}
+              ) : null}
+
+              {config.publishTarget === 'netlify' ? (
+                <div className="nx-callout nx-callout--netlify">
+                  <p>
+                    <strong>Netlify (modelo Bodasesor):</strong> Nexus no hace push de HTML a su
+                    sitio. Se conecta el proyecto Netlify; en el <em>build</em> de Netlify se baja el
+                    SEO y se despliega desde <strong>su código / su repo</strong>. Así no se borra
+                    la página principal.
+                  </p>
+                  <div className="nx-row">
+                    <Field
+                      label="Site ID o URL Netlify"
+                      required
+                      hint="Ej. site id o https://app.netlify.com/sites/…"
+                    >
+                      <input
+                        placeholder="mi-sitio o UUID"
+                        value={config.netlifySiteId}
+                        onChange={onText('netlifySiteId')}
+                      />
+                    </Field>
+                    <Field
+                      label="URL pública del sitio"
+                      hint="Dominio que ve el cliente."
+                    >
+                      <input
+                        type="url"
+                        placeholder="https://tu-dominio.com"
+                        value={config.publishSiteUrl}
+                        onChange={onText('publishSiteUrl')}
+                      />
+                    </Field>
+                  </div>
+                  <Field
+                    label="Token / build hook (conexión)"
+                    hint="Prototipo: aquí irá el secreto de conexión. Netlify ejecuta el deploy."
+                  >
+                    <input
+                      type="password"
+                      autoComplete="off"
+                      placeholder="Build hook o token de conexión"
+                      value={config.netlifyConnectToken}
+                      onChange={onText('netlifyConnectToken')}
+                    />
+                  </Field>
+                </div>
+              ) : null}
+
+              {config.publishTarget === 'api' ? (
+                <div className="nx-callout nx-callout--api">
+                  <p>
+                    <strong>WordPress, Wix, Shopify, Hostinger y similares:</strong> el cliente pega
+                    la <em>API key</em> (o application password) de su página. Ahí sí Nexus puede
+                    publicar / hacer push por API sin pisar un repo Git ajeno.
+                  </p>
+                  <div className="nx-row">
+                    <Field label="URL del sitio / CMS" required>
+                      <input
+                        type="url"
+                        placeholder="https://tu-dominio.com"
+                        value={config.publishSiteUrl}
+                        onChange={onText('publishSiteUrl')}
+                      />
+                    </Field>
+                    <Field
+                      label="API key / application password"
+                      required
+                      hint="No se muestra en el HTML público; solo en el panel."
+                    >
+                      <input
+                        type="password"
+                        autoComplete="off"
+                        placeholder="••••••••"
+                        value={config.publishApiKey}
+                        onChange={onText('publishApiKey')}
+                      />
+                    </Field>
+                  </div>
+                </div>
+              ) : null}
             </section>
 
+            {/* 8 · Redes */}
             <section className="nx-card" id="cfg-redes">
               <h2>{CONFIG_SECTIONS[7].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[7].blurb}</p>
-              <div className="nx-row">
-                <Field label="Instagram">
-                  <input
-                    type="url"
-                    value={config.socialInstagram}
-                    onChange={onText('socialInstagram')}
-                  />
-                </Field>
-                <Field label="Facebook">
-                  <input
-                    type="url"
-                    value={config.socialFacebook}
-                    onChange={onText('socialFacebook')}
-                  />
-                </Field>
-                <Field label="TikTok">
-                  <input type="url" value={config.socialTiktok} onChange={onText('socialTiktok')} />
-                </Field>
-                <Field label="LinkedIn">
-                  <input
-                    type="url"
-                    value={config.socialLinkedin}
-                    onChange={onText('socialLinkedin')}
-                  />
-                </Field>
+
+              <div className="nx-social-list">
+                {config.socialLinks.map((link) => (
+                  <div key={link.id} className="nx-social-row">
+                    <Field label="Red">
+                      <select
+                        value={link.network}
+                        onChange={(e) =>
+                          patchSocial(link.id, {
+                            network: e.target.value as SocialNetworkId,
+                            customName:
+                              e.target.value === 'other' ? link.customName || '' : undefined,
+                          })
+                        }
+                      >
+                        {SOCIAL_NETWORK_OPTIONS.map((o) => (
+                          <option key={o.id} value={o.id}>
+                            {o.label}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+                    {link.network === 'other' ? (
+                      <Field label="Nombre de la red">
+                        <input
+                          placeholder="Threads, Behance…"
+                          value={link.customName || ''}
+                          onChange={(e) => patchSocial(link.id, { customName: e.target.value })}
+                        />
+                      </Field>
+                    ) : (
+                      <Field label=" ">
+                        <p className="nx-social-name">{socialLabel(link)}</p>
+                      </Field>
+                    )}
+                    <Field label="URL o @">
+                      <input
+                        type="url"
+                        placeholder="https://…"
+                        value={link.url}
+                        onChange={(e) => patchSocial(link.id, { url: e.target.value })}
+                      />
+                    </Field>
+                    <button
+                      type="button"
+                      className="btn btn-ghost nx-social-remove"
+                      onClick={() => removeSocial(link.id)}
+                      disabled={config.socialLinks.length <= 1}
+                      aria-label={`Quitar ${socialLabel(link)}`}
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                ))}
               </div>
+
+              <button type="button" className="btn btn-ghost" onClick={addSocial}>
+                + Agregar otra red
+              </button>
             </section>
 
             <div className="nx-actions">
@@ -412,6 +579,7 @@ export default function NexusClientConfigPage() {
 }
 
 function toPayload(config: NexusClientConfig) {
+  const country = getCountry(config.countryCode);
   return {
     brandName: config.brandName.trim(),
     tagline: config.tagline.trim(),
@@ -424,8 +592,10 @@ function toPayload(config: NexusClientConfig) {
     whatsapp: config.whatsapp.trim(),
     contactEmail: config.contactEmail.trim(),
     phone: config.phone.trim(),
-    cityFocus: config.cityFocus.trim(),
+    countryCode: config.countryCode,
+    countryName: country?.name || '',
     stateRegion: config.stateRegion.trim(),
+    cityFocus: config.cityFocus.trim(),
     address: config.address.trim(),
     servicesOffered: config.servicesOffered.trim(),
     idealClient: config.idealClient.trim(),
@@ -433,15 +603,27 @@ function toPayload(config: NexusClientConfig) {
       .split(/[,;\n]+/)
       .map((k) => k.trim())
       .filter(Boolean),
-    hasOwnSite: config.hasOwnSite,
-    siteHomeUrl: config.hasOwnSite ? config.siteHomeUrl.trim() : '',
-    cmsPlatform: config.hasOwnSite ? config.cmsPlatform : 'none',
-    publishSlug: config.publishSlug.trim(),
-    social: {
-      instagram: config.socialInstagram.trim(),
-      facebook: config.socialFacebook.trim(),
-      tiktok: config.socialTiktok.trim(),
-      linkedin: config.socialLinkedin.trim(),
+    publish: {
+      target: config.publishTarget,
+      slug: config.publishSlug.trim(),
+      siteUrl: config.publishSiteUrl.trim() || config.siteHomeUrl.trim(),
+      // secretos: en payload real irían cifrados / solo servidor
+      hasApiKey: Boolean(config.publishApiKey.trim()),
+      netlifySiteId: config.netlifySiteId.trim(),
+      hasNetlifyToken: Boolean(config.netlifyConnectToken.trim()),
+      pushBy:
+        config.publishTarget === 'netlify'
+          ? 'netlify_build'
+          : config.publishTarget === 'api'
+            ? 'nexus_api'
+            : 'none',
     },
+    social: config.socialLinks
+      .filter((s) => s.url.trim())
+      .map((s) => ({
+        network: s.network,
+        name: socialLabel(s),
+        url: s.url.trim(),
+      })),
   };
 }

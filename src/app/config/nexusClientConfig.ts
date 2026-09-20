@@ -1,43 +1,67 @@
 /**
  * Prototipo: datos que el cliente llena para personalizar su Nexus.
- * Espejo del onboarding Hostinger (`/onboarding`) — solo UI local para corregir copy y flujo.
- * No llama a Nexus todavía; guarda en localStorage.
+ * Solo UI local (localStorage). Cuando se apruebe → onboarding real.
  */
 
+import type { CountryCode } from './locations';
+
 export type NexusTone = 'formal' | 'cercano' | 'experto';
-export type CmsPlatform = 'wordpress' | 'shopify' | 'other' | 'none';
+
+/** Cómo se publica el contenido en el sitio del cliente. */
+export type PublishTarget =
+  | 'preview' // *.pinkpurple.site
+  | 'netlify' // build/push en su Netlify (como Bodasesor) — Nexus no pisa el sitio
+  | 'api'; // WordPress, Wix, Shopify, Hostinger… vía API key — Nexus empuja
+
+export type SocialNetworkId =
+  | 'instagram'
+  | 'facebook'
+  | 'tiktok'
+  | 'linkedin'
+  | 'youtube'
+  | 'x'
+  | 'pinterest'
+  | 'whatsapp'
+  | 'other';
+
+export interface SocialLink {
+  id: string;
+  network: SocialNetworkId;
+  /** Si network === 'other', nombre libre (Threads, Behance…). */
+  customName?: string;
+  url: string;
+}
 
 export interface NexusClientConfig {
-  // 1 · Sitio / escaneo
   siteHomeUrl: string;
-  // 2 · Marca
   brandName: string;
   tagline: string;
   tone: NexusTone;
   colors: string;
   logoUrl: string;
-  // 3 · Contacto
   whatsapp: string;
   contactEmail: string;
   phone: string;
-  // 4 · Ubicación
-  cityFocus: string;
+  /** ISO-ish country code from locations list */
+  countryCode: CountryCode | '';
   stateRegion: string;
+  cityFocus: string;
   address: string;
-  // 5 · Oferta
   servicesOffered: string;
   idealClient: string;
-  // 6 · Keywords
   targetKeywords: string;
-  // 7 · Publicación
   hasOwnSite: boolean;
-  cmsPlatform: CmsPlatform;
+  publishTarget: PublishTarget;
   publishSlug: string;
-  // 8 · Redes
-  socialInstagram: string;
-  socialFacebook: string;
-  socialTiktok: string;
-  socialLinkedin: string;
+  /** URL del sitio / CMS */
+  publishSiteUrl: string;
+  /** API key / Application Password / token del CMS (no Netlify) */
+  publishApiKey: string;
+  /** Netlify: site id o URL del sitio en Netlify */
+  netlifySiteId: string;
+  /** Netlify: build hook o token de conexión (prototipo) */
+  netlifyConnectToken: string;
+  socialLinks: SocialLink[];
 }
 
 export interface ConfigSection {
@@ -68,8 +92,8 @@ export const CONFIG_SECTIONS: ConfigSection[] = [
   {
     id: 'ubicacion',
     title: '4 · Ubicación',
-    blurb: 'Ciudad / región para SEO local y copy (“en Guadalajara…”).',
-    requiredHint: 'Obligatorio: ciudad',
+    blurb: 'País, estado/provincia y ciudad para SEO local.',
+    requiredHint: 'Obligatorio: país, estado y ciudad',
   },
   {
     id: 'oferta',
@@ -85,12 +109,13 @@ export const CONFIG_SECTIONS: ConfigSection[] = [
   {
     id: 'publicacion',
     title: '7 · Dónde publica',
-    blurb: 'Dominio propio + CMS, o preview en *.pinkpurple.site.',
+    blurb:
+      'Netlify = su build hace el deploy (como Bodasesor). Otros CMS = conexión por API key y Nexus empuja.',
   },
   {
     id: 'redes',
     title: '8 · Redes (opcional)',
-    blurb: 'Enlaces sociales para footer y schema cuando existan.',
+    blurb: 'Agrega las que uses. Puedes sumar más redes cuando quieras.',
   },
 ];
 
@@ -100,12 +125,50 @@ export const TONE_OPTIONS: { id: NexusTone; label: string; hint: string }[] = [
   { id: 'experto', label: 'Técnico-profesional', hint: 'Autoridad, preciso' },
 ];
 
-export const CMS_OPTIONS: { id: CmsPlatform; label: string }[] = [
-  { id: 'wordpress', label: 'WordPress' },
-  { id: 'shopify', label: 'Shopify' },
-  { id: 'other', label: 'Otro / custom' },
-  { id: 'none', label: 'Sin CMS (solo preview Nexus)' },
+export const SOCIAL_NETWORK_OPTIONS: { id: SocialNetworkId; label: string }[] = [
+  { id: 'instagram', label: 'Instagram' },
+  { id: 'facebook', label: 'Facebook' },
+  { id: 'tiktok', label: 'TikTok' },
+  { id: 'linkedin', label: 'LinkedIn' },
+  { id: 'youtube', label: 'YouTube' },
+  { id: 'x', label: 'X (Twitter)' },
+  { id: 'pinterest', label: 'Pinterest' },
+  { id: 'whatsapp', label: 'WhatsApp Business (canal)' },
+  { id: 'other', label: 'Otra…' },
 ];
+
+export const PUBLISH_TARGET_OPTIONS: {
+  id: PublishTarget;
+  label: string;
+  hint: string;
+}[] = [
+  {
+    id: 'preview',
+    label: 'Preview PinkPurple (*.pinkpurple.site)',
+    hint: 'Sin sitio propio todavía. Solo preview en Nexus.',
+  },
+  {
+    id: 'netlify',
+    label: 'Netlify (como Bodasesor)',
+    hint: 'El push lo hace Netlify en su build/repo. Nexus no escribe HTML encima de su sitio.',
+  },
+  {
+    id: 'api',
+    label: 'WordPress, Wix, Shopify u otro (API key)',
+    hint: 'Conectas con API key / application password. Ahí sí Nexus puede publicar por API.',
+  },
+];
+
+function newSocialId(): string {
+  return `soc_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+export function createSocialLink(
+  network: SocialNetworkId = 'instagram',
+  url = '',
+): SocialLink {
+  return { id: newSocialId(), network, url };
+}
 
 export const EMPTY_CONFIG: NexusClientConfig = {
   siteHomeUrl: '',
@@ -117,57 +180,104 @@ export const EMPTY_CONFIG: NexusClientConfig = {
   whatsapp: '',
   contactEmail: '',
   phone: '',
-  cityFocus: '',
+  countryCode: 'MX',
   stateRegion: '',
+  cityFocus: '',
   address: '',
   servicesOffered: '',
   idealClient: '',
   targetKeywords: '',
   hasOwnSite: false,
-  cmsPlatform: 'none',
+  publishTarget: 'preview',
   publishSlug: '',
-  socialInstagram: '',
-  socialFacebook: '',
-  socialTiktok: '',
-  socialLinkedin: '',
+  publishSiteUrl: '',
+  publishApiKey: '',
+  netlifySiteId: '',
+  netlifyConnectToken: '',
+  socialLinks: [
+    createSocialLink('instagram'),
+    createSocialLink('facebook'),
+  ],
 };
 
-/** Ejemplo rellenable para revisar el diseño con datos reales. */
 export const SAMPLE_CONFIG: NexusClientConfig = {
+  ...EMPTY_CONFIG,
   siteHomeUrl: 'https://ejemplo-negocio.mx',
   brandName: 'Estudio Norte',
   tagline: 'Diseño y obra para casas en CDMX',
   tone: 'cercano',
   colors: '#1e3a8a, #f8fafc',
-  logoUrl: '',
   whatsapp: '+52 55 1234 5678',
   contactEmail: 'hola@estudionorte.mx',
-  phone: '',
+  countryCode: 'MX',
+  stateRegion: 'Ciudad de México',
   cityFocus: 'Ciudad de México',
-  stateRegion: 'CDMX',
   address: 'Col. Roma Norte',
   servicesOffered: 'Diseño interior, remodelación completa, asesoría de materiales',
-  idealClient: 'Familias que remodelan casa o depto en CDMX y quieren un solo equipo de principio a fin',
+  idealClient:
+    'Familias que remodelan casa o depto en CDMX y quieren un solo equipo de principio a fin',
   targetKeywords:
     'remodelación CDMX, diseño interior Roma Norte, remodelar departamento Ciudad de México',
   hasOwnSite: true,
-  cmsPlatform: 'wordpress',
+  publishTarget: 'api',
+  publishSiteUrl: 'https://ejemplo-negocio.mx',
+  publishApiKey: '',
   publishSlug: 'estudio-norte',
-  socialInstagram: 'https://instagram.com/estudionorte',
-  socialFacebook: '',
-  socialTiktok: '',
-  socialLinkedin: '',
+  socialLinks: [
+    createSocialLink('instagram', 'https://instagram.com/estudionorte'),
+    createSocialLink('facebook', ''),
+    { ...createSocialLink('other', 'https://threads.net/@estudionorte'), customName: 'Threads' },
+  ],
 };
 
-export const STORAGE_KEY = 'pp_nexus_client_config_prototype_v1';
+export const STORAGE_KEY = 'pp_nexus_client_config_prototype_v2';
+
+function migrateLegacy(raw: Record<string, unknown>): Partial<NexusClientConfig> {
+  const next: Partial<NexusClientConfig> = { ...raw } as Partial<NexusClientConfig>;
+
+  if (!Array.isArray(raw.socialLinks)) {
+    const links: SocialLink[] = [];
+    const map: [SocialNetworkId, string][] = [
+      ['instagram', String(raw.socialInstagram || '')],
+      ['facebook', String(raw.socialFacebook || '')],
+      ['tiktok', String(raw.socialTiktok || '')],
+      ['linkedin', String(raw.socialLinkedin || '')],
+    ];
+    for (const [network, url] of map) {
+      if (url || network === 'instagram' || network === 'facebook') {
+        links.push(createSocialLink(network, url));
+      }
+    }
+    next.socialLinks = links.length ? links : EMPTY_CONFIG.socialLinks;
+  }
+
+  if (!raw.publishTarget) {
+    if (raw.hasOwnSite === false || raw.cmsPlatform === 'none') next.publishTarget = 'preview';
+    else if (raw.cmsPlatform === 'other' || String(raw.cmsPlatform || '').includes('netlify')) {
+      next.publishTarget = 'netlify';
+    } else next.publishTarget = 'api';
+  }
+
+  if (!raw.countryCode) next.countryCode = 'MX';
+  if (!raw.publishSiteUrl && raw.siteHomeUrl) next.publishSiteUrl = String(raw.siteHomeUrl);
+
+  return next;
+}
 
 export function loadConfig(): NexusClientConfig {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...EMPTY_CONFIG };
-    return { ...EMPTY_CONFIG, ...JSON.parse(raw) };
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pp_nexus_client_config_prototype_v1');
+    if (!raw) return { ...EMPTY_CONFIG, socialLinks: EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })) };
+    const parsed = migrateLegacy(JSON.parse(raw) as Record<string, unknown>);
+    return {
+      ...EMPTY_CONFIG,
+      ...parsed,
+      socialLinks: Array.isArray(parsed.socialLinks)
+        ? parsed.socialLinks.map((s) => ({ ...s }))
+        : EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })),
+    };
   } catch {
-    return { ...EMPTY_CONFIG };
+    return { ...EMPTY_CONFIG, socialLinks: EMPTY_CONFIG.socialLinks.map((s) => ({ ...s })) };
   }
 }
 
@@ -175,15 +285,33 @@ export function saveConfig(config: NexusClientConfig): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 }
 
-/** Checklist rápida de campos obligatorios (misma lógica que onboarding Nexus). */
 export function missingRequired(config: NexusClientConfig): string[] {
   const miss: string[] = [];
   if (!config.brandName.trim() || config.brandName.trim().length < 2) miss.push('Nombre de marca');
   if (!config.tone) miss.push('Tono de voz');
   if (!config.whatsapp.trim()) miss.push('WhatsApp');
+  if (!config.countryCode) miss.push('País');
+  if (!config.stateRegion.trim()) miss.push('Estado / provincia');
   if (!config.cityFocus.trim()) miss.push('Ciudad');
   if (!config.servicesOffered.trim()) miss.push('Servicios / productos');
   if (!config.idealClient.trim()) miss.push('Cliente ideal');
-  if (config.hasOwnSite && !config.siteHomeUrl.trim()) miss.push('URL del sitio propio');
+
+  if (config.publishTarget === 'preview' && !config.publishSlug.trim() && !config.brandName.trim()) {
+    miss.push('Slug de preview');
+  }
+  if (config.publishTarget === 'api') {
+    if (!config.publishSiteUrl.trim()) miss.push('URL del sitio (API)');
+    if (!config.publishApiKey.trim()) miss.push('API key del sitio');
+  }
+  if (config.publishTarget === 'netlify') {
+    if (!config.netlifySiteId.trim() && !config.publishSiteUrl.trim()) {
+      miss.push('Site ID o URL Netlify');
+    }
+  }
   return miss;
+}
+
+export function socialLabel(link: SocialLink): string {
+  if (link.network === 'other') return (link.customName || 'Otra red').trim() || 'Otra red';
+  return SOCIAL_NETWORK_OPTIONS.find((o) => o.id === link.network)?.label || link.network;
 }

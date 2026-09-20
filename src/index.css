@@ -2687,6 +2687,103 @@ button.gsc-metric {
   gap: 0.35rem 1rem;
 }
 
+.nx-radio--block {
+  align-items: flex-start;
+}
+
+.nx-radio--block span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.nx-radio--block strong {
+  font-size: 0.95rem;
+}
+
+.nx-radio--block small {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.nx-callout {
+  margin-top: 0.75rem;
+  padding: 1rem 1.05rem;
+  border-radius: 14px;
+  border: 1px solid rgba(140, 61, 245, 0.16);
+  background: rgba(140, 61, 245, 0.05);
+}
+
+.nx-callout p {
+  margin: 0 0 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.nx-callout--netlify {
+  border-color: rgba(0, 170, 150, 0.28);
+  background: rgba(0, 170, 150, 0.06);
+}
+
+.nx-callout--api {
+  border-color: rgba(244, 60, 176, 0.22);
+  background: rgba(244, 60, 176, 0.05);
+}
+
+.nx-social-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.nx-social-row {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border-radius: 14px;
+  border: 1px solid rgba(140, 61, 245, 0.12);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.nx-social-row .nx-field {
+  margin-bottom: 0;
+}
+
+.nx-social-name {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(140, 61, 245, 0.06);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.nx-social-remove {
+  justify-self: start;
+  padding: 0.45rem 0.85rem !important;
+  font-size: 0.82rem !important;
+}
+
+@media (min-width: 720px) {
+  .nx-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .nx-row--3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .nx-social-row {
+    grid-template-columns: minmax(8rem, 11rem) minmax(7rem, 10rem) minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .nx-tone-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .nx-tones,
 .nx-radios {
   border: 0;
@@ -2795,16 +2892,6 @@ button.gsc-metric {
   color: #1a7a45;
   font-weight: 700;
   font-size: 0.9rem;
-}
-
-@media (min-width: 720px) {
-  .nx-row {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .nx-tone-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @media (min-width: 1100px) {
