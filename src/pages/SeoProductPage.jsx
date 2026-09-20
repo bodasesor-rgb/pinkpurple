@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import GrowthChartCarousel from '../components/GrowthChartCarousel.jsx';
+import SeoNumbersDashboard from '../components/SeoNumbersDashboard.jsx';
 import { getProductBySlug } from '../data/products.js';
 import {
   PLANS,
@@ -157,6 +158,8 @@ export default function SeoProductPage() {
             Captura real · Google PageSpeed Insights · SEO <strong>100</strong> (móvil) · bodasesor.com
           </figcaption>
         </figure>
+
+        <SeoNumbersDashboard />
 
         <div className="plans-toolbar">
           <div className="billing-toggle" role="group" aria-label="Periodo de pago">
