@@ -9,6 +9,14 @@ import {
 } from 'react';
 import { ApiError, UNAUTHORIZED_EVENT, auth as authApi } from '../api/client';
 import type { AuthUser, RegisterInput } from '../api/types';
+import {
+  buildDemoSession,
+  clearDemoSession,
+  isDemoUserId,
+  loadDemoSession,
+  saveDemoSession,
+  type DemoConfig,
+} from './demoSession';
 
 type AuthStatus = 'loading' | 'authenticated' | 'anonymous';
 
@@ -18,10 +26,16 @@ interface AuthContextValue {
   /** Alias de status === 'loading' para los componentes antiguos. */
   loading: boolean;
   isAuthenticated: boolean;
+  /** true si la sesión viene del simulador de la home (no es cuenta Nexus). */
+  isDemo: boolean;
   error: string;
   clearError: () => void;
   login: (email: string, password: string) => Promise<AuthUser>;
   register: (input: RegisterInput) => Promise<AuthUser>;
+  /** Abre el panel real (/app) con los datos del simulador. */
+  enterDemoFromSimulator: (config: DemoConfig) => AuthUser;
+  /** Borra la empresa de prueba y vuelve a anónimo. */
+  deleteDemoCompany: () => void;
   logout: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   resetPassword: (token: string, password: string) => Promise<void>;
@@ -36,12 +50,23 @@ function messageOf(err: unknown, fallback: string): string {
   return fallback;
 }
 
+function applyDemoIfPresent(
+  setUser: (u: AuthUser | null) => void,
+  setStatus: (s: AuthStatus) => void,
+): boolean {
+  const demo = loadDemoSession();
+  if (!demo) return false;
+  setUser(demo.user);
+  setStatus('authenticated');
+  return true;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [error, setError] = useState('');
 
-  // Rehidrata la sesión desde la cookie httpOnly al cargar la app.
+  // Rehidrata la sesión desde cookie httpOnly; si no hay, usa demo del simulador.
   useEffect(() => {
     const controller = new AbortController();
     let alive = true;
@@ -50,13 +75,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .me(controller.signal)
       .then((session) => {
         if (!alive) return;
-        setUser(session.user ?? null);
-        setStatus(session.user ? 'authenticated' : 'anonymous');
+        if (session.user && !isDemoUserId(session.user.id)) {
+          clearDemoSession();
+          setUser(session.user);
+          setStatus('authenticated');
+          return;
+        }
+        if (!applyDemoIfPresent(setUser, setStatus)) {
+          setUser(null);
+          setStatus('anonymous');
+        }
       })
       .catch(() => {
         if (!alive) return;
-        setUser(null);
-        setStatus('anonymous');
+        if (!applyDemoIfPresent(setUser, setStatus)) {
+          setUser(null);
+          setStatus('anonymous');
+        }
       });
 
     return () => {
@@ -65,9 +100,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Cualquier 401 del cliente cierra la sesión en la UI.
   useEffect(() => {
     function onUnauthorized() {
+      if (loadDemoSession()) {
+        applyDemoIfPresent(setUser, setStatus);
+        return;
+      }
       setUser(null);
       setStatus('anonymous');
     }
@@ -81,6 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError('');
     try {
       const session = await authApi.login({ email: email.trim(), password });
+      clearDemoSession();
       setUser(session.user);
       setStatus('authenticated');
       return session.user;
@@ -98,6 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: input.email.trim(),
         fullName: input.fullName.trim(),
       });
+      clearDemoSession();
       setUser(session.user);
       setStatus('authenticated');
       return session.user;
@@ -107,15 +147,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const enterDemoFromSimulator = useCallback((config: DemoConfig) => {
+    const session = buildDemoSession(config);
+    saveDemoSession(session);
+    setUser(session.user);
+    setStatus('authenticated');
+    setError('');
+    return session.user;
+  }, []);
+
+  const deleteDemoCompany = useCallback(() => {
+    clearDemoSession();
+    setUser(null);
+    setStatus('anonymous');
+    setError('');
+  }, []);
+
   const logout = useCallback(async () => {
     setError('');
+    const wasDemo = isDemoUserId(user?.id);
     try {
-      await authApi.logout();
+      if (!wasDemo) await authApi.logout();
     } finally {
+      clearDemoSession();
       setUser(null);
       setStatus('anonymous');
     }
-  }, []);
+  }, [user?.id]);
 
   const requestPasswordReset = useCallback(async (email: string) => {
     setError('');
@@ -140,13 +198,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = useCallback(async () => {
     try {
       const session = await authApi.me();
-      setUser(session.user ?? null);
-      setStatus(session.user ? 'authenticated' : 'anonymous');
+      if (session.user && !isDemoUserId(session.user.id)) {
+        clearDemoSession();
+        setUser(session.user);
+        setStatus('authenticated');
+        return;
+      }
     } catch {
+      /* fall through to demo */
+    }
+    if (!applyDemoIfPresent(setUser, setStatus)) {
       setUser(null);
       setStatus('anonymous');
     }
   }, []);
+
+  const isDemo = isDemoUserId(user?.id);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -154,16 +221,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       status,
       loading: status === 'loading',
       isAuthenticated: status === 'authenticated',
+      isDemo,
       error,
       clearError,
       login,
       register,
+      enterDemoFromSimulator,
+      deleteDemoCompany,
       logout,
       requestPasswordReset,
       resetPassword,
       refreshUser,
     }),
-    [user, status, error, clearError, login, register, logout, requestPasswordReset, resetPassword, refreshUser],
+    [
+      user,
+      status,
+      isDemo,
+      error,
+      clearError,
+      login,
+      register,
+      enterDemoFromSimulator,
+      deleteDemoCompany,
+      logout,
+      requestPasswordReset,
+      resetPassword,
+      refreshUser,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

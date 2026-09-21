@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { account, jobs as jobsApi } from '../../api/client';
 import { EmptyState, ErrorState, SkeletonRows } from '../../components/states/States';
 import { useAsync } from '../../hooks/useAsync';
 import { useAuth } from '../../auth/AuthContext';
+import { loadDemoConfig } from '../../auth/demoSession';
 import { JobStatusBadge, UsageMeter, formatDateTime } from '../shared/ui';
 
 const PROFILE_LS_KEY = 'pp_studio_profile_v1';
@@ -32,7 +33,9 @@ function saveLocalProfile(userId: string | undefined, data: LocalProfile) {
 }
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, isDemo, deleteDemoCompany } = useAuth();
+  const navigate = useNavigate();
+  const demo = isDemo ? loadDemoConfig() : null;
   const usage = useAsync((signal) => account.usage(signal), []);
   const recent = useAsync((signal) => jobsApi.list({ pageSize: 5 }, signal), []);
 
@@ -43,8 +46,8 @@ export default function ProfilePage() {
   useEffect(() => {
     const local = loadLocalProfile(user?.id);
     setFullName(local.fullName || user?.fullName || '');
-    setCompany(local.company || '');
-  }, [user?.id, user?.fullName]);
+    setCompany(local.company || demo?.company || '');
+  }, [user?.id, user?.fullName, demo?.company]);
 
   function onSaveProfile(e: FormEvent) {
     e.preventDefault();
@@ -55,15 +58,49 @@ export default function ProfilePage() {
     setSavedNote('Guardado en este dispositivo. La sync con servidor llega con la API de cuenta.');
   }
 
+  function onDeleteCompany() {
+    const label = demo?.brandName || demo?.company || 'esta empresa de prueba';
+    if (
+      !window.confirm(
+        `¿Borrar ${label}? Se elimina la sesión de simulación y todos sus proyectos de este navegador.`,
+      )
+    ) {
+      return;
+    }
+    deleteDemoCompany();
+    navigate('/#simulador', { replace: true });
+  }
+
   const displayName = fullName.trim() || user?.fullName?.split(' ')[0] || 'Hola';
 
   return (
     <>
+      {isDemo ? (
+        <div className="pp-demo-banner" role="status">
+          <p>
+            Empresa de prueba — mismo panel que un usuario real. Puedes crear/editar proyectos y
+            borrarlos.
+          </p>
+          <button type="button" className="pp-btn pp-btn--danger pp-btn--sm" onClick={onDeleteCompany}>
+            Borrar empresa
+          </button>
+        </div>
+      ) : null}
+
       <div className="pp-page-head">
         <div>
           <h1>Hola, {displayName.split(' ')[0]}</h1>
-          <p>Tu hub en Pink Purple Studio. Elige una herramienta o revisa tu plan.</p>
+          <p>
+            {demo?.brandName
+              ? `Hub de ${demo.brandName}. Abre SEO → Proyectos para ver el sitio que acabas de crear.`
+              : 'Tu hub en Pink Purple Studio. Elige una herramienta o revisa tu plan.'}
+          </p>
         </div>
+        {isDemo ? (
+          <Link className="pp-btn pp-btn--primary" to="/app/seo/proyectos">
+            Ver proyectos
+          </Link>
+        ) : null}
       </div>
 
       <div className="pp-grid pp-grid--profile">

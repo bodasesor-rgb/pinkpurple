@@ -144,6 +144,47 @@
   white-space: nowrap;
 }
 
+.pp-topbar__demo {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7a2bb8;
+  background: rgba(140, 61, 245, 0.12);
+  border: 1px solid rgba(140, 61, 245, 0.22);
+}
+
+.pp-demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(140, 61, 245, 0.28);
+  background: linear-gradient(135deg, rgba(244, 60, 176, 0.08), rgba(140, 61, 245, 0.1));
+}
+
+.pp-demo-banner p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--pp-muted);
+  max-width: 52ch;
+}
+
+.pp-page-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
 /* ── Sidebar + drawer ─────────────────────────────────────── */
 .pp-sidebar-backdrop {
   display: none;

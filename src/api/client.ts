@@ -37,11 +37,36 @@ import type {
   ResetPasswordInput,
   Session,
 } from './types';
+import { loadDemoSession, listDemoProjects, getDemoProject, createDemoProject, updateDemoProject, removeDemoProject } from '../auth/demoSession';
+import { getPlanById } from '../data/plans.js';
 
 export const API_BASE = (import.meta.env.VITE_API_BASE ?? '/api').replace(/\/$/, '');
 
 /** Permite levantar el panel sin Nexus: VITE_USE_MOCKS=true */
 const FORCE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
+
+function demoActive(): boolean {
+  return Boolean(typeof window !== 'undefined' && loadDemoSession());
+}
+
+function demoPlanUsage(): PlanUsage {
+  const demo = loadDemoSession();
+  const plan = getPlanById(demo?.config.planId || demo?.user.planId || 'starter');
+  const end = new Date();
+  end.setDate(end.getDate() + 20);
+  const start = new Date();
+  start.setDate(start.getDate() - 10);
+  return {
+    planId: plan.id,
+    planName: plan.name,
+    billing: 'monthly',
+    periodStart: start.toISOString(),
+    periodEnd: end.toISOString(),
+    landings: { used: 0, limit: plan.landings ?? 0 },
+    blogs: { used: 0, limit: plan.blogs ?? 0 },
+    sites: { used: 0, limit: plan.sites == null ? null : plan.sites },
+  };
+}
 
 /** Endpoints que Nexus todavía no expone: siempre responden mock. */
 const MOCK_ONLY = {
@@ -156,6 +181,10 @@ async function withMock<T>(label: string, mockValue: T, run: () => Promise<T>): 
     mockWarn(label, 'VITE_USE_MOCKS=true');
     return mockValue;
   }
+  if (demoActive()) {
+    mockWarn(label, 'sesión simulador (sin cookie Nexus)');
+    return mockValue;
+  }
   try {
     return await run();
   } catch (err) {
@@ -247,9 +276,8 @@ export const auth = {
 export const account = {
   /** GET /usage → consumo del periodo actual */
   usage(signal?: AbortSignal): Promise<PlanUsage> {
-    return withMock('GET /usage', mockPlanUsage, () =>
-      request<PlanUsage>('/usage', { signal }),
-    );
+    const fallback = demoActive() ? demoPlanUsage() : mockPlanUsage;
+    return withMock('GET /usage', fallback, () => request<PlanUsage>('/usage', { signal }));
   },
 
   /** GET /me → perfil del cliente autenticado */
@@ -265,14 +293,19 @@ export const account = {
 export const projects = {
   /** GET /projects */
   list(signal?: AbortSignal): Promise<Paginated<Project>> {
-    return withMock('GET /projects', mockPaginated(mockProjects), () =>
+    const fallback = demoActive() ? mockPaginated(listDemoProjects()) : mockPaginated(mockProjects);
+    return withMock('GET /projects', fallback, () =>
       request<Paginated<Project>>('/projects', { signal }),
     );
   },
 
   /** GET /projects/:id */
   get(id: string, signal?: AbortSignal): Promise<Project> {
-    const fallback = mockProjects.find((p) => p.id === id) ?? mockProjects[0];
+    const fallback =
+      (demoActive() ? getDemoProject(id) : undefined) ??
+      mockProjects.find((p) => p.id === id) ??
+      listDemoProjects()[0] ??
+      mockProjects[0];
     return withMock(`GET /projects/${id}`, fallback, () =>
       request<Project>(`/projects/${id}`, { signal }),
     );
@@ -280,16 +313,29 @@ export const projects = {
 
   /** POST /projects */
   create(input: ProjectInput, signal?: AbortSignal): Promise<Project> {
+    if (demoActive()) {
+      mockWarn('POST /projects', 'sesión simulador');
+      return Promise.resolve(createDemoProject(input));
+    }
     return request<Project>('/projects', { method: 'POST', body: input, signal });
   },
 
   /** PATCH /projects/:id */
   update(id: string, input: Partial<ProjectInput>, signal?: AbortSignal): Promise<Project> {
+    if (demoActive()) {
+      mockWarn(`PATCH /projects/${id}`, 'sesión simulador');
+      return Promise.resolve(updateDemoProject(id, input));
+    }
     return request<Project>(`/projects/${id}`, { method: 'PATCH', body: input, signal });
   },
 
-  /** DELETE /projects/:id */
+  /** DELETE /projects/:id — en demo, si borra el último, cierra la empresa */
   remove(id: string, signal?: AbortSignal): Promise<void> {
+    if (demoActive()) {
+      mockWarn(`DELETE /projects/${id}`, 'sesión simulador');
+      removeDemoProject(id);
+      return Promise.resolve();
+    }
     return request<void>(`/projects/${id}`, { method: 'DELETE', signal });
   },
 };
@@ -309,7 +355,8 @@ export const jobs = {
     params: { projectId?: string; status?: JobStatus; page?: number; pageSize?: number } = {},
     signal?: AbortSignal,
   ): Promise<Paginated<Job>> {
-    return withMock('GET /jobs', mockPaginated(mockJobs), () =>
+    const fallback = demoActive() ? mockPaginated<Job>([]) : mockPaginated(mockJobs);
+    return withMock('GET /jobs', fallback, () =>
       request<Paginated<Job>>('/jobs', { query: params, signal }),
     );
   },
@@ -342,7 +389,8 @@ export const jobs = {
 export const connections = {
   /** GET /connections */
   list(signal?: AbortSignal): Promise<Paginated<Connection>> {
-    return withMock('GET /connections', mockPaginated(mockConnections), () =>
+    const fallback = demoActive() ? mockPaginated<Connection>([]) : mockPaginated(mockConnections);
+    return withMock('GET /connections', fallback, () =>
       request<Paginated<Connection>>('/connections', { signal }),
     );
   },

@@ -7,7 +7,7 @@ type Props = {
 };
 
 export default function AppTopbar({ onMenuToggle, onLogout }: Props) {
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
 
   return (
     <header className="pp-topbar">
@@ -29,6 +29,11 @@ export default function AppTopbar({ onMenuToggle, onLogout }: Props) {
             <em>Studio</em>
           </span>
         </NavLink>
+        {isDemo ? (
+          <span className="pp-topbar__demo" title="Sesión del simulador de la home">
+            Simulación
+          </span>
+        ) : null}
       </div>
 
       <div className="pp-topbar__right">

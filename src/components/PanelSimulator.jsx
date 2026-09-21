@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { COUNTRIES, statesForCountry } from '../app/config/locations.ts';
 import { TONE_OPTIONS } from '../app/config/nexusClientConfig.ts';
 import { PUBLISH_PLATFORMS } from '../app/config/publishPlatforms.ts';
+import { useAuth } from '../auth/AuthContext.tsx';
 import { PLANS } from '../data/plans.js';
 
 const STEPS = [
@@ -175,10 +176,12 @@ function Field({ label, required, hint, children }) {
 }
 
 export default function PanelSimulator() {
+  const navigate = useNavigate();
+  const { enterDemoFromSimulator } = useAuth();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(EMPTY);
-  const [submitted, setSubmitted] = useState(false);
   const [attempted, setAttempted] = useState(false);
+  const [opening, setOpening] = useState(false);
 
   const checks = useMemo(() => buildChecks(form), [form]);
   const passed = checks.filter((c) => c.ok).length;
@@ -199,7 +202,7 @@ export default function PanelSimulator() {
       }
       return next;
     });
-    setSubmitted(false);
+    setOpening(false);
   }
 
   function goNext() {
@@ -219,30 +222,24 @@ export default function PanelSimulator() {
       setStep(STEPS.length - 1);
       return;
     }
-    try {
-      localStorage.setItem(
-        'pp_studio_simulator_v1',
-        JSON.stringify({ ...form, createdAt: new Date().toISOString() }),
-      );
-      localStorage.setItem(
-        'pp_studio_profile_v1:sim',
-        JSON.stringify({ fullName: form.fullName, company: form.company }),
-      );
-    } catch {
-      /* ignore */
-    }
-    setSubmitted(true);
+    setOpening(true);
+    enterDemoFromSimulator({
+      ...form,
+      createdAt: new Date().toISOString(),
+    });
+    navigate('/app/seo/proyectos', { replace: true });
   }
 
   return (
     <section className="section sim" id="simulador">
       <div className="container">
         <div className="section__intro section__intro--center">
-          <p className="eyebrow">Simulador · chequeo</p>
-          <h2>Crea el panel escribiendo todo literal.</h2>
+          <p className="eyebrow">Simulador · panel real</p>
+          <h2>Llena todo y abre el Studio como un usuario.</h2>
           <p>
-            Sin atajos: llena cada campo como en el onboarding real. El preview del Studio se arma
-            con tus datos y la lista de chequeos marca qué falta antes de “crear” el panel.
+            Completas el alta como un cliente real. Al terminar abres el panel Studio con tu
+            proyecto SEO ya creado. Puedes editarlo, crear más o <strong>borrar la empresa</strong>{' '}
+            cuando quieras.
           </p>
         </div>
 
@@ -632,20 +629,21 @@ export default function PanelSimulator() {
                       Faltan campos. Vuelve a los pasos anteriores y completa todo literalmente.
                     </p>
                   ) : null}
-                  {submitted && allOk ? (
+                  {allOk ? (
                     <div className="sim__success">
                       <p>
-                        Panel simulado listo para <strong>{displayBrand}</strong> · plan{' '}
+                        Todo listo. Al pulsar el botón abrirás el <strong>panel Studio real</strong>{' '}
+                        como <strong>{displayUser}</strong> · <strong>{displayBrand}</strong> · plan{' '}
                         <strong>{plan.name}</strong>.
                       </p>
-                      <div className="sim__success-actions">
-                        <Link className="btn btn-primary" to="/app">
-                          Abrir panel Studio
+                      <p className="sim__blurb" style={{ marginBottom: 0 }}>
+                        Es una sesión de prueba en este navegador (no crea cuenta en Nexus). Para
+                        cuenta real usa{' '}
+                        <Link className="pp-link" to="/registro">
+                          /registro
                         </Link>
-                        <Link className="btn btn-ghost" to="/configuracion-nexus">
-                          Ver Config Nexus completa
-                        </Link>
-                      </div>
+                        .
+                      </p>
                     </div>
                   ) : null}
                 </div>
@@ -656,7 +654,7 @@ export default function PanelSimulator() {
                   type="button"
                   className="btn btn-ghost"
                   onClick={goPrev}
-                  disabled={step === 0}
+                  disabled={step === 0 || opening}
                 >
                   Atrás
                 </button>
@@ -665,18 +663,18 @@ export default function PanelSimulator() {
                     Siguiente
                   </button>
                 ) : (
-                  <button type="submit" className="btn btn-primary">
-                    {allOk ? 'Crear panel (simulación)' : 'Revisar chequeos'}
+                  <button type="submit" className="btn btn-primary" disabled={!allOk || opening}>
+                    {opening ? 'Abriendo panel…' : 'Abrir mi panel Studio'}
                   </button>
                 )}
               </div>
             </form>
           </div>
 
-          <aside className="sim__preview" aria-label="Vista previa del panel Studio">
+          <aside className="sim__preview" aria-label="Progreso hacia el panel Studio">
             <div className="sim__preview-head">
-              <p className="eyebrow">Preview en vivo</p>
-              <h3>Así se arma tu Studio</h3>
+              <p className="eyebrow">Lo que vas a abrir</p>
+              <h3>Pink Purple Studio</h3>
               <p className="sim__progress">
                 Chequeos <strong>{passed}</strong>/{checks.length}
               </p>
@@ -685,7 +683,7 @@ export default function PanelSimulator() {
               </div>
             </div>
 
-            <div className="sim-panel">
+            <div className="sim-panel sim-panel--real">
               <header className="sim-panel__top">
                 <div className="sim-panel__brand">
                   <strong>Pink Purple</strong>
@@ -702,46 +700,32 @@ export default function PanelSimulator() {
                   <span className="sim-panel__child">Historial</span>
                   <span className="sim-panel__child">Conexiones</span>
                   <span>⚙ Configuración</span>
-                  <span className="sim-panel__soon">◈ Ads · pronto</span>
                 </nav>
                 <div className="sim-panel__content">
-                  <p className="sim-panel__kicker">Hola, {displayUser.split(' ')[0]}</p>
+                  <p className="sim-panel__kicker">Hola, {displayUser.split(' ')[0] || '…'}</p>
                   <h4>{displayBrand}</h4>
                   <p className="sim-panel__meta">
                     {form.company || 'Empresa'} · {plan.name}
                     {form.stateRegion ? ` · ${form.stateRegion}` : ''}
                   </p>
                   <p className="sim-panel__tag">
-                    {form.tagline || 'Tu tagline aparecerá aquí cuando lo escribas.'}
+                    {form.tagline || 'Al abrir el panel verás esta misma estructura a pantalla completa.'}
                   </p>
-                  <div className="sim-panel__cards">
-                    <div>
-                      <strong>SEO</strong>
-                      <span>{form.servicesOffered ? 'Oferta lista' : 'Falta oferta'}</span>
-                    </div>
-                    <div>
-                      <strong>Publicación</strong>
-                      <span>
-                        {PUBLISH_PLATFORMS.find((p) => p.id === form.publishTarget)?.label ||
-                          '—'}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
 
+            <p className="sim__blurb" style={{ marginTop: '0.85rem' }}>
+              Al terminar no te quedas aquí: saltas a <code>/app</code> con sidebar fija, topbar y
+              tu proyecto SEO ya armado.
+            </p>
+
             <ul className="sim__mini-checks">
-              {checks.slice(0, 8).map((c) => (
+              {checks.map((c) => (
                 <li key={c.id} className={c.ok ? 'is-ok' : ''}>
                   {c.ok ? '✓' : '·'} {c.label}
                 </li>
               ))}
-              {checks.length > 8 ? (
-                <li className={allOk ? 'is-ok' : ''}>
-                  {allOk ? '✓' : '·'} +{checks.length - 8} chequeos más…
-                </li>
-              ) : null}
             </ul>
           </aside>
         </div>

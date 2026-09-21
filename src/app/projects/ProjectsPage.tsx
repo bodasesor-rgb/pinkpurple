@@ -1,24 +1,42 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ApiError, projects as projectsApi } from '../../api/client';
 import { EmptyState, ErrorState, SkeletonRows } from '../../components/states/States';
 import { useAsync } from '../../hooks/useAsync';
+import { useAuth } from '../../auth/AuthContext';
+import { loadDemoSession, removeDemoProject } from '../../auth/demoSession';
 import { formatDate } from '../shared/ui';
 
 export default function ProjectsPage() {
+  const { isDemo, deleteDemoCompany } = useAuth();
+  const navigate = useNavigate();
   const { data, loading, error, reload } = useAsync((signal) => projectsApi.list(signal), []);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState('');
+  const demo = isDemo ? loadDemoSession() : null;
 
   async function onRemove(id: string, name: string) {
-    if (!window.confirm(`¿Eliminar el proyecto "${name}"? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+    const isLastDemo = isDemo && (data?.items.length ?? 0) <= 1;
+    const msg = isLastDemo
+      ? `¿Eliminar "${name}"? Es el último proyecto: también se borrará la empresa de prueba.`
+      : `¿Eliminar el proyecto "${name}"? Esta acción no se puede deshacer.`;
+    if (!window.confirm(msg)) return;
+
     setActionError('');
     setRemovingId(id);
     try {
-      await projectsApi.remove(id);
-      reload();
+      if (isDemo) {
+        const result = removeDemoProject(id);
+        if (result.companyDeleted) {
+          deleteDemoCompany();
+          navigate('/#simulador', { replace: true });
+          return;
+        }
+        reload();
+      } else {
+        await projectsApi.remove(id);
+        reload();
+      }
     } catch (err) {
       setActionError(err instanceof ApiError ? err.message : 'No se pudo eliminar el proyecto.');
     } finally {
@@ -26,16 +44,40 @@ export default function ProjectsPage() {
     }
   }
 
+  function onDeleteCompany() {
+    const label = demo?.config.brandName || demo?.config.company || 'esta empresa';
+    if (
+      !window.confirm(
+        `¿Borrar ${label} por completo? Se cierran todos los proyectos de prueba de este navegador.`,
+      )
+    ) {
+      return;
+    }
+    deleteDemoCompany();
+    navigate('/#simulador', { replace: true });
+  }
+
   return (
     <>
       <div className="pp-page-head">
         <div>
           <h1>Proyectos</h1>
-          <p>Cada proyecto es un sitio con su ciudad, servicios e idioma para generar contenido.</p>
+          <p>
+            {isDemo
+              ? 'Empresa de prueba: crea, edita o borra proyectos como en una cuenta real.'
+              : 'Cada proyecto es un sitio con su ciudad, servicios e idioma para generar contenido.'}
+          </p>
         </div>
-        <Link className="pp-btn pp-btn--primary" to="/app/seo/proyectos/nuevo">
-          Nuevo proyecto
-        </Link>
+        <div className="pp-page-head__actions">
+          {isDemo ? (
+            <button type="button" className="pp-btn pp-btn--danger" onClick={onDeleteCompany}>
+              Borrar empresa
+            </button>
+          ) : null}
+          <Link className="pp-btn pp-btn--primary" to="/app/seo/proyectos/nuevo">
+            Nuevo proyecto
+          </Link>
+        </div>
       </div>
 
       {actionError ? (
