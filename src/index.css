@@ -2917,7 +2917,23 @@ button.gsc-metric {
 .nx-field {
   display: grid;
   gap: 0.4rem;
-  margin-bottom: 0.95rem;
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+.nx-stack {
+  display: grid;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.nx-stack:last-child {
+  margin-bottom: 0;
+}
+
+.nx-stack > .nx-field:last-child,
+.nx-card > .nx-field:last-child {
+  margin-bottom: 0;
 }
 
 .nx-field__label {
@@ -3134,7 +3150,22 @@ button.gsc-metric {
 
 .nx-row {
   display: grid;
-  gap: 0.35rem 1rem;
+  gap: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.nx-publish-row__body .nx-stack,
+.nx-publish-row__body .nx-field {
+  margin-bottom: 0;
+}
+
+.nx-publish-row__body .nx-stack {
+  margin-top: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.nx-publish-row__body > .nx-field {
+  margin-bottom: 0.85rem;
 }
 
 .nx-radio--block {
@@ -3486,29 +3517,20 @@ button.gsc-metric {
 }
 
 .nx-social-row {
-  display: grid;
-  gap: 0.5rem;
-  padding: 0.85rem;
+  display: block;
+  padding: 0.95rem 1rem;
   border-radius: 14px;
   border: 1px solid rgba(140, 61, 245, 0.12);
   background: rgba(255, 255, 255, 0.7);
 }
 
-.nx-social-row .nx-field {
+.nx-social-row .nx-stack {
   margin-bottom: 0;
-}
-
-.nx-social-name {
-  margin: 0;
-  padding: 0.75rem 0.9rem;
-  border-radius: 12px;
-  background: rgba(140, 61, 245, 0.06);
-  color: var(--muted);
-  font-size: 0.9rem;
 }
 
 .nx-social-remove {
   justify-self: start;
+  width: fit-content;
   padding: 0.45rem 0.85rem !important;
   font-size: 0.82rem !important;
 }
@@ -3520,11 +3542,6 @@ button.gsc-metric {
 
   .nx-row--3 {
     grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .nx-social-row {
-    grid-template-columns: minmax(8rem, 11rem) minmax(7rem, 10rem) minmax(0, 1fr) auto;
-    align-items: end;
   }
 
   .nx-tone-grid {

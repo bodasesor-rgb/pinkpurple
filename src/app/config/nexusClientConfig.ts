@@ -80,7 +80,7 @@ export const CONFIG_SECTIONS: ConfigSection[] = [
   {
     id: 'contacto',
     title: '3 · Contacto',
-    blurb: 'WhatsApp para CTAs, footer y botón flotante.',
+    blurb: 'WhatsApp (obligatorio), correo y teléfono extra si lo necesitas — van a CTAs, footer y botón flotante.',
     requiredHint: 'Obligatorio: WhatsApp con código de país',
   },
   {

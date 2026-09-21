@@ -465,7 +465,8 @@ export default function NexusClientConfigPage() {
             <section className="nx-card" id="cfg-marca">
               <h2>{CONFIG_SECTIONS[1].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[1].blurb}</p>
-              <div className="nx-row">
+
+              <div className="nx-stack">
                 <Field label="Nombre de marca" required>
                   <input
                     required
@@ -474,7 +475,7 @@ export default function NexusClientConfigPage() {
                     onChange={onText('brandName')}
                   />
                 </Field>
-                <Field label="Tagline" hint="Opcional.">
+                <Field label="Tagline" hint="Opcional · frase corta bajo el nombre.">
                   <input
                     placeholder="Diseño y obra para casas en CDMX"
                     value={config.tagline}
@@ -507,7 +508,7 @@ export default function NexusClientConfigPage() {
                 </div>
               </fieldset>
 
-              <div className="nx-row">
+              <div className="nx-stack">
                 <div className="nx-field">
                   <span className="nx-field__label">Colores de marca</span>
                   <div className="nx-color-add">
@@ -534,7 +535,7 @@ export default function NexusClientConfigPage() {
                     </button>
                   </div>
                   <small className="nx-field__hint">
-                    Usa el selector (tabla de colores) o escribe el código hex y agrégalo a la lista.
+                    Usa el selector o escribe el código hex y agrégalo a la lista.
                   </small>
                   {config.brandColors.length ? (
                     <ul className="nx-color-list">
@@ -542,7 +543,11 @@ export default function NexusClientConfigPage() {
                         <li key={hex}>
                           <span className="nx-color-chip" style={{ background: hex }} aria-hidden />
                           <code>{hex}</code>
-                          <button type="button" className="btn btn-ghost" onClick={() => removeBrandColor(hex)}>
+                          <button
+                            type="button"
+                            className="btn btn-ghost"
+                            onClick={() => removeBrandColor(hex)}
+                          >
                             Quitar
                           </button>
                         </li>
@@ -552,10 +557,13 @@ export default function NexusClientConfigPage() {
                     <p className="nx-field__hint">Sin colores aún.</p>
                   )}
                 </div>
+
                 <div className="nx-field">
                   <span className="nx-field__label">Logo</span>
                   <div
-                    className={`nx-logo-drop${logoDragOver ? ' is-over' : ''}${config.logoUrl ? ' has-preview' : ''}`}
+                    className={`nx-logo-drop${logoDragOver ? ' is-over' : ''}${
+                      config.logoUrl ? ' has-preview' : ''
+                    }`}
                     onDragOver={(e) => {
                       e.preventDefault();
                       setLogoDragOver(true);
@@ -600,18 +608,16 @@ export default function NexusClientConfigPage() {
                     Debe ser imagen <strong>sin fondo</strong> (PNG o SVG preferible). Máx. 2.5 MB.
                   </small>
                   {logoError ? <p className="nx-scan-error">{logoError}</p> : null}
-                  <Field
-                    label="O pega una URL"
-                    hint="Opcional si ya subiste el archivo."
-                  >
-                    <input
-                      type="url"
-                      placeholder="https://…/logo.png"
-                      value={config.logoUrl.startsWith('data:') ? '' : config.logoUrl}
-                      onChange={onText('logoUrl')}
-                    />
-                  </Field>
                 </div>
+
+                <Field label="URL del logo (opcional)" hint="Si no subiste archivo, pega un enlace directo.">
+                  <input
+                    type="url"
+                    placeholder="https://…/logo.png"
+                    value={config.logoUrl.startsWith('data:') ? '' : config.logoUrl}
+                    onChange={onText('logoUrl')}
+                  />
+                </Field>
               </div>
             </section>
 
@@ -619,21 +625,42 @@ export default function NexusClientConfigPage() {
             <section className="nx-card" id="cfg-contacto">
               <h2>{CONFIG_SECTIONS[2].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[2].blurb}</p>
-              <Field label="WhatsApp" required hint="Con código de país, ej. +52 55 1234 5678">
-                <input
-                  type="tel"
-                  placeholder="+52 55 1234 5678"
-                  value={config.whatsapp}
-                  onChange={onText('whatsapp')}
-                />
-              </Field>
+              <div className="nx-stack">
+                <Field label="WhatsApp" required hint="Con código de país, ej. +52 55 1234 5678">
+                  <input
+                    type="tel"
+                    placeholder="+52 55 1234 5678"
+                    value={config.whatsapp}
+                    onChange={onText('whatsapp')}
+                  />
+                </Field>
+                <Field label="Correo" hint="Para contacto y formularios.">
+                  <input
+                    type="email"
+                    placeholder="hola@tu-negocio.com"
+                    value={config.contactEmail}
+                    onChange={onText('contactEmail')}
+                  />
+                </Field>
+                <Field
+                  label="Teléfono extra"
+                  hint="Opcional · fijo o segundo número si no es el de WhatsApp."
+                >
+                  <input
+                    type="tel"
+                    placeholder="+52 55 0000 0000"
+                    value={config.phone}
+                    onChange={onText('phone')}
+                  />
+                </Field>
+              </div>
             </section>
 
             {/* 4 · Ubicación */}
             <section className="nx-card" id="cfg-ubicacion">
               <h2>{CONFIG_SECTIONS[3].title}</h2>
               <p className="nx-blurb">{CONFIG_SECTIONS[3].blurb}</p>
-              <div className="nx-row">
+              <div className="nx-stack">
                 <div className="nx-field nx-country-field">
                   <span className="nx-field__label">
                     País <em className="nx-req">*</em>
@@ -689,7 +716,11 @@ export default function NexusClientConfigPage() {
                     Escribe la letra inicial para saltar a esa sección (M → México, Brasil…).
                   </small>
                 </div>
-                <Field label="Ciudad" required hint="División local del país (estado, provincia, región…).">
+                <Field
+                  label="Ciudad"
+                  required
+                  hint="División local del país (estado, provincia, región…)."
+                >
                   <select
                     value={config.stateRegion}
                     onChange={onText('stateRegion')}
@@ -706,10 +737,10 @@ export default function NexusClientConfigPage() {
                     ))}
                   </select>
                 </Field>
+                <Field label="Dirección" hint="Opcional.">
+                  <input value={config.address} onChange={onText('address')} />
+                </Field>
               </div>
-              <Field label="Dirección" hint="Opcional.">
-                <input value={config.address} onChange={onText('address')} />
-              </Field>
             </section>
 
             {/* 5 · Oferta */}
@@ -815,28 +846,26 @@ export default function NexusClientConfigPage() {
                           ) : null}
 
                           {opt.id === 'netlify' ? (
-                            <>
-                              <div className="nx-row">
-                                <Field
-                                  label="Site ID o URL Netlify"
-                                  required
-                                  hint="Site configuration → General → Site details"
-                                >
-                                  <input
-                                    placeholder="mi-sitio o UUID"
-                                    value={config.netlifySiteId}
-                                    onChange={onText('netlifySiteId')}
-                                  />
-                                </Field>
-                                <Field label="URL pública del sitio" hint="Dominio que ve el cliente.">
-                                  <input
-                                    type="url"
-                                    placeholder="https://tu-dominio.com"
-                                    value={config.publishSiteUrl}
-                                    onChange={onText('publishSiteUrl')}
-                                  />
-                                </Field>
-                              </div>
+                            <div className="nx-stack">
+                              <Field
+                                label="Site ID o URL Netlify"
+                                required
+                                hint="Site configuration → General → Site details"
+                              >
+                                <input
+                                  placeholder="mi-sitio o UUID"
+                                  value={config.netlifySiteId}
+                                  onChange={onText('netlifySiteId')}
+                                />
+                              </Field>
+                              <Field label="URL pública del sitio" hint="Dominio que ve el cliente.">
+                                <input
+                                  type="url"
+                                  placeholder="https://tu-dominio.com"
+                                  value={config.publishSiteUrl}
+                                  onChange={onText('publishSiteUrl')}
+                                />
+                              </Field>
                               <Field
                                 label="Build hook / token de conexión"
                                 hint="Build & deploy → Build hooks. Netlify ejecuta el deploy."
@@ -849,13 +878,13 @@ export default function NexusClientConfigPage() {
                                   onChange={onText('netlifyConnectToken')}
                                 />
                               </Field>
-                            </>
+                            </div>
                           ) : null}
 
                           {isApiKeyPublish(opt.id) ||
                           opt.id === 'squarespace' ||
                           opt.id === 'hostinger' ? (
-                            <div className="nx-row">
+                            <div className="nx-stack">
                               <Field label="URL del sitio" required={opt.id !== 'hostinger'}>
                                 <input
                                   type="url"
@@ -927,54 +956,52 @@ export default function NexusClientConfigPage() {
               <div className="nx-social-list">
                 {config.socialLinks.map((link) => (
                   <div key={link.id} className="nx-social-row">
-                    <Field label="Red">
-                      <select
-                        value={link.network}
-                        onChange={(e) =>
-                          patchSocial(link.id, {
-                            network: e.target.value as SocialNetworkId,
-                            customName:
-                              e.target.value === 'other' ? link.customName || '' : undefined,
-                          })
-                        }
-                      >
-                        {SOCIAL_NETWORK_OPTIONS.map((o) => (
-                          <option key={o.id} value={o.id}>
-                            {o.label}
-                          </option>
-                        ))}
-                      </select>
-                    </Field>
-                    {link.network === 'other' ? (
-                      <Field label="Nombre de la red">
+                    <div className="nx-stack">
+                      <Field label="Red">
+                        <select
+                          value={link.network}
+                          onChange={(e) =>
+                            patchSocial(link.id, {
+                              network: e.target.value as SocialNetworkId,
+                              customName:
+                                e.target.value === 'other' ? link.customName || '' : undefined,
+                            })
+                          }
+                        >
+                          {SOCIAL_NETWORK_OPTIONS.map((o) => (
+                            <option key={o.id} value={o.id}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                      {link.network === 'other' ? (
+                        <Field label="Nombre de la red">
+                          <input
+                            placeholder="Threads, Behance…"
+                            value={link.customName || ''}
+                            onChange={(e) => patchSocial(link.id, { customName: e.target.value })}
+                          />
+                        </Field>
+                      ) : null}
+                      <Field label="URL o @">
                         <input
-                          placeholder="Threads, Behance…"
-                          value={link.customName || ''}
-                          onChange={(e) => patchSocial(link.id, { customName: e.target.value })}
+                          type="url"
+                          placeholder="https://…"
+                          value={link.url}
+                          onChange={(e) => patchSocial(link.id, { url: e.target.value })}
                         />
                       </Field>
-                    ) : (
-                      <Field label=" ">
-                        <p className="nx-social-name">{socialLabel(link)}</p>
-                      </Field>
-                    )}
-                    <Field label="URL o @">
-                      <input
-                        type="url"
-                        placeholder="https://…"
-                        value={link.url}
-                        onChange={(e) => patchSocial(link.id, { url: e.target.value })}
-                      />
-                    </Field>
-                    <button
-                      type="button"
-                      className="btn btn-ghost nx-social-remove"
-                      onClick={() => removeSocial(link.id)}
-                      disabled={config.socialLinks.length <= 1}
-                      aria-label={`Quitar ${socialLabel(link)}`}
-                    >
-                      Quitar
-                    </button>
+                      <button
+                        type="button"
+                        className="btn btn-ghost nx-social-remove"
+                        onClick={() => removeSocial(link.id)}
+                        disabled={config.socialLinks.length <= 1}
+                        aria-label={`Quitar ${socialLabel(link)}`}
+                      >
+                        Quitar
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1024,6 +1051,8 @@ function toPayload(config: NexusClientConfig) {
     colors: config.brandColors,
     logoUrl: config.logoUrl.trim(),
     whatsapp: config.whatsapp.trim(),
+    contactEmail: config.contactEmail.trim(),
+    phone: config.phone.trim(),
     countryCode: config.countryCode,
     countryName: country?.name || '',
     countryFlag: country?.flag || '',
