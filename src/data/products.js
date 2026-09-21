@@ -12,7 +12,7 @@ export const PRODUCTS = [
     status: 'live',
     tagline: 'Generador de landings de venta, blogs y SEO 100/100',
     description:
-      'PinkPurple SEO escribe y publica landings de venta, blogs y páginas SEO con el diseño de tus sitios. Incluye keywords, SEO 100/100 para Google e IA, y publicación en WordPress, Shopify, Netlify y más — en una o varias páginas web según tu plan (Mini 1, Starter 3, Growth 6, Pro 15, Diamond ilimitadas).',
+      'PinkPurple SEO escribe y publica landings de venta, blogs y páginas SEO con el diseño de tus sitios. Incluye keywords, SEO 100/100 para Google e IA, y publicación en WordPress, Shopify, Netlify y más — en una o varias páginas web según tu plan (Mini 1, Starter 2, Growth 5, Pro 10, Diamond ilimitadas).',
     image: '/brand/seo-product.jpg',
     imageAlt: 'PinkPurple SEO — cohete y crecimiento en buscadores',
     highlights: [
