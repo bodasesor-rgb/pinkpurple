@@ -124,11 +124,113 @@ const pillars = [
 
 export default function SeoProductPage() {
   const [billing, setBilling] = useState('monthly');
+  const [showFreeTrial, setShowFreeTrial] = useState(false);
   const isAnnual = billing === 'annual';
   const product = getProductBySlug('seo');
   const freePlan = PLANS.find((p) => p.price === 0) || PLANS[0];
   const paidPlans = PLANS.filter((p) => p.price > 0);
-  const allPlans = [freePlan, ...paidPlans];
+
+  function renderPlanCard(plan) {
+    const isFree = plan.price === 0;
+    const tokens = plan.tokens ?? plan.landings + plan.blogs;
+    const pricing = isFree ? null : getPlanPricing(plan.price);
+    const displayPrice = isFree
+      ? null
+      : isAnnual
+        ? pricing.annualPerMonth
+        : pricing.monthly;
+
+    return (
+      <article
+        key={plan.id}
+        className={`plan-card${plan.featured ? ' plan-card--featured' : ''}${
+          isFree ? ' plan-card--free' : ''
+        }`}
+      >
+        {plan.featured ? <p className="plan-card__badge">Más popular</p> : null}
+        <h2>{plan.name}</h2>
+        {isFree ? (
+          <>
+            <p className="plan-card__price">
+              <span>Gratis</span>
+            </p>
+            <p className="plan-card__annual-meta plan-card__annual-meta--muted">
+              Una sola vez · sin tarjeta
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="plan-card__price">
+              <span>{formatPrice(displayPrice)}</span>
+              <small>USD / mes</small>
+            </p>
+            {isAnnual ? (
+              <p className="plan-card__annual-meta">
+                ${formatNum(pricing.annualTotal)} al año · ahorras $
+                {formatNum(pricing.savings)}
+              </p>
+            ) : (
+              <p className="plan-card__annual-meta plan-card__annual-meta--muted">
+                o ${formatNum(pricing.annualPerMonth)}/mes anual
+              </p>
+            )}
+          </>
+        )}
+        <ul className="plan-card__pages">
+          {isFree ? (
+            <li>
+              <strong>
+                {formatNum(plan.landings)} + {formatNum(plan.blogs)}
+              </strong>{' '}
+              landings y blogs (una vez)
+            </li>
+          ) : (
+            <>
+              <li>
+                <strong>{formatNum(plan.landings)}</strong> landings
+              </li>
+              <li>
+                <strong>{formatNum(plan.blogs)}</strong> blogs
+              </li>
+            </>
+          )}
+          <li>
+            <strong>{formatSites(plan.sites)}</strong>
+          </li>
+          {!isFree ? (
+            <li>
+              <strong>{formatNum(tokens)}</strong> tokens / herramienta
+            </li>
+          ) : (
+            <li>Sin renovación mensual</li>
+          )}
+        </ul>
+
+        <div className="plan-card__includes">
+          <p className="plan-card__includes-title">Incluye</p>
+          <ul className="plan-icons" aria-label={`Incluye ${plan.name}`}>
+            {INCLUDES.map((item) => (
+              <li key={item.id} title={item.label}>
+                <span className="plan-icons__icon">{item.icon}</span>
+                <span className="plan-icons__label">{item.short || item.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <Link
+          className={`btn ${
+            plan.featured || isFree ? 'btn-primary' : 'btn-ghost'
+          } plan-card__cta`}
+          to={`/pago?plan=${plan.id}&billing=${
+            isFree ? 'monthly' : isAnnual ? 'annual' : 'monthly'
+          }`}
+        >
+          {isFree ? 'Activar prueba' : `Elegir ${plan.name}`}
+        </Link>
+      </article>
+    );
+  }
 
   return (
     <>
@@ -165,125 +267,58 @@ export default function SeoProductPage() {
           <div className="billing-toggle" role="group" aria-label="Periodo de pago">
             <button
               type="button"
-              className={`billing-toggle__btn${!isAnnual ? ' is-active' : ''}`}
-              onClick={() => setBilling('monthly')}
+              className={`billing-toggle__btn${!showFreeTrial && !isAnnual ? ' is-active' : ''}`}
+              onClick={() => {
+                setShowFreeTrial(false);
+                setBilling('monthly');
+              }}
             >
               Mensual
             </button>
             <button
               type="button"
-              className={`billing-toggle__btn${isAnnual ? ' is-active' : ''}`}
-              onClick={() => setBilling('annual')}
+              className={`billing-toggle__btn${!showFreeTrial && isAnnual ? ' is-active' : ''}`}
+              onClick={() => {
+                setShowFreeTrial(false);
+                setBilling('annual');
+              }}
             >
               Anual
               <span className="billing-toggle__save">-25%</span>
             </button>
+            <button
+              type="button"
+              className={`billing-toggle__btn billing-toggle__btn--free${
+                showFreeTrial ? ' is-active' : ''
+              }`}
+              onClick={() => setShowFreeTrial(true)}
+              aria-expanded={showFreeTrial}
+            >
+              Prueba gratis
+            </button>
           </div>
         </div>
 
-        <div className="plans-grid plans-grid--six">
-          {allPlans.map((plan) => {
-            const isFree = plan.price === 0;
-            const tokens = plan.tokens ?? plan.landings + plan.blogs;
-            const pricing = isFree ? null : getPlanPricing(plan.price);
-            const displayPrice = isFree
-              ? null
-              : isAnnual
-                ? pricing.annualPerMonth
-                : pricing.monthly;
-
-            return (
-              <article
-                key={plan.id}
-                className={`plan-card${plan.featured ? ' plan-card--featured' : ''}${
-                  isFree ? ' plan-card--free' : ''
-                }`}
-              >
-                {plan.featured ? <p className="plan-card__badge">Más popular</p> : null}
-                <h2>{plan.name}</h2>
-                {isFree ? (
-                  <>
-                    <p className="plan-card__price">
-                      <span>Gratis</span>
-                    </p>
-                    <p className="plan-card__annual-meta plan-card__annual-meta--muted">
-                      Una sola vez · sin tarjeta
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="plan-card__price">
-                      <span>{formatPrice(displayPrice)}</span>
-                      <small>USD / mes</small>
-                    </p>
-                    {isAnnual ? (
-                      <p className="plan-card__annual-meta">
-                        ${formatNum(pricing.annualTotal)} al año · ahorras $
-                        {formatNum(pricing.savings)}
-                      </p>
-                    ) : (
-                      <p className="plan-card__annual-meta plan-card__annual-meta--muted">
-                        o ${formatNum(pricing.annualPerMonth)}/mes anual
-                      </p>
-                    )}
-                  </>
-                )}
-                <ul className="plan-card__pages">
-                  {isFree ? (
-                    <li>
-                      <strong>
-                        {formatNum(plan.landings)} + {formatNum(plan.blogs)}
-                      </strong>{' '}
-                      landings y blogs (una vez)
-                    </li>
-                  ) : (
-                    <>
-                      <li>
-                        <strong>{formatNum(plan.landings)}</strong> landings
-                      </li>
-                      <li>
-                        <strong>{formatNum(plan.blogs)}</strong> blogs
-                      </li>
-                    </>
-                  )}
-                  <li>
-                    <strong>{formatSites(plan.sites)}</strong>
-                  </li>
-                  {!isFree ? (
-                    <li>
-                      <strong>{formatNum(tokens)}</strong> tokens / herramienta
-                    </li>
-                  ) : (
-                    <li>Sin renovación mensual</li>
-                  )}
-                </ul>
-
-                <div className="plan-card__includes">
-                  <p className="plan-card__includes-title">Incluye</p>
-                  <ul className="plan-icons" aria-label={`Incluye ${plan.name}`}>
-                    {INCLUDES.map((item) => (
-                      <li key={item.id} title={item.label}>
-                        <span className="plan-icons__icon">{item.icon}</span>
-                        <span className="plan-icons__label">{item.short || item.label}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <Link
-                  className={`btn ${
-                    plan.featured || isFree ? 'btn-primary' : 'btn-ghost'
-                  } plan-card__cta`}
-                  to={`/pago?plan=${plan.id}&billing=${
-                    isFree ? 'monthly' : isAnnual ? 'annual' : 'monthly'
-                  }`}
-                >
-                  {isFree ? 'Activar prueba' : `Elegir ${plan.name}`}
-                </Link>
-              </article>
-            );
-          })}
-        </div>
+        {showFreeTrial ? (
+          <div className="plans-free-panel" id="plan-prueba-gratis">
+            <p className="plans-free-panel__lead">
+              Suficiente para ver la magia de la herramienta · una sola vez · sin tarjeta
+            </p>
+            <div className="plans-free-panel__card">{renderPlanCard(freePlan)}</div>
+            <button
+              type="button"
+              className="btn btn-ghost plans-free-panel__back"
+              onClick={() => {
+                setShowFreeTrial(false);
+                setBilling('monthly');
+              }}
+            >
+              Ver paquetes de pago
+            </button>
+          </div>
+        ) : (
+          <div className="plans-grid plans-grid--paid">{paidPlans.map((plan) => renderPlanCard(plan))}</div>
+        )}
 
         <p className="plans-note plans-note--strong">
           <strong>Varias páginas web:</strong> puedes conectar más de un sitio. Mini = 1 · Starter
