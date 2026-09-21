@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import ProductServicesCarousel from '../components/ProductServicesCarousel.jsx';
+import PanelSimulator from '../components/PanelSimulator.jsx';
 import { getLiveProducts } from '../data/products.js';
 
 const studioPillars = [
@@ -56,12 +57,17 @@ export default function HomePage() {
               <Link className="btn btn-ghost" to="/app">
                 Abrir mi panel
               </Link>
+              <a className="btn btn-ghost" href="#simulador">
+                Simular alta del panel
+              </a>
             </div>
           </div>
 
           <ProductServicesCarousel />
         </div>
       </section>
+
+      <PanelSimulator />
 
       <section className="section home-showcase" id="studio">
         <div className="container">

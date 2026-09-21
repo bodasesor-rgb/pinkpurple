@@ -91,7 +91,7 @@ export default function ProjectFormPage() {
       } else {
         await projectsApi.create(payload);
       }
-      navigate('/app/proyectos', { replace: true });
+      navigate('/app/seo/proyectos', { replace: true });
     } catch (err) {
       setSaveError(err instanceof ApiError ? err.message : 'No se pudo guardar el proyecto.');
     } finally {
@@ -120,7 +120,7 @@ export default function ProjectFormPage() {
             Estos datos alimentan al generador: ciudad y servicios definen de qué va cada landing.
           </p>
         </div>
-        <Link className="pp-btn pp-btn--ghost" to="/app/proyectos">
+        <Link className="pp-btn pp-btn--ghost" to="/app/seo/proyectos">
           Volver
         </Link>
       </div>
@@ -201,7 +201,7 @@ export default function ProjectFormPage() {
             <button className="pp-btn pp-btn--primary" type="submit" disabled={saving}>
               {saving ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear proyecto'}
             </button>
-            <Link className="pp-btn pp-btn--ghost" to="/app/proyectos">
+            <Link className="pp-btn pp-btn--ghost" to="/app/seo/proyectos">
               Cancelar
             </Link>
           </div>

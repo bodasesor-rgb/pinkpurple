@@ -81,7 +81,7 @@ export default function HistoryPage() {
           <h1>Historial</h1>
           <p>Todo lo que has pedido, con su estado y el enlace a la página publicada.</p>
         </div>
-        <Link className="pp-btn pp-btn--primary" to="/app/generar">
+        <Link className="pp-btn pp-btn--primary" to="/app/seo/generar">
           Generar contenido
         </Link>
       </div>
@@ -151,7 +151,7 @@ export default function HistoryPage() {
               : 'Cuando generes tu primera landing o blog aparecerá en esta lista.'
           }
           action={
-            <Link className="pp-btn pp-btn--primary" to="/app/generar">
+            <Link className="pp-btn pp-btn--primary" to="/app/seo/generar">
               Generar contenido
             </Link>
           }

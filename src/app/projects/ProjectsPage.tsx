@@ -33,7 +33,7 @@ export default function ProjectsPage() {
           <h1>Proyectos</h1>
           <p>Cada proyecto es un sitio con su ciudad, servicios e idioma para generar contenido.</p>
         </div>
-        <Link className="pp-btn pp-btn--primary" to="/app/proyectos/nuevo">
+        <Link className="pp-btn pp-btn--primary" to="/app/seo/proyectos/nuevo">
           Nuevo proyecto
         </Link>
       </div>
@@ -54,7 +54,7 @@ export default function ProjectsPage() {
           title="Aún no tienes proyectos"
           description="Crea el primero con el dominio y la ciudad del negocio; después podrás generar landings y blogs."
           action={
-            <Link className="pp-btn pp-btn--primary" to="/app/proyectos/nuevo">
+            <Link className="pp-btn pp-btn--primary" to="/app/seo/proyectos/nuevo">
               Crear proyecto
             </Link>
           }
@@ -84,19 +84,19 @@ export default function ProjectsPage() {
               <div className="pp-item__actions">
                 <Link
                   className="pp-btn pp-btn--ghost pp-btn--sm"
-                  to={`/app/proyectos/${project.id}`}
+                  to={`/app/seo/proyectos/${project.id}`}
                 >
                   Editar
                 </Link>
                 <Link
                   className="pp-btn pp-btn--ghost pp-btn--sm"
-                  to={`/app/generar?projectId=${project.id}`}
+                  to={`/app/seo/generar?projectId=${project.id}`}
                 >
                   Generar
                 </Link>
                 <Link
                   className="pp-btn pp-btn--ghost pp-btn--sm"
-                  to={`/app/historial?projectId=${project.id}`}
+                  to={`/app/seo/historial?projectId=${project.id}`}
                 >
                   Historial
                 </Link>

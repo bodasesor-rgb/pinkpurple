@@ -172,7 +172,7 @@ export default function ConnectionsPage() {
             title="Necesitas un proyecto primero"
             description="Las conexiones se asocian a un proyecto."
             action={
-              <Link className="pp-btn pp-btn--primary" to="/app/proyectos/nuevo">
+              <Link className="pp-btn pp-btn--primary" to="/app/seo/proyectos/nuevo">
                 Crear proyecto
               </Link>
             }

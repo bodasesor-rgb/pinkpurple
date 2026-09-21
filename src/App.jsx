@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet, useSearchParams } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet, useParams, useSearchParams } from 'react-router-dom';
 import SiteHeader from './components/SiteHeader.jsx';
 import SiteFooter from './components/SiteFooter.jsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
@@ -16,9 +16,10 @@ import RegisterPage from './auth/pages/RegisterPage.tsx';
 import ForgotPasswordPage from './auth/pages/ForgotPasswordPage.tsx';
 import ResetPasswordPage from './auth/pages/ResetPasswordPage.tsx';
 
-// Panel de clientes
+// Panel Studio
 import AppLayout from './app/layout/AppLayout.tsx';
-import DashboardPage from './app/dashboard/DashboardPage.tsx';
+import ProfilePage from './app/profile/ProfilePage.tsx';
+import SettingsPage from './app/settings/SettingsPage.tsx';
 import ProjectsPage from './app/projects/ProjectsPage.tsx';
 import ProjectFormPage from './app/projects/ProjectFormPage.tsx';
 import GeneratePage from './app/generate/GeneratePage.tsx';
@@ -26,10 +27,8 @@ import HistoryPage from './app/history/HistoryPage.tsx';
 import ConnectionsPage from './app/connections/ConnectionsPage.tsx';
 import BillingPage from './app/billing/BillingPage.tsx';
 
-// Sitio público — prototipo config Nexus (antes de mandarlo a clientes)
 import NexusClientConfigPage from './pages/NexusClientConfigPage.tsx';
 
-/** Marketing + auth comparten cabecera y pie; el panel tiene su propio layout. */
 function PublicShell() {
   return (
     <div className="app-shell">
@@ -42,11 +41,15 @@ function PublicShell() {
   );
 }
 
-/** El checkout real aún no existe: /pago manda al registro con el plan elegido. */
 function CheckoutRedirect() {
   const [searchParams] = useSearchParams();
   const query = searchParams.toString();
   return <Navigate to={`/registro${query ? `?${query}` : ''}`} replace />;
+}
+
+function LegacyProjectRedirect() {
+  const { projectId } = useParams();
+  return <Navigate to={`/app/seo/proyectos/${projectId}`} replace />;
 }
 
 export default function App() {
@@ -60,14 +63,31 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<DashboardPage />} />
-        <Route path="proyectos" element={<ProjectsPage />} />
-        <Route path="proyectos/nuevo" element={<ProjectFormPage />} />
-        <Route path="proyectos/:projectId" element={<ProjectFormPage />} />
-        <Route path="generar" element={<GeneratePage />} />
-        <Route path="historial" element={<HistoryPage />} />
-        <Route path="conexiones" element={<ConnectionsPage />} />
-        <Route path="plan" element={<BillingPage />} />
+        <Route index element={<ProfilePage />} />
+
+        <Route path="seo">
+          <Route index element={<Navigate to="proyectos" replace />} />
+          <Route path="proyectos" element={<ProjectsPage />} />
+          <Route path="proyectos/nuevo" element={<ProjectFormPage />} />
+          <Route path="proyectos/:projectId" element={<ProjectFormPage />} />
+          <Route path="generar" element={<GeneratePage />} />
+          <Route path="historial" element={<HistoryPage />} />
+          <Route path="conexiones" element={<ConnectionsPage />} />
+        </Route>
+
+        <Route path="configuracion" element={<SettingsPage />}>
+          <Route path="plan" element={<BillingPage />} />
+        </Route>
+
+        {/* Compat rutas planas antiguas */}
+        <Route path="proyectos" element={<Navigate to="/app/seo/proyectos" replace />} />
+        <Route path="proyectos/nuevo" element={<Navigate to="/app/seo/proyectos/nuevo" replace />} />
+        <Route path="proyectos/:projectId" element={<LegacyProjectRedirect />} />
+        <Route path="generar" element={<Navigate to="/app/seo/generar" replace />} />
+        <Route path="historial" element={<Navigate to="/app/seo/historial" replace />} />
+        <Route path="conexiones" element={<Navigate to="/app/seo/conexiones" replace />} />
+        <Route path="plan" element={<Navigate to="/app/configuracion/plan" replace />} />
+
         <Route path="*" element={<Navigate to="/app" replace />} />
       </Route>
 

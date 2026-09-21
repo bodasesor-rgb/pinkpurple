@@ -21,7 +21,7 @@ export default function DashboardPage() {
           <h1>Hola, {firstName}</h1>
           <p>Resumen de tu plan y de lo último que generó PinkPurpleSEO.</p>
         </div>
-        <Link className="pp-btn pp-btn--primary" to="/app/generar">
+        <Link className="pp-btn pp-btn--primary" to="/app/seo/generar">
           Generar contenido
         </Link>
       </div>
@@ -58,7 +58,7 @@ export default function DashboardPage() {
             <h2 className="pp-card__title" id="ultimos-trabajos" style={{ marginBottom: 0 }}>
               Últimos trabajos
             </h2>
-            <Link className="pp-link" to="/app/historial">
+            <Link className="pp-link" to="/app/seo/historial">
               Ver historial
             </Link>
           </div>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
               action={
                 <Link
                   className="pp-btn pp-btn--primary"
-                  to={projectCount === 0 ? '/app/proyectos/nuevo' : '/app/generar'}
+                  to={projectCount === 0 ? '/app/seo/proyectos/nuevo' : '/app/seo/generar'}
                 >
                   {projectCount === 0 ? 'Crear proyecto' : 'Generar contenido'}
                 </Link>

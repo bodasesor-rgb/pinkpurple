@@ -101,7 +101,7 @@ export default function GeneratePage() {
           title="Sin proyectos todavía"
           description="Crea un proyecto y vuelve aquí para generar tu primera landing o blog."
           action={
-            <Link className="pp-btn pp-btn--primary" to="/app/proyectos/nuevo">
+            <Link className="pp-btn pp-btn--primary" to="/app/seo/proyectos/nuevo">
               Crear proyecto
             </Link>
           }
@@ -290,7 +290,7 @@ export default function GeneratePage() {
                     Ver publicada
                   </a>
                 ) : null}
-                <Link className="pp-btn pp-btn--ghost pp-btn--sm" to="/app/historial">
+                <Link className="pp-btn pp-btn--ghost pp-btn--sm" to="/app/seo/historial">
                   Ir al historial
                 </Link>
               </div>

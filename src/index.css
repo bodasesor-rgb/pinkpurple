@@ -3688,3 +3688,440 @@ button.gsc-metric {
     box-shadow: 0 14px 36px rgba(140, 61, 245, 0.06);
   }
 }
+
+/* ── Simulador alta de panel (home) ───────────────────────── */
+.sim {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(244, 60, 176, 0.08), transparent 50%),
+    radial-gradient(ellipse at 90% 20%, rgba(140, 61, 245, 0.1), transparent 45%),
+    #fff;
+}
+
+.sim__layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.sim__steps {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.sim__step {
+  appearance: none;
+  border: 1px solid rgba(140, 61, 245, 0.18);
+  background: #fff;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sim__step.is-active {
+  color: #fff;
+  border-color: transparent;
+  background: var(--grad);
+}
+
+.sim__step.is-done:not(.is-active) {
+  color: var(--lavender);
+  border-color: rgba(140, 61, 245, 0.35);
+  background: rgba(140, 61, 245, 0.08);
+}
+
+.sim__card {
+  padding: 1.15rem;
+  border-radius: 18px;
+  border: 1px solid rgba(140, 61, 245, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 32px rgba(140, 61, 245, 0.06);
+}
+
+.sim__card h3 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.sim__blurb {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.sim__grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.sim-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sim-field__label {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.sim-field__label em {
+  color: var(--magenta);
+  font-style: normal;
+}
+
+.sim-field__hint {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.sim-field input,
+.sim-field textarea,
+.sim-field select {
+  width: 100%;
+  border: 1px solid rgba(140, 61, 245, 0.2);
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  background: #fff;
+}
+
+.sim-field textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+.sim__plans,
+.sim__tones {
+  margin: 1rem 0 0;
+  border: 0;
+  padding: 0;
+}
+
+.sim__plans legend,
+.sim__tones legend {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 0.55rem;
+}
+
+.sim__plans legend em,
+.sim__tones legend em {
+  color: var(--magenta);
+  font-style: normal;
+}
+
+.sim__plan-grid,
+.sim__tone-grid,
+.sim__publish-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.sim__plan,
+.sim__tone,
+.sim__publish {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid rgba(140, 61, 245, 0.16);
+  background: #fff;
+  cursor: pointer;
+}
+
+.sim__plan input,
+.sim__tone input,
+.sim__publish input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sim__plan strong,
+.sim__tone strong,
+.sim__publish strong {
+  font-size: 0.92rem;
+}
+
+.sim__plan span,
+.sim__tone span,
+.sim__publish span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.sim__plan.is-on,
+.sim__tone.is-on,
+.sim__publish.is-on {
+  border-color: rgba(140, 61, 245, 0.45);
+  background: linear-gradient(135deg, rgba(244, 60, 176, 0.08), rgba(140, 61, 245, 0.1));
+}
+
+.sim__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.sim__checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.sim__checks li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  border: 1px solid rgba(140, 61, 245, 0.12);
+}
+
+.sim__checks li.is-ok {
+  color: #1b7a4a;
+  background: rgba(34, 160, 100, 0.08);
+  border-color: rgba(34, 160, 100, 0.25);
+}
+
+.sim__checks li.is-miss {
+  color: #8a4a18;
+  background: rgba(255, 170, 60, 0.1);
+}
+
+.sim__error {
+  margin: 0.85rem 0 0;
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.sim__success {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 14px;
+  background: rgba(34, 160, 100, 0.1);
+  border: 1px solid rgba(34, 160, 100, 0.28);
+}
+
+.sim__success-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+
+.sim__preview {
+  padding: 1.1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(140, 61, 245, 0.14);
+  background: rgba(250, 247, 254, 0.95);
+}
+
+.sim__preview-head h3 {
+  margin: 0.2rem 0 0.55rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+
+.sim__progress {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.sim__meter {
+  margin: 0.55rem 0 1rem;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(140, 61, 245, 0.12);
+  overflow: hidden;
+}
+
+.sim__meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--grad);
+  transition: width 0.25s ease;
+}
+
+.sim-panel {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(140, 61, 245, 0.18);
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(140, 61, 245, 0.08);
+}
+
+.sim-panel__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid rgba(140, 61, 245, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.sim-panel__brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.sim-panel__brand strong {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 0.88rem;
+}
+
+.sim-panel__brand em {
+  font-style: normal;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sim-panel__user {
+  font-size: 0.75rem;
+  color: var(--muted);
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-panel__body {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  min-height: 220px;
+}
+
+.sim-panel__side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.65rem 0.45rem;
+  background: #faf7fe;
+  border-right: 1px solid rgba(140, 61, 245, 0.1);
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.sim-panel__side span.is-active {
+  color: var(--lavender);
+  font-weight: 700;
+  background: rgba(140, 61, 245, 0.1);
+  border-radius: 8px;
+  padding: 0.3rem 0.4rem;
+}
+
+.sim-panel__child {
+  padding-left: 0.55rem !important;
+  opacity: 0.85;
+}
+
+.sim-panel__soon {
+  opacity: 0.55;
+}
+
+.sim-panel__content {
+  padding: 0.85rem;
+}
+
+.sim-panel__kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.sim-panel__content h4 {
+  margin: 0.2rem 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.sim-panel__meta,
+.sim-panel__tag {
+  margin: 0 0 0.55rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.sim-panel__cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.sim-panel__cards div {
+  padding: 0.55rem;
+  border-radius: 10px;
+  background: rgba(140, 61, 245, 0.06);
+  border: 1px solid rgba(140, 61, 245, 0.12);
+}
+
+.sim-panel__cards strong {
+  display: block;
+  font-size: 0.72rem;
+}
+
+.sim-panel__cards span {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.sim__mini-checks {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.sim__mini-checks li.is-ok {
+  color: #1b7a4a;
+  font-weight: 600;
+}
+
+@media (min-width: 960px) {
+  .sim__layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    align-items: start;
+  }
+
+  .sim__preview {
+    position: sticky;
+    top: 5.5rem;
+  }
+
+  .sim__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sim__plan-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sim__tone-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
