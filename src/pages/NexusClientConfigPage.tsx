@@ -369,11 +369,11 @@ export default function NexusClientConfigPage() {
     <div className="page-pad nx-page">
       <div className="container">
         <header className="page-hero page-hero--wide">
-          <p className="eyebrow">Prototipo interno · no es el panel de clientes</p>
+          <p className="eyebrow">Activo en onboarding · panel Nexus</p>
           <h1>Configuración Nexus cliente</h1>
           <p>
-            Datos que el cliente llena para armar su Nexus a medida. Edita aquí copy, orden y
-            campos; cuando quede como quieres, lo pasamos al flujo real de onboarding.
+            Misma información que el cliente llena en el onboarding real (`/onboarding`) y que el
+            dueño puede precargar al crear una empresa en Entrada. Edita aquí el copy de referencia.
           </p>
           <div className="nx-page__actions">
             <button type="button" className="btn btn-ghost" onClick={loadSample}>

@@ -1,6 +1,7 @@
 /**
- * Prototipo: datos que el cliente llena para personalizar su Nexus.
- * Solo UI local (localStorage). Cuando se apruebe → onboarding real.
+ * Datos que el cliente llena para personalizar su Nexus.
+ * Flujo real: onboarding PinkPurple (`/onboarding`) + alta en entrada (Nueva empresa).
+ * Este prototipo del sitio marketing sirve de referencia visual.
  */
 
 import type { CountryCode } from './locations';
