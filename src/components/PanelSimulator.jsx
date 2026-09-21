@@ -142,6 +142,7 @@ export default function PanelSimulator() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [scanNote, setScanNote] = useState('');
+  const [scanPayload, setScanPayload] = useState(null);
 
   const plan = PLANS.find((p) => p.id === form.planId) || PLANS[2];
   const cities = form.countryCode ? statesForCountry(form.countryCode) : [];
@@ -176,8 +177,17 @@ export default function PanelSimulator() {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ url }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (data && typeof data === 'object') {
+      const json = await res.json().catch(() => ({}));
+      // La function Netlify responde { success, data: ExtremeScanResult }
+      const data = json?.data && typeof json.data === 'object' ? json.data : json;
+      if (data && typeof data === 'object' && !data.error) {
+        setScanPayload(data);
+        const cms = Array.isArray(data.cmsHints) ? data.cmsHints[0] : '';
+        const publishGuess = ['wordpress', 'shopify', 'wix', 'webflow', 'netlify', 'squarespace'].includes(
+          String(cms).toLowerCase(),
+        )
+          ? String(cms).toLowerCase()
+          : form.publishTarget;
         patch({
           brandName: data.brandName || form.brandName,
           tagline: data.tagline || form.tagline,
@@ -185,7 +195,7 @@ export default function PanelSimulator() {
           contactEmail: data.contactEmail || form.contactEmail,
           phone: data.phone || form.phone,
           cityFocus: data.city || data.stateRegion || form.cityFocus,
-          stateRegion: data.stateRegion || form.stateRegion,
+          stateRegion: data.stateRegion || data.city || form.stateRegion,
           countryCode: data.countryCode || form.countryCode,
           address: data.address || form.address,
           servicesOffered: data.servicesOffered || form.servicesOffered,
@@ -195,12 +205,21 @@ export default function PanelSimulator() {
             : form.targetKeywords,
           siteHomeUrl: data.url || url,
           tone: data.tone || form.tone,
+          publishTarget: publishGuess,
           socialInstagram: data.social?.instagram || form.socialInstagram,
           socialFacebook: data.social?.facebook || form.socialFacebook,
+          socialTiktok: data.social?.tiktok || form.socialTiktok,
+          socialLinkedin: data.social?.linkedin || form.socialLinkedin,
         });
+        const pages = Array.isArray(data.pages) ? data.pages.length : 0;
+        setScanNote(
+          data.ok
+            ? `Escaneo listo (${pages} página${pages === 1 ? '' : 's'}). Revisa y corrige.`
+            : `Escaneo parcial${data.warnings?.length ? `: ${data.warnings[0]}` : ''}. Completa a mano.`,
+        );
+      } else if (!res.ok || json?.error) {
+        setScanNote(String(json?.error || data?.error || 'No se pudo escanear; continúa a mano.'));
       }
-      if (!res.ok && data?.error) setScanNote(String(data.error));
-      else setScanNote('Escaneo listo — revisa y corrige lo que haga falta.');
     } catch {
       setScanNote('No se pudo escanear; continúa a mano (igual que el onboarding real).');
     } finally {
@@ -249,7 +268,7 @@ export default function PanelSimulator() {
     setBusy(true);
     try {
       const city = form.cityFocus.trim() || form.stateRegion.trim();
-      enterDemoFromSimulator({
+      const config = {
         fullName: form.fullName.trim(),
         email: form.email.trim(),
         company: form.brandName.trim() || form.fullName.trim(),
@@ -273,8 +292,19 @@ export default function PanelSimulator() {
         publishSiteUrl: form.publishSiteUrl.trim() || form.siteHomeUrl.trim(),
         publishApiKey: form.publishApiKey,
         netlifySiteId: form.netlifySiteId,
+        logoUrl: scanPayload?.logoUrl || '',
+        colors: Array.isArray(scanPayload?.colors) ? scanPayload.colors : [],
+        voiceNotes: scanPayload?.voiceNotes || '',
+        socialInstagram: form.socialInstagram,
+        socialFacebook: form.socialFacebook,
+        socialTiktok: form.socialTiktok,
+        socialLinkedin: form.socialLinkedin,
+        planStatus: 'active',
+        extraTokens: 0,
         createdAt: new Date().toISOString(),
-      });
+        nexusPayload: { scan: scanPayload },
+      };
+      enterDemoFromSimulator(config);
       // Mismo destino que onboarding real: panel hub
       navigate('/app', { replace: true });
     } finally {

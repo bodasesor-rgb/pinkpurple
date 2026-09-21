@@ -29,6 +29,19 @@ export type DemoConfig = {
   publishSiteUrl: string;
   publishApiKey?: string;
   netlifySiteId?: string;
+  logoUrl?: string;
+  colors?: string[];
+  voiceNotes?: string;
+  socialInstagram?: string;
+  socialFacebook?: string;
+  socialTiktok?: string;
+  socialLinkedin?: string;
+  socialYoutube?: string;
+  socialX?: string;
+  /** Payload completo del escaneo / onboarding para enviar a Nexus. */
+  nexusPayload?: Record<string, unknown>;
+  extraTokens?: number;
+  planStatus?: 'active' | 'cancelled';
   createdAt?: string;
 };
 
@@ -124,8 +137,11 @@ export function buildDemoSession(config: DemoConfig): DemoSession {
   const id = `${DEMO_USER_PREFIX}${stamp}`;
   const normalized: DemoConfig = {
     ...config,
+    planStatus: config.planStatus || 'active',
+    extraTokens: config.extraTokens || 0,
     createdAt: config.createdAt || new Date().toISOString(),
   };
+  normalized.nexusPayload = buildNexusPayload(normalized);
   return {
     user: {
       id,
@@ -202,4 +218,87 @@ export function removeDemoProject(id: string): { companyDeleted: boolean } {
   }
   saveDemoSession({ ...session, projects });
   return { companyDeleted: false };
+}
+
+/** Payload que el onboarding real enviaría a Nexus (complete). */
+export function buildNexusPayload(config: DemoConfig): Record<string, unknown> {
+  const keywords = String(config.targetKeywords || '')
+    .split(/[,;\n]+/)
+    .map((k) => k.trim())
+    .filter(Boolean);
+  const prevScan =
+    config.nexusPayload && typeof config.nexusPayload.scan === 'object'
+      ? config.nexusPayload.scan
+      : null;
+  return {
+    brandName: config.brandName,
+    tagline: config.tagline,
+    logoUrl: config.logoUrl || '',
+    colors: config.colors || [],
+    tone: config.tone,
+    voiceNotes: config.voiceNotes || '',
+    whatsapp: config.whatsapp,
+    contactEmail: config.contactEmail,
+    phone: config.phone,
+    countryCode: config.countryCode,
+    cityFocus: config.stateRegion,
+    stateRegion: config.stateRegion,
+    address: config.address,
+    servicesOffered: config.servicesOffered,
+    idealClient: config.idealClient,
+    targetKeywords: keywords,
+    hasOwnSite: config.publishTarget !== 'preview',
+    siteHomeUrl: config.siteHomeUrl,
+    publishSiteUrl: config.publishSiteUrl || config.siteHomeUrl,
+    publishSlug: config.publishSlug,
+    publishApiKey: config.publishApiKey || '',
+    netlifySiteId: config.netlifySiteId || '',
+    cmsPlatform: config.publishTarget === 'preview' ? 'none' : config.publishTarget,
+    social: {
+      instagram: config.socialInstagram || '',
+      facebook: config.socialFacebook || '',
+      tiktok: config.socialTiktok || '',
+      linkedin: config.socialLinkedin || '',
+      youtube: config.socialYoutube || '',
+      x: config.socialX || '',
+    },
+    planId: config.planId,
+    fullName: config.fullName,
+    email: config.email,
+    company: config.company,
+    extraTokens: config.extraTokens || 0,
+    planStatus: config.planStatus || 'active',
+    scan: prevScan,
+  };
+}
+
+/** Actualiza datos de marca/cuenta de la empresa de prueba (y el proyecto principal). */
+export function updateDemoConfig(partial: Partial<DemoConfig>): DemoConfig {
+  const session = loadDemoSession();
+  if (!session) throw new Error('No hay empresa de prueba activa.');
+  const merged = { ...session.config, ...partial };
+  const config: DemoConfig = {
+    ...merged,
+    nexusPayload: buildNexusPayload(merged),
+  };
+  const user = {
+    ...session.user,
+    fullName: config.fullName.trim() || session.user.fullName,
+    email: config.email.trim() || session.user.email,
+    planId: config.planId || session.user.planId,
+  };
+  let projects = session.projects;
+  if (projects[0]) {
+    const head = {
+      ...projects[0],
+      name: config.brandName.trim() || projects[0].name,
+      domain: domainFromUrl(config.siteHomeUrl) || projects[0].domain,
+      city: config.stateRegion.trim() || projects[0].city,
+      services: servicesFromConfig(config),
+      updatedAt: new Date().toISOString(),
+    };
+    projects = [head, ...projects.slice(1)];
+  }
+  saveDemoSession({ user, config, projects });
+  return config;
 }

@@ -44,6 +44,13 @@ export const STUDIO_NAV: NavItem[] = [
     enabled: true,
     children: [
       {
+        id: 'config-perfil',
+        label: 'Editar perfil',
+        to: '/app/configuracion/perfil',
+        icon: '✎',
+        enabled: true,
+      },
+      {
         id: 'config-plan',
         label: 'Plan y facturación',
         to: '/app/configuracion/plan',

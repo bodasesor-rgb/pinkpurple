@@ -1,12 +1,16 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
+import { loadDemoConfig } from '../../auth/demoSession';
 
 export default function SettingsPage() {
   const { user } = useAuth();
   const location = useLocation();
-  const isPlan = location.pathname.includes('/configuracion/plan');
+  const demo = loadDemoConfig();
+  const nested =
+    location.pathname.includes('/configuracion/plan') ||
+    location.pathname.includes('/configuracion/perfil');
 
-  if (isPlan) {
+  if (nested) {
     return <Outlet />;
   }
 
@@ -15,25 +19,35 @@ export default function SettingsPage() {
       <div className="pp-page-head">
         <div>
           <h1>Configuración</h1>
-          <p>Cuenta, seguridad y plan de Pink Purple Studio.</p>
+          <p>Cuenta, datos del alta, seguridad y plan.</p>
         </div>
       </div>
 
       <div className="pp-grid pp-grid--profile">
         <section className="pp-card">
-          <h2 className="pp-card__title">Cuenta</h2>
+          <h2 className="pp-card__title">Editar perfil</h2>
           <p className="pp-item__meta">
-            <strong>{user?.fullName || '—'}</strong>
+            <strong>{demo?.fullName || user?.fullName || '—'}</strong>
             <br />
-            {user?.email}
+            {demo?.email || user?.email}
+            {demo?.brandName ? (
+              <>
+                <br />
+                Marca: {demo.brandName}
+              </>
+            ) : null}
           </p>
-          <p className="pp-field__hint" style={{ marginTop: '0.75rem' }}>
-            Edita nombre y empresa desde{' '}
-            <Link className="pp-link" to="/app">
-              Perfil
-            </Link>
-            .
+          <p className="pp-field__hint" style={{ marginTop: '0.55rem' }}>
+            Modifica lo que llenaste al registrarte y en el onboarding (marca, contacto, oferta,
+            publicación…).
           </p>
+          <Link
+            className="pp-btn pp-btn--primary"
+            to="/app/configuracion/perfil"
+            style={{ marginTop: '0.85rem' }}
+          >
+            Editar perfil
+          </Link>
         </section>
 
         <section className="pp-card">
@@ -48,8 +62,14 @@ export default function SettingsPage() {
 
         <section className="pp-card">
           <h2 className="pp-card__title">Plan y facturación</h2>
-          <p className="pp-item__meta">Consulta uso, renovación y límites de tu plan.</p>
-          <Link className="pp-btn pp-btn--primary" to="/app/configuracion/plan" style={{ marginTop: '0.85rem' }}>
+          <p className="pp-item__meta">
+            Cambiar o cancelar plan, ver consumo y comprar tokens extra.
+          </p>
+          <Link
+            className="pp-btn pp-btn--primary"
+            to="/app/configuracion/plan"
+            style={{ marginTop: '0.85rem' }}
+          >
             Ver plan
           </Link>
         </section>

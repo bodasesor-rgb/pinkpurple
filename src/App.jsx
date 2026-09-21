@@ -26,6 +26,7 @@ import GeneratePage from './app/generate/GeneratePage.tsx';
 import HistoryPage from './app/history/HistoryPage.tsx';
 import ConnectionsPage from './app/connections/ConnectionsPage.tsx';
 import BillingPage from './app/billing/BillingPage.tsx';
+import EditProfilePage from './app/settings/EditProfilePage.tsx';
 
 import NexusClientConfigPage from './pages/NexusClientConfigPage.tsx';
 
@@ -76,6 +77,7 @@ export default function App() {
         </Route>
 
         <Route path="configuracion" element={<SettingsPage />}>
+          <Route path="perfil" element={<EditProfilePage />} />
           <Route path="plan" element={<BillingPage />} />
         </Route>
 
