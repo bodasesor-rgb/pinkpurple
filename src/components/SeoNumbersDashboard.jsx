@@ -124,9 +124,7 @@ export default function SeoNumbersDashboard() {
         </div>
       </div>
 
-      <p className="seo-dash__note">
-        Demo estilo Ubersuggest · cifras de ejemplo · nítido en cualquier pantalla
-      </p>
+      <p className="seo-dash__note">Captura Ubersuggest</p>
     </section>
   );
 }
