@@ -3697,9 +3697,54 @@ button.gsc-metric {
     #fff;
 }
 
-.sim__layout {
-  display: grid;
-  gap: 1.25rem;
+.sim__layout--single {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.sim__dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0.55rem;
+}
+
+.sim__dot {
+  height: 6px;
+  flex: 1;
+  min-width: 18px;
+  border-radius: 999px;
+  background: rgba(140, 61, 245, 0.14);
+}
+
+.sim__dot.is-on {
+  background: var(--grad);
+}
+
+.sim__dot.is-done {
+  background: #3ecf8e;
+}
+
+.sim__progress-label {
+  margin: 0 0 0.85rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.sim__scan {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.sim__footnote {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.sim__footnote a {
+  color: var(--lavender);
 }
 
 .sim__steps {
