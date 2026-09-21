@@ -42,9 +42,9 @@ export const mockPlanUsage: PlanUsage = {
   billing: 'monthly',
   periodStart: daysFromNow(-12),
   periodEnd: daysFromNow(18),
-  landings: { used: 84, limit: 400 },
+  landings: { used: 84, limit: 300 },
   blogs: { used: 31, limit: 150 },
-  sites: { used: 2, limit: 6 },
+  sites: { used: 2, limit: 5 },
 };
 
 export const mockProjects: Project[] = [

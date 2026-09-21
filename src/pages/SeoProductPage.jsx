@@ -117,8 +117,8 @@ const pillars = [
     id: 'publish',
     kicker: '03 · Multi-sitio',
     title: 'Conecta varias páginas web',
-    text: 'Publica en WordPress, Shopify, Netlify y más. Según el plan conectas 1, 3, 6, 15 o sitios ilimitados.',
-    detail: 'Mini 1 · Starter 3 · Growth 6 · Pro 15 · Diamond ilimitadas',
+    text: 'Publica en WordPress, Shopify, Netlify y más. Según el plan conectas 1, 2, 5, 10 o sitios ilimitados.',
+    detail: 'Mini 1 · Starter 2 · Growth 5 · Pro 10 · Diamond ilimitadas',
   },
 ];
 
@@ -287,7 +287,7 @@ export default function SeoProductPage() {
 
         <p className="plans-note plans-note--strong">
           <strong>Varias páginas web:</strong> puedes conectar más de un sitio. Mini = 1 · Starter
-          = 3 · Growth = 6 · Pro = 15 · Diamond = ilimitadas. Prueba gratis = 1 sitio.
+          = 2 · Growth = 5 · Pro = 10 · Diamond = ilimitadas. Prueba gratis = 1 sitio.
         </p>
 
         <p className="plans-note">
