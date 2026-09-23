@@ -25,7 +25,10 @@ export default function AppTopbar({ onMenuToggle, onLogout }: Props) {
         <NavLink to="/app" className="pp-topbar__brand" end>
           <img src="/brand/logo-mark.svg" alt="" width={24} height={28} />
           <span className="pp-topbar__brand-text">
-            <strong>Pink Purple</strong>
+            <strong>
+              <span className="pp-topbar__brand-pink">Pink</span>
+              <span className="pp-topbar__brand-purple">Purple</span>
+            </strong>
             <em>Studio</em>
           </span>
         </NavLink>

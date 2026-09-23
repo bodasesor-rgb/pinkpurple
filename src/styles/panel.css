@@ -4,12 +4,12 @@
 .pp-app {
   --pp-magenta: #f43cb0;
   --pp-violet: #8c3df5;
-  --pp-grad: linear-gradient(90deg, #f43cb0 0%, #8c3df5 100%);
+  --pp-grad: linear-gradient(90deg, #f43cb0 0%, #8c3df5 100%); /* solo isotipo SVG */
   --pp-ink: #14101f;
   --pp-muted: #6b6478;
   --pp-line: rgba(140, 61, 245, 0.16);
   --pp-surface: #ffffff;
-  --pp-bg: #faf7fe;
+  --pp-bg: #f7f6f9;
   --pp-radius: 16px;
   --pp-shadow: 0 10px 30px rgba(140, 61, 245, 0.08);
   --pp-font-display: 'Space Grotesk', system-ui, sans-serif;
@@ -106,20 +106,26 @@
 }
 
 .pp-topbar__brand-text strong {
-  background: var(--pp-grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
   font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.pp-topbar__brand-pink {
+  color: var(--pp-magenta);
+}
+
+.pp-topbar__brand-purple {
+  color: var(--pp-violet);
 }
 
 .pp-topbar__brand-text em {
   font-style: normal;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--pp-muted);
+  text-transform: none;
+  color: var(--pp-ink);
 }
 
 .pp-topbar__right {
@@ -479,12 +485,13 @@
 }
 
 .pp-btn--primary {
-  background: var(--pp-grad);
+  background: var(--pp-violet);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(244, 60, 176, 0.25);
+  box-shadow: 0 10px 24px rgba(140, 61, 245, 0.28);
 }
 
 .pp-btn--primary:hover:not(:disabled) {
+  background: #7a2ee0;
   transform: translateY(-1px);
 }
 
@@ -761,12 +768,12 @@
 .pp-bar__fill {
   height: 100%;
   border-radius: 999px;
-  background: var(--pp-grad);
+  background: var(--pp-violet);
   transition: width 0.4s ease;
 }
 
 .pp-bar__fill--full {
-  background: linear-gradient(90deg, #d62058, #f43cb0);
+  background: var(--pp-magenta);
 }
 
 /* ── Listas / tablas ──────────────────────────────────────── */
@@ -1110,7 +1117,7 @@ button.pp-chip {
 .pp-config__toc-btn.is-active {
   color: #fff;
   border-color: transparent;
-  background: var(--pp-grad);
+  background: var(--pp-violet);
 }
 
 .pp-config__form {

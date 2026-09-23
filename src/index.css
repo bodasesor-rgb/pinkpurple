@@ -4,18 +4,20 @@
   --lavender: #8c3df5;
   --logo-pink: #f43cb0;
   --logo-violet: #8c3df5;
-  --logo-purple: #0b0614;
-  --logo-blush: #fff0f7;
+  --logo-ink: #0b0614;
+  --logo-purple: #8c3df5; /* palabra Purple del logo = violeta de marca (no negro) */
+  --logo-blush: #f6f5f8;
   --black: #000000;
   --white: #ffffff;
-  --ink: #0b0614;
-  --ink-2: #fdf2f8;
+  --ink: #14121a;
+  --ink-2: #f7f6f9;
   --muted: #6b6478;
   --muted-dark: #4a4458;
-  --line: rgba(140, 61, 245, 0.16);
+  --line: rgba(20, 18, 26, 0.1);
   --glass: rgba(255, 255, 255, 0.72);
+  /* Gradiente solo para el isotipo SVG; textos/botones NO lo usan */
   --grad: linear-gradient(90deg, #f43cb0 0%, #8c3df5 100%);
-  --grad-soft: linear-gradient(135deg, rgba(244, 60, 176, 0.14), rgba(140, 61, 245, 0.1));
+  --grad-soft: linear-gradient(135deg, rgba(140, 61, 245, 0.06), rgba(244, 60, 176, 0.04));
   --font-display: 'Unbounded', system-ui, sans-serif;
   --font-body: 'Figtree', system-ui, sans-serif;
 }
@@ -64,10 +66,9 @@ button,
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(ellipse 90% 55% at 8% -8%, rgba(244, 60, 176, 0.2), transparent 58%),
-    radial-gradient(ellipse 70% 50% at 96% 0%, rgba(140, 61, 245, 0.16), transparent 55%),
-    radial-gradient(ellipse 55% 40% at 50% 100%, rgba(244, 60, 176, 0.08), transparent 60%),
-    linear-gradient(180deg, #ffffff 0%, #fff5fa 42%, #f7f0fc 100%);
+    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(140, 61, 245, 0.06), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 95% 0%, rgba(244, 60, 176, 0.04), transparent 50%),
+    linear-gradient(180deg, #ffffff 0%, #f7f6f9 100%);
 }
 
 main {
@@ -136,16 +137,17 @@ main {
   justify-content: center;
   padding: 0.7rem 1.2rem !important;
   border-radius: 999px !important;
-  background: var(--grad) !important;
+  background: var(--lavender) !important;
   color: #fff !important;
   font-weight: 700 !important;
-  box-shadow: 0 10px 28px rgba(244, 60, 176, 0.28);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 28px rgba(140, 61, 245, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .btn-nav-brand:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 32px rgba(140, 61, 245, 0.34);
+  background: #7a2ee0 !important;
+  box-shadow: 0 14px 32px rgba(140, 61, 245, 0.3);
   color: #fff !important;
 }
 
@@ -183,14 +185,17 @@ main {
 }
 
 .brand-logo__pink {
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--logo-pink);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .brand-logo__purple {
-  color: var(--logo-purple);
+  color: var(--logo-violet);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .brand-logo__p {
@@ -207,10 +212,10 @@ main {
   letter-spacing: -0.04em;
   text-transform: none;
   padding-left: 0;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--logo-ink);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .brand-logo--header .brand-logo__mark {
@@ -372,10 +377,10 @@ main {
 .nav-cta {
   padding: 0.7rem 1.2rem !important;
   border-radius: 999px;
-  background: var(--grad);
+  background: var(--lavender);
   color: var(--white) !important;
   font-weight: 600;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 12px 40px rgba(244, 60, 176, 0.35);
+  box-shadow: 0 10px 28px rgba(140, 61, 245, 0.28);
 }
 
 .menu-toggle {
@@ -410,8 +415,8 @@ main {
   inset: -20% -10% auto;
   height: 70%;
   background:
-    radial-gradient(circle at 30% 40%, rgba(244, 60, 176, 0.28), transparent 42%),
-    radial-gradient(circle at 70% 30%, rgba(140, 61, 245, 0.26), transparent 45%);
+    radial-gradient(circle at 30% 40%, rgba(244, 60, 176, 0.1), transparent 42%),
+    radial-gradient(circle at 70% 30%, rgba(140, 61, 245, 0.1), transparent 45%);
   filter: blur(8px);
   animation: aurora 14s ease-in-out infinite alternate;
   pointer-events: none;
@@ -421,8 +426,8 @@ main {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(140, 61, 245, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(244, 60, 176, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(140, 61, 245, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 60, 176, 0.035) 1px, transparent 1px);
   background-size: 72px 72px;
   mask-image: radial-gradient(ellipse 75% 65% at 50% 35%, #000 10%, transparent 70%);
   pointer-events: none;
@@ -449,14 +454,17 @@ main {
 }
 
 .hero__brand-pink {
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--logo-pink);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .hero__brand-purple {
-  color: var(--logo-purple);
+  color: var(--logo-violet);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .hero__brand-p {
@@ -473,16 +481,17 @@ main {
   line-height: 1.08;
   letter-spacing: -0.03em;
   font-weight: 700;
+  color: var(--ink);
   animation: rise 0.9s ease 0.06s both;
 }
 
 .hero h1 span {
   display: block;
   margin-top: 0.15em;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--ink);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .hero__lead {
@@ -594,10 +603,10 @@ main {
 .hero__brand-studio {
   display: inline-block;
   margin-left: 0.15em;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--logo-ink);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .page-stage__cta {
@@ -606,17 +615,18 @@ main {
   justify-content: center;
   padding: 0.75rem 1.2rem;
   border-radius: 999px;
-  background: var(--grad);
-  font-weight: 600;
-  font-size: 0.92rem;
-  margin-bottom: 1.35rem;
+  background: var(--lavender);
   color: #fff;
-  box-shadow: 0 10px 30px rgba(244, 60, 176, 0.35);
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: none;
+  margin-bottom: 1.35rem;
+  box-shadow: 0 10px 28px rgba(140, 61, 245, 0.22);
 }
 
 .page-stage__cta--soon {
-  background: rgba(140, 61, 245, 0.12);
-  color: var(--logo-purple);
+  background: rgba(140, 61, 245, 0.1);
+  color: var(--lavender);
   box-shadow: none;
   cursor: default;
 }
@@ -684,7 +694,7 @@ main {
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 50%;
-  background: var(--grad);
+  background: var(--lavender);
 }
 
 /* Buttons */
@@ -705,15 +715,19 @@ main {
 }
 
 .btn-primary {
-  background: var(--grad);
+  background: var(--lavender);
   color: var(--white);
-  box-shadow: 0 14px 40px rgba(244, 60, 176, 0.38);
+  box-shadow: 0 12px 32px rgba(140, 61, 245, 0.28);
+}
+
+.btn-primary:hover {
+  background: #7a2ee0;
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.7);
   color: var(--ink);
-  border: 1px solid rgba(140, 61, 245, 0.22);
+  border: 1px solid rgba(20, 18, 26, 0.12);
   backdrop-filter: blur(8px);
 }
 
@@ -729,11 +743,8 @@ main {
 }
 
 .section--ink {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(244, 60, 176, 0.06)),
-    linear-gradient(135deg, rgba(140, 61, 245, 0.07), rgba(244, 60, 176, 0.05)),
-    #f8f3fc;
-  border-block: 1px solid rgba(140, 61, 245, 0.1);
+  background: #f3f2f6;
+  border-block: 1px solid rgba(20, 18, 26, 0.08);
 }
 
 .section--cta {
@@ -746,14 +757,14 @@ main {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--lavender);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
 }
 
 .eyebrow--light {
-  color: var(--magenta);
+  color: var(--lavender);
   background: none;
   -webkit-background-clip: unset;
   background-clip: unset;
@@ -846,8 +857,8 @@ main {
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #fff;
-  background: var(--grad);
-  box-shadow: 0 8px 24px rgba(244, 60, 176, 0.3);
+  background: var(--lavender);
+  box-shadow: 0 8px 24px rgba(140, 61, 245, 0.22);
 }
 
 .pillar h3 {
@@ -914,10 +925,7 @@ main {
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 600;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--lavender);
   padding-top: 0.25rem;
 }
 
@@ -1070,7 +1078,7 @@ main {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  background: var(--grad);
+  background: var(--lavender);
 }
 
 .product-feature__list--hero {
@@ -1158,8 +1166,8 @@ main {
 .free-bubble__chip {
   appearance: none;
   border: 1px solid rgba(244, 60, 176, 0.35);
-  background: linear-gradient(135deg, rgba(244, 60, 176, 0.12), rgba(140, 61, 245, 0.1));
-  color: var(--logo-purple);
+  background: rgba(140, 61, 245, 0.08);
+  color: var(--lavender);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 800;
@@ -1171,7 +1179,7 @@ main {
 
 .free-bubble__chip:hover,
 .free-bubble.is-open .free-bubble__chip {
-  background: var(--grad);
+  background: var(--lavender);
   color: #fff;
   border-color: transparent;
 }
@@ -1240,8 +1248,8 @@ main {
 
 .billing-toggle__btn.is-active {
   color: #fff;
-  background: var(--grad);
-  box-shadow: 0 10px 24px rgba(244, 60, 176, 0.28);
+  background: var(--lavender);
+  box-shadow: 0 10px 24px rgba(140, 61, 245, 0.22);
 }
 
 .billing-toggle__save {
@@ -1336,10 +1344,7 @@ main {
   font-size: 1.55rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--lavender);
 }
 
 .plan-card__price small {
@@ -1744,10 +1749,7 @@ main {
   margin: 0;
   font-family: var(--font-display);
   font-size: 2rem;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--lavender);
 }
 
 .account-email {
@@ -2573,7 +2575,7 @@ button.gsc-metric {
 
 .growth-dot.is-active {
   width: 1.35rem;
-  background: var(--grad);
+  background: var(--lavender);
 }
 
 /* Home showcase — recuadros unificados + imagen completa */
@@ -2686,10 +2688,7 @@ button.gsc-metric {
   font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 700;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--lavender);
 }
 
 .how-flow__item h2 {
@@ -2776,7 +2775,7 @@ button.gsc-metric {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  background: var(--grad);
+  background: var(--lavender);
 }
 
 .how-cta {
@@ -3717,7 +3716,7 @@ button.gsc-metric {
 }
 
 .sim__dot.is-on {
-  background: var(--grad);
+  background: var(--lavender);
 }
 
 .sim__dot.is-done {
@@ -3772,7 +3771,7 @@ button.gsc-metric {
 .sim__step.is-active {
   color: #fff;
   border-color: transparent;
-  background: var(--grad);
+  background: var(--lavender);
 }
 
 .sim__step.is-done:not(.is-active) {
@@ -3997,7 +3996,7 @@ button.gsc-metric {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--grad);
+  background: var(--lavender);
   transition: width 0.25s ease;
 }
 
@@ -4026,10 +4025,7 @@ button.gsc-metric {
 }
 
 .sim-panel__brand strong {
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--lavender);
   font-size: 0.88rem;
 }
 
